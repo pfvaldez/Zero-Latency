@@ -143,3 +143,8 @@ The brief's workflow we name in the video: **learning from visitor feedback**. T
 | Clarity, design, inclusivity, AI value | 15% | Why a menu, SMS or spreadsheet couldn't do this |
 | Scalability and what happens next | 10% | Any farm, any language MMS and NLLB cover |
 | Responsible AI, data and safety | Pass/fail | The non-negotiables above |
+
+## Git
+
+- No AI attribution in commits or pull requests: no Co-Authored-By trailers, no "Generated with" footers, no session links. The commit-msg hook in .githooks strips them anyway.
+- The commit author is always the person running the session.
