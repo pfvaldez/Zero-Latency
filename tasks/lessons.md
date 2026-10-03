@@ -94,7 +94,7 @@ Read at the start of every session. After any correction or bug, add an entry: w
 ### L-014: Old file picked from a search
 - **What happened:** An old zip from `~/files` was copied.
 - **Rule:** When a file is found by search, take the newest match and verify its contents before using it.
-- **Check:** Matches are listed newest first with dates (`ls -lt`), and the chosen file's contents are shown (for a zip, `unzip -l`) before it is copied.
+- **Check:** Matches are sorted newest first by modification time without bare globs (see L-013), and the expected contents are verified before copying (for a zip, `unzip -l` lists the expected files).
 
 ### L-015: Superseded steps run again
 - **What happened:** Superseded download commands were run again.
