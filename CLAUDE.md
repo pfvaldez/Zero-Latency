@@ -148,3 +148,9 @@ The brief's workflow we name in the video: **learning from visitor feedback**. T
 
 - No AI attribution in commits or pull requests: no Co-Authored-By trailers, no "Generated with" footers, no session links. The commit-msg hook in .githooks strips them anyway.
 - The commit author is always the person running the session.
+
+## Subagents in this repo (.claude/agents/)
+
+- `guardrail-reviewer`: after any change to `apps/web`, `packages/core`, `supabase` or `pipeline`, and at every checkpoint. Read-only; checks the diff against the non-negotiables.
+- `test-verifier`: before marking any task done and at every checkpoint. Runs install, check, typecheck, test and e2e (plus pytest if `pipeline/` changed) and reports a pass/fail table.
+- `docs-researcher`: before writing config or integration code for any library in the stack. Returns the current version, the Bun or uv install command, a minimal snippet and sources.

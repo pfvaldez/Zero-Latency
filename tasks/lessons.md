@@ -19,6 +19,10 @@ Read at the start of every session. After any correction or bug, add an entry: w
 13. Before adding a teammate: confirm the registration email, acceptance, age eligibility (18–35 for the World Bank track) and what they will build.
 14. Respect platform limits when drafting messages (Discord: 2,000 characters).
 15. Check text-color contrast before choosing brand colors for text.
+16. Shell commands must check location and inputs first and stop on failure; run git only after `git rev-parse --show-toplevel` shows the project.
+17. Write shell commands for zsh; find files with `find` and quoted patterns, never bare globs that may match nothing.
+18. When a file is found by search, take the newest match and verify its contents before using it.
+19. When a new approach replaces an old one, say which steps to stop using and give one path at a time.
 
 ## Entries
 
@@ -76,6 +80,26 @@ Read at the start of every session. After any correction or bug, add an entry: w
 - **What happened:** The first prototype matched questions with a keyword list instead of the e5 model.
 - **Rule:** Any stand-in must be labeled in the UI (demo mode), in the docs and in the video until it's replaced.
 - **Check:** `manifest.labels.standIn` is empty in the production pack.
+
+### L-012: Git ran in the home folder
+- **What happened:** Setup commands assumed paths; a failed `cd` made git run in the home folder, which was an accidental repo.
+- **Rule:** Shell commands must check location and inputs first and stop on failure; run git only after `git rev-parse --show-toplevel` shows the project.
+- **Check:** Before any git command, `git rev-parse --show-toplevel` prints the project folder, not the home folder, and steps are joined with `&&` so nothing runs after a failed `cd`.
+
+### L-013: Bare glob aborted in zsh
+- **What happened:** A glob aborted with "no matches found".
+- **Rule:** Write shell commands for zsh; find files with `find` and quoted patterns, never bare globs that may match nothing.
+- **Check:** Every file search looks like `find <folder> -name '<pattern>'`, with the pattern in quotes.
+
+### L-014: Old file picked from a search
+- **What happened:** An old zip from `~/files` was copied.
+- **Rule:** When a file is found by search, take the newest match and verify its contents before using it.
+- **Check:** Matches are listed newest first with dates (`ls -lt`), and the chosen file's contents are shown (for a zip, `unzip -l`) before it is copied.
+
+### L-015: Superseded steps run again
+- **What happened:** Superseded download commands were run again.
+- **Rule:** When a new approach replaces an old one, say which steps to stop using and give one path at a time.
+- **Check:** A message that replaces earlier steps opens with a "Stop using" line naming them, then gives a single numbered path.
 
 ## Bug log
 
