@@ -211,6 +211,41 @@ describe("FarmPackManifestSchema", () => {
   });
 });
 
+describe("add-ons that still need something (needs)", () => {
+  const withAddons = (addons: unknown[], mode: "demo" | "production" = "demo") =>
+    FarmPackManifestSchema.safeParse({ ...manifest(), mode, addons }).success;
+  const fact = { id: "f", kind: "fact", text: { en: "x" }, checked: true };
+  const product = { id: "p", kind: "product", text: { en: "x" }, checked: true, currency: "GMD" };
+  const card = { id: "c", kind: "farm-card", text: { en: "x" }, checked: true };
+
+  it("accepts a fact without a source only when it lists needs: source", () => {
+    expect(withAddons([{ ...fact }])).toBe(false);
+    expect(withAddons([{ ...fact, needs: ["source"] }])).toBe(true);
+    expect(withAddons([{ ...fact, source: "ICO", needs: ["source"] }])).toBe(false); // claims a gap it lacks
+    expect(withAddons([{ ...fact, source: "ICO" }])).toBe(true);
+  });
+
+  it("accepts a product without a price only when it lists needs: price", () => {
+    expect(withAddons([{ ...product }])).toBe(false);
+    expect(withAddons([{ ...product, needs: ["price"] }])).toBe(true);
+    expect(withAddons([{ ...product, price: 250 }])).toBe(true);
+    expect(withAddons([{ ...product, price: 250, needs: ["price"] }])).toBe(false);
+  });
+
+  it("accepts a farm card without a phone only when it lists needs: phone", () => {
+    expect(withAddons([{ ...card }])).toBe(false);
+    expect(withAddons([{ ...card, needs: ["phone"] }])).toBe(true);
+    expect(withAddons([{ ...card, phone: "+220 000 0000" }])).toBe(true);
+  });
+
+  it("blocks any add-on that still needs something from a production pack", () => {
+    const needy = { ...fact, needs: ["source"] };
+    expect(withAddons([needy], "demo")).toBe(true);
+    expect(withAddons([needy], "production")).toBe(false);
+    expect(withAddons([{ ...fact, source: "ICO" }], "production")).toBe(true);
+  });
+});
+
 describe("OutboxItemSchema", () => {
   it("accepts each variant", () => {
     for (const item of [question(), feedback(), order()]) {

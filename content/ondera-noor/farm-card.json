@@ -1,0 +1,18 @@
+{
+  "note": "Needs a demo phone number. Never a real person's number without their say-so.",
+  "id": "farm-card",
+  "lines": [
+    {
+      "en": "Call or text to order more coffee."
+    },
+    {
+      "en": "Pay by mobile money."
+    },
+    {
+      "en": "Tell a friend about the tour."
+    }
+  ],
+  "needs": [
+    "phone"
+  ]
+}

@@ -1,5 +1,26 @@
 export const CORE_PACKAGE = "@asknoor/core";
 
+export {
+  type AddonContent,
+  CheckEntrySchema,
+  type ChecksFile,
+  ChecksFileSchema,
+  ClipSourceSchema,
+  ClipsFileSchema,
+  FactsFileSchema,
+  FarmCardFileSchema,
+  MONTHLY_PLACEHOLDERS,
+  ORDER_LINE_PLACEHOLDERS,
+  ProductsFileSchema,
+  parseTestQuestions,
+  RecipeFileSchema,
+  RecordingsFileSchema,
+  SmsTemplatesFileSchema,
+  TEST_QUESTION_COLUMNS,
+  type TestQuestionRow,
+  TestQuestionRowSchema,
+  toAddons,
+} from "./content.ts";
 export { decide } from "./guardrails/decide.ts";
 export { decideSafety, SAFETY_LEXICON } from "./guardrails/safety.ts";
 export {

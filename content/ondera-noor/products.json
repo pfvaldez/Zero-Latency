@@ -1,0 +1,35 @@
+{
+  "note": "Prices are in dalasi (GMD). All need a price until Preet sets them.",
+  "products": [
+    {
+      "id": "beans-250",
+      "name": {
+        "en": "Roasted beans, 250 g"
+      },
+      "currency": "GMD",
+      "needs": [
+        "price"
+      ]
+    },
+    {
+      "id": "ground-250",
+      "name": {
+        "en": "Ground coffee, 250 g"
+      },
+      "currency": "GMD",
+      "needs": [
+        "price"
+      ]
+    },
+    {
+      "id": "recipe-kit",
+      "name": {
+        "en": "Recipe kit (beans, spice and recipe card)"
+      },
+      "currency": "GMD",
+      "needs": [
+        "price"
+      ]
+    }
+  ]
+}

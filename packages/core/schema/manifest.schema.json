@@ -210,6 +210,17 @@
               "checked": {
                 "type": "boolean"
               },
+              "needs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "source",
+                    "price",
+                    "phone"
+                  ]
+                }
+              },
               "kind": {
                 "type": "string",
                 "const": "fact"
@@ -223,8 +234,7 @@
               "id",
               "text",
               "checked",
-              "kind",
-              "source"
+              "kind"
             ],
             "additionalProperties": false
           },
@@ -252,6 +262,17 @@
               },
               "checked": {
                 "type": "boolean"
+              },
+              "needs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "source",
+                    "price",
+                    "phone"
+                  ]
+                }
               },
               "kind": {
                 "type": "string",
@@ -291,6 +312,17 @@
               "checked": {
                 "type": "boolean"
               },
+              "needs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "source",
+                    "price",
+                    "phone"
+                  ]
+                }
+              },
               "kind": {
                 "type": "string",
                 "const": "product"
@@ -309,7 +341,6 @@
               "text",
               "checked",
               "kind",
-              "price",
               "currency"
             ],
             "additionalProperties": false
@@ -339,9 +370,24 @@
               "checked": {
                 "type": "boolean"
               },
+              "needs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "source",
+                    "price",
+                    "phone"
+                  ]
+                }
+              },
               "kind": {
                 "type": "string",
                 "const": "farm-card"
+              },
+              "phone": {
+                "type": "string",
+                "minLength": 1
               }
             },
             "required": [

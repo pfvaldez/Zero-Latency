@@ -1,0 +1,35 @@
+{
+  "note": "Narrator add-ons, not Noor's voice. All drafts; none has a source yet.",
+  "facts": [
+    {
+      "id": "fact-1",
+      "afterClip": 2,
+      "text": {
+        "en": "Each coffee cherry usually holds two seeds. Those seeds are the coffee beans."
+      },
+      "needs": [
+        "source"
+      ]
+    },
+    {
+      "id": "fact-2",
+      "afterClip": 2,
+      "text": {
+        "en": "Sometimes a cherry grows just one round bean, called a peaberry."
+      },
+      "needs": [
+        "source"
+      ]
+    },
+    {
+      "id": "fact-3",
+      "afterClip": 3,
+      "text": {
+        "en": "When beans roast, they crack like popcorn. Roasters call it the first crack."
+      },
+      "needs": [
+        "source"
+      ]
+    }
+  ]
+}

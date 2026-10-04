@@ -1,0 +1,131 @@
+{
+  "note": "English text is a preview and a draft (Preet to check). Noor's texts go out in Wolof only: the Wolof fields stay null until the NLLB step drafts them, and they stay drafts until a Wolof speaker checks them. The English order line is draft wording for Preet to review.",
+  "monthly": {
+    "en": "This month: {guests} guests shared feedback. {orders} orders ({items} items). Loved: {loved}. Most asked: {asked} ({askedCount}). Most wished for: {wished}.",
+    "wo": {
+      "text": null,
+      "status": "needs-nllb-draft"
+    }
+  },
+  "orderLine": {
+    "en": "Order: {items} items, total {total} {currency}. Noor confirms payment.",
+    "wo": {
+      "text": null,
+      "status": "needs-nllb-draft"
+    }
+  },
+  "themeLabels": {
+    "stay": {
+      "en": "staying overnight",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "food": {
+      "en": "food",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "buy": {
+      "en": "buying coffee",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "price": {
+      "en": "prices",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "path": {
+      "en": "the walk",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "kids": {
+      "en": "children",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "roast": {
+      "en": "roasting",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "picking": {
+      "en": "picking",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "story": {
+      "en": "Noor's story",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "view": {
+      "en": "the view",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "welcome": {
+      "en": "the welcome",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "taste": {
+      "en": "taste",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "length": {
+      "en": "tour length",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "wifi": {
+      "en": "wifi",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "transport": {
+      "en": "transport",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    },
+    "other": {
+      "en": "other topics",
+      "wo": {
+        "text": null,
+        "status": "needs-nllb-draft"
+      }
+    }
+  }
+}

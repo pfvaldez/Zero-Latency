@@ -49,18 +49,23 @@ export interface Clip {
   momentIds: string[];
 }
 
-// TRD 6.1 references Addon without defining it. Shape follows content/<farm>/addons.json
-// (TRD 5): facts with sources, Noor's recipe, products with prices, the farm card.
+// TRD 6.1 references Addon without defining it. Shape follows the content files in
+// content/<farm>/ (facts, recipe, products, farm card): narrator add-ons, never Noor's voice.
+// `needs` lists what is still missing (a fact's source, a product's price, the farm card's phone
+// number). Such an add-on is shown labeled in demo mode and blocked from a production pack.
+export type AddonNeed = "source" | "price" | "phone";
+
 interface AddonBase {
   id: string;
   text: LocalizedText;
   checked: boolean; // only checked add-ons may ship in a production pack
+  needs?: AddonNeed[];
 }
 export type Addon =
-  | (AddonBase & { kind: "fact"; source: string })
+  | (AddonBase & { kind: "fact"; source?: string })
   | (AddonBase & { kind: "recipe" })
-  | (AddonBase & { kind: "product"; price: number; currency: string })
-  | (AddonBase & { kind: "farm-card" });
+  | (AddonBase & { kind: "product"; price?: number; currency: string })
+  | (AddonBase & { kind: "farm-card"; phone?: string });
 
 export interface Thresholds {
   match: number;
