@@ -69,7 +69,9 @@ flowchart LR
 6. `embed` encodes each moment as `passage: <checked text>` in every available language and stores normalized vectors.
 7. `export_model` exports e5 to ONNX and quantizes to int8 (P1: vocabulary trimming).
 8. `pack` writes `manifest.json`, audio (mono AAC `.m4a`, 48 kbps, -16 LUFS: AAC plays on iOS Safari where Opus in a web container is unreliable), WebVTT subtitles, embeddings and model files, with sizes and SHA-256 checksums. In `--mode production`, unchecked items are excluded. In `--mode demo`, they're included and flagged.
-9. `eval` calibrates the match threshold on the test set, writes it into the manifest, and writes `docs/EVAL.md`.
+9. `eval` (`bun run eval`, packages/pack) calibrates the match threshold on the test set, writes it to `content/<farm>/eval/threshold.json` (the builder puts it in the manifest) and writes `docs/EVAL.md`.
+
+Implementation notes (Slice 2): steps 4 to 8 are `pipeline/asknoor/translate.py` (NLLB drafts, sentence by sentence, rerun when the English changes) and the TypeScript pack builder in `packages/pack` (Transformers.js on Node 24; `planPack`, WebVTT, consent and evaluation maths are pure code in `packages/core`). The model is pinned in `packages/pack/model.lock.json` (repo, revision, sha256 per file) and is copied into each pack under `model/multilingual-e5-small/`; the manifest records `model.source`, `model.revision`, `model.queryPrefix`, `embeddings.passagePrefix` and `embeddings.rows` (one row per moment and language). NLLB-200 is CC-BY-NC-4.0 (non-commercial): fine for the hackathon, to be noted in the data card, and a limit for "any farm" use. The held-back clip is left out of every pack unless built with `--publish`. A committed synthetic fixture pack (`apps/web/public/packs/fixture/`, generated tones, no model files) lets CI and the guest app's tests run without anyone's recording. See `docs/PACK.md`.
 
 ### 3.2 Ask a question (guest's phone, offline)
 1. `AskBox` sends the text to `AskService.ask(text)`.
@@ -520,7 +522,7 @@ Rules: only these placeholders; theme labels come from checked `sms_templates` r
 | Item | Budget |
 |---|---|
 | Initial JavaScript (gzipped, guest route) | 250 KB or less, excluding the worker and model |
-| Farm pack | Measured and reported; P0 at most 150 MB, P1 at most 50 MB |
+| Farm pack | Measured and reported; P0 at most 150 MB, P1 at most 50 MB. Measured 2026-10-04: the model files are 135.4 MB, audio about 0.5 MB (`docs/EVAL.md`) |
 | Time from question to outcome | 800 ms or less median on a mid-range Android after warm-up |
 | Model first load | 5 s or less on a mid-range Android |
 | Lighthouse (guest route) | PWA installable; accessibility 95 or higher |

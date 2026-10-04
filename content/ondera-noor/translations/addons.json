@@ -1,0 +1,161 @@
+{
+  "note": "Machine drafts from facebook/nllb-200-distilled-600M (CC-BY-NC-4.0). Not checked by anyone. Wolof lines are translations of the English text, not a transcript of the AI-dubbed audio.",
+  "model": "facebook/nllb-200-distilled-600M",
+  "revision": "f8d333a098d19b4fd9a8b18f94170487ad3f821d",
+  "license": "CC-BY-NC-4.0",
+  "draft": true,
+  "items": {
+    "fact-1": {
+      "sourceSha256": "7dfb50b0ce1e229e6a169fddbe01140e7a55ef11680b10146fad9bfe910400f3",
+      "sentences": [
+        {
+          "en": "Each coffee cherry usually holds two seeds.",
+          "de": "Jede Kaffeekörsche enthält in der Regel zwei Samen.",
+          "nl": "Elke koffiekers bevat meestal twee zaden.",
+          "sv": "Varje kaffekörs innehåller vanligtvis två frön.",
+          "wo": "Fekk ca kaw gi nekk am na ñaari xeex."
+        },
+        {
+          "en": "Those seeds are the coffee beans.",
+          "de": "Diese Samen sind die Kaffeebohnen.",
+          "nl": "Die zaden zijn de koffiebonen.",
+          "sv": "Dessa frön är kaffebönorna.",
+          "wo": "Ñoom xeex yi, ñooy xeex yi."
+        }
+      ]
+    },
+    "fact-2": {
+      "sourceSha256": "2d57daee8d315b6839c515ad27c8b4ec08ac5d2deb1374942560f8a4b37d6971",
+      "sentences": [
+        {
+          "en": "Sometimes a cherry grows just one round bean, called a peaberry.",
+          "de": "Manchmal wächst eine Kirsche nur eine runde Bohne, eine Peabery.",
+          "nl": "Soms groeit een kersje slechts één ronde bonen, een peebery.",
+          "sv": "Ibland växer en körsbär bara en rund bön, en peaberry.",
+          "wo": "Ci ñenn yoon, cherry bi di juddu benn féew rekk, ñu koy tudde peebery."
+        }
+      ]
+    },
+    "fact-3": {
+      "sourceSha256": "e10d6ddb2aeee28b442a1fa5e111abe17f597d2f12ec5bc5a4012a59ec266d06",
+      "sentences": [
+        {
+          "en": "When beans roast, they crack like popcorn.",
+          "de": "Wenn Bohnen geröstet werden, knacken sie wie Popcorn.",
+          "nl": "Als bonen worden geroosterd, scheuren ze als popcorn.",
+          "sv": "När bönor rostas spränger de som popcorn.",
+          "wo": "Bi ñu sàkku feebar yi, dañu daanu ni popcorn."
+        },
+        {
+          "en": "Roasters call it the first crack.",
+          "de": "Roasters nennen es den ersten Riss.",
+          "nl": "Roasters noemen het de eerste scheur.",
+          "sv": "Rostare kallar det den första sprängningen.",
+          "wo": "Mbootaay yi di ko wooye \"géej bu jëkk\"."
+        }
+      ]
+    },
+    "recipe": {
+      "sourceSha256": "10e0bccdc60908dad3d1bc0ce662209927c4dcd110e766a16ad1d0835bc25962",
+      "sentences": [
+        {
+          "en": "Spiced farm coffee",
+          "de": "Gewürzigen Bauernkaffee",
+          "nl": "Gespiste boerderijkoffie",
+          "sv": "Förädlingskaffe med kryddor",
+          "wo": "Caféy farmuy"
+        },
+        {
+          "en": "Grind 2 tablespoons of roasted beans for each cup.",
+          "de": "2 Esslöffel geröstete Bohnen pro Tasse.",
+          "nl": "Grind 2 eetlepels geroosterde bonen per kopje.",
+          "sv": "Grind 2 matskedar rostade bönor för varje kopp.",
+          "wo": "Jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jë"
+        },
+        {
+          "en": "Add a small pinch of djar (grains of Selim) or one clove.",
+          "de": "Fügen Sie ein kleines Stück Djar (Selimkorn) oder einen Knoblauch hinzu.",
+          "nl": "Voeg een klein stukje djar (selimgranen) of een knoflook toe.",
+          "sv": "Lägg till en liten klump djar (selimkorn) eller en klump.",
+          "wo": "Add a small pinch of djar (gànnaaw Selim) walla benn clav."
+        },
+        {
+          "en": "Pour on water just off the boil and wait 4 minutes.",
+          "de": "Gießen Sie kurz vor dem Kochen Wasser auf und warten Sie 4 Minuten.",
+          "nl": "Giet water uit het koken en wacht 4 minuten.",
+          "sv": "Häll på vatten från koken och vänta 4 minuter.",
+          "wo": "Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne:\" \"Sëriñ bi dafa wax ne: \"Sëriñ bi dafa wax ne:\""
+        },
+        {
+          "en": "Strain through a cloth and sweeten if you like.",
+          "de": "Strecken Sie durch ein Tuch und süßen Sie es, wenn Sie möchten.",
+          "nl": "Strek een doek door en zoet als je wilt.",
+          "sv": "Sträcka genom en tyg och söta om du vill.",
+          "wo": "Jëfleen ko ci sàq bi, su ngeen bëggee."
+        }
+      ]
+    },
+    "beans-250": {
+      "sourceSha256": "161383452d62e26a9adb6519564ef6889760f2b7582b0d6e75737730c4450cd2",
+      "sentences": [
+        {
+          "en": "Roasted beans, 250 g",
+          "de": "Gebratene Bohnen, 250 g",
+          "nl": "geroosterde bonen, 250 g",
+          "sv": "Röstade bönor, 250 g",
+          "wo": "Jëf-jëf, 250 g"
+        }
+      ]
+    },
+    "ground-250": {
+      "sourceSha256": "01bce83f258a28d7c46d5319bf9eaeeed682fadecda1e3121224eaccc0169b40",
+      "sentences": [
+        {
+          "en": "Ground coffee, 250 g",
+          "de": "Gemahlener Kaffee, 250 g",
+          "nl": "Gemoelde koffie, 250 g",
+          "sv": "Grädd kaffe, 250 g",
+          "wo": "Café mi miir, 250 g"
+        }
+      ]
+    },
+    "recipe-kit": {
+      "sourceSha256": "b8212178b85e942d7328c5863d4c09a2e83305f89f1ae44ffc7e89c3c4a3f646",
+      "sentences": [
+        {
+          "en": "Recipe kit (beans, spice and recipe card)",
+          "de": "Rezeptpaket (Bohnen, Gewürze und Rezeptkarte)",
+          "nl": "Receptpakket (bonen, kruiden en receptkaart)",
+          "sv": "Reseptpaket (bönor, kryddor och receptkort)",
+          "wo": "Cëru recette bi (beans, spices and recipe card)"
+        }
+      ]
+    },
+    "farm-card": {
+      "sourceSha256": "3c269c48c0df56e779d5e9de8f3749ecaa50fcf570d96751700eb7a4f8070dc0",
+      "sentences": [
+        {
+          "en": "Call or text to order more coffee.",
+          "de": "Rufen Sie an oder schreiben Sie, um mehr Kaffee zu bestellen.",
+          "nl": "Bel of sms om meer koffie te bestellen.",
+          "sv": "Ring eller sms för att beställa mer kaffe.",
+          "wo": "Dimbal ko walla bindal ko ngir jël kafe."
+        },
+        {
+          "en": "Pay by mobile money.",
+          "de": "Zahlen Sie mit Mobilgeld.",
+          "nl": "Betaal met mobiel geld.",
+          "sv": "Betala med mobila pengar.",
+          "wo": "Jëfalu ko ci fonti fonti."
+        },
+        {
+          "en": "Tell a friend about the tour.",
+          "de": "Erzählen Sie einem Freund von der Tour.",
+          "nl": "Vertel een vriend over de tour.",
+          "sv": "Berätta för en vän om turen.",
+          "wo": "Waxal sa xarit ci mbirum tour bi."
+        }
+      ]
+    }
+  }
+}

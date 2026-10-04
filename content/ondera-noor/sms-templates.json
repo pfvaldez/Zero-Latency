@@ -3,128 +3,146 @@
   "monthly": {
     "en": "This month: {guests} guests shared feedback. {orders} orders ({items} items). Loved: {loved}. Most asked: {asked} ({askedCount}). Most wished for: {wished}.",
     "wo": {
-      "text": null,
-      "status": "needs-nllb-draft"
+      "text": "Ci weer bii: {guests} ay doxandéem àddatu nañu. {orders} àddukaay yi ({items} yëf yi). Love: {loved}. Ñoo laaj: {asked} ({askedCount}). Ñoo bëgg: {wished}.",
+      "status": "draft",
+      "sourceSha256": "6ba8b439a4952bb104bf3c1cff65c510bd8161e3a1a525676ef025513e77ef21"
     }
   },
   "orderLine": {
     "en": "Order: {items} items, total {total} {currency}. Noor confirms payment.",
     "wo": {
-      "text": null,
-      "status": "needs-nllb-draft"
+      "text": "Jëfandikukat: {items} item, total {total} {currency}. Noor xamal na ko.",
+      "status": "draft",
+      "sourceSha256": "4b0233b093d463ffd25220cacb7067b02837d8c749014c5bbbd779a3900cb189"
     }
   },
   "themeLabels": {
     "stay": {
       "en": "staying overnight",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "toog ci guddi",
+        "status": "draft",
+        "sourceSha256": "6080c45faa9bfde82f094895312b1d16c86a395079e7b8ca550fca80e1ee7587"
       }
     },
     "food": {
       "en": "food",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "ñam",
+        "status": "draft",
+        "sourceSha256": "c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b"
       }
     },
     "buy": {
       "en": "buying coffee",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "jënd kafe",
+        "status": "draft",
+        "sourceSha256": "173ee77258fd3368a74d0fea8412b1cd541bb724c184eadcafb7b57b6a934352"
       }
     },
     "price": {
       "en": "prices",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "xaalis yi",
+        "status": "draft",
+        "sourceSha256": "fe81f9390ffe3dc8daa4888a7dc430ce4a41f164281d15449a24840a70b5f2c2"
       }
     },
     "path": {
       "en": "the walk",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "dox",
+        "status": "draft",
+        "sourceSha256": "103723379d69982348c76e4fae30cc7baab6e347da6081393da52e711d623240"
       }
     },
     "kids": {
       "en": "children",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "doom",
+        "status": "draft",
+        "sourceSha256": "10910087de24bfcabe854fda62b5023a61fe531705043b9979fdf00f12c4c0ec"
       }
     },
     "roast": {
       "en": "roasting",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "réer",
+        "status": "draft",
+        "sourceSha256": "9b78665395b9a55c4425adb7e63696e07c86fbaee542e6a3101e3de060e91257"
       }
     },
     "picking": {
       "en": "picking",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "jëllu",
+        "status": "draft",
+        "sourceSha256": "6ac8a2e6b822add3112d670f3f9b0809420a6f4faf3c3734dda5761b78591311"
       }
     },
     "story": {
       "en": "Noor's story",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "Kàddug Noor",
+        "status": "draft",
+        "sourceSha256": "48d40309508eea88116298eb234a4eadf74a3df2a8a09d71927d8492daaf3505"
       }
     },
     "view": {
       "en": "the view",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "gis-gisu bi",
+        "status": "draft",
+        "sourceSha256": "1498f9b77eb4ad2c185d69b5051fef0c03227e511111bdf91938fdbc6de39919"
       }
     },
     "welcome": {
       "en": "the welcome",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "xët yi ci wàll gi",
+        "status": "draft",
+        "sourceSha256": "0e858b69d2a86a3a78e8836d1db89eb9fd6b493cd795b4af4aa5b48c7ba55c49"
       }
     },
     "taste": {
       "en": "taste",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "xam-xam",
+        "status": "draft",
+        "sourceSha256": "814e6bcc41679ddd4302c312b459cde7eb0a340d537c83a8e37512d84f91f2af"
       }
     },
     "length": {
       "en": "tour length",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "Jëfandikukat bi",
+        "status": "draft",
+        "sourceSha256": "8a224a53476bef0fce6fc4e3d1c37ce6071435714c13c454cdfd552a1582e407"
       }
     },
     "wifi": {
       "en": "wifi",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "wifi",
+        "status": "draft",
+        "sourceSha256": "debdc6fdb6c19c94ff78b653767bfac108d84ed51a54a58a72866dc635b15729"
       }
     },
     "transport": {
       "en": "transport",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "xët yi ci suuf am nañ ab lëkkalekaay buy jëm",
+        "status": "draft",
+        "sourceSha256": "6694ea8075001f6628da20f1afdafc74a763e2098bafc633b057534792db6aad"
       }
     },
     "other": {
       "en": "other topics",
       "wo": {
-        "text": null,
-        "status": "needs-nllb-draft"
+        "text": "yeneen yëngu-yëngu",
+        "status": "draft",
+        "sourceSha256": "286f6cb6e49098a2208978241d5fc196519616aadf64c5acb981acc593c8acf8"
       }
     }
   }

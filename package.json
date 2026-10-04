@@ -16,7 +16,12 @@
     "test:coverage": "vitest run --coverage",
     "e2e": "bun run --cwd apps/web e2e",
     "check": "biome check .",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "pack:model": "bun run --cwd packages/pack model",
+    "pack:build": "bun run --cwd packages/pack build",
+    "pack:fixture": "bun run --cwd packages/pack fixture",
+    "eval": "bun run --cwd packages/pack eval",
+    "test:model": "vitest run --root packages/pack --config vitest.model.config.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

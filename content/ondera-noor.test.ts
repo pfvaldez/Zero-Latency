@@ -158,10 +158,36 @@ describe("sms-templates.json", () => {
     expect(result.encoding).toBe("gsm7");
   });
 
-  it("has no Wolof text yet (the NLLB step drafts it, a Wolof speaker checks it)", () => {
-    expect(sms.monthly.wo.text).toBeNull();
-    expect(sms.orderLine.wo.text).toBeNull();
-    for (const id of THEME_IDS) expect(sms.themeLabels[id].wo.text).toBeNull();
+  it("has Wolof as NLLB machine drafts only: never marked checked, placeholders intact", () => {
+    for (const entry of [
+      sms.monthly,
+      sms.orderLine,
+      ...THEME_IDS.map((id) => sms.themeLabels[id]),
+    ]) {
+      expect(entry.wo.status).toBe("draft");
+      expect(entry.wo.text).not.toBeNull();
+    }
+    const ph = (t: string) => [...t.matchAll(/\{[^{}]*\}/g)].map((m) => m[0]).sort();
+    expect(ph(sms.monthly.wo.text ?? "")).toEqual(ph(sms.monthly.en));
+    expect(ph(sms.orderLine.wo.text ?? "")).toEqual(ph(sms.orderLine.en));
+  });
+
+  it("reports the Wolof draft's SMS size: over two segments it cannot be sent, so the report is held", () => {
+    // FINDING (2026-10-04): the NLLB draft is UCS-2 and needs 3 segments, so fillTemplate refuses
+    // it. A Wolof speaker has to shorten it; until then monthly-summary holds Noor's text.
+    const wo = sms.monthly.wo.text ?? "";
+    const label = { text: sms.themeLabels.stay.wo.text ?? "", checked: true };
+    const counts = { guests: 12, orders: 3, items: 5, askedCount: 4 };
+    let outcome: string;
+    try {
+      const r = fillTemplate(wo, counts, { loved: label, asked: label, wished: label });
+      outcome = `fits in ${r.segments} segment(s)`;
+      expect(r.body).not.toMatch(/[{}]/);
+    } catch (error) {
+      outcome = (error as Error).message;
+      expect(outcome).toMatch(/SMS segments/); // the only acceptable failure
+    }
+    expect(outcome).toBeTruthy();
   });
 });
 

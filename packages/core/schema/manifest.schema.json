@@ -88,6 +88,59 @@
               "type": "string",
               "minLength": 1
             }
+          },
+          "subtitles": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "enum": [
+                "en",
+                "de",
+                "nl",
+                "sv"
+              ]
+            },
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "dubbed": {
+            "type": "object",
+            "properties": {
+              "lang": {
+                "type": "string",
+                "const": "wo"
+              },
+              "audio": {
+                "type": "string",
+                "minLength": 1
+              },
+              "durationMs": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "subtitles": {
+                "type": "string",
+                "minLength": 1
+              },
+              "subtitlesDraft": {
+                "type": "boolean",
+                "const": true
+              },
+              "label": {
+                "type": "string",
+                "const": "AI-dubbed (ElevenLabs)"
+              }
+            },
+            "required": [
+              "lang",
+              "audio",
+              "durationMs",
+              "label"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -95,7 +148,8 @@
           "kind",
           "audio",
           "durationMs",
-          "momentIds"
+          "momentIds",
+          "subtitles"
         ],
         "additionalProperties": false
       }
@@ -168,6 +222,13 @@
             "additionalProperties": {
               "type": "boolean"
             }
+          },
+          "timing": {
+            "type": "string",
+            "enum": [
+              "estimated",
+              "word-timestamps"
+            ]
           }
         },
         "required": [
@@ -176,7 +237,8 @@
           "startMs",
           "endMs",
           "subtitles",
-          "topic"
+          "topic",
+          "timing"
         ],
         "additionalProperties": false
       }
@@ -412,6 +474,18 @@
           "type": "string",
           "minLength": 1
         },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "queryPrefix": {
+          "type": "string",
+          "const": "query: "
+        },
         "dim": {
           "type": "number",
           "const": 384
@@ -436,6 +510,9 @@
       "required": [
         "id",
         "dir",
+        "source",
+        "revision",
+        "queryPrefix",
         "dim",
         "quantization",
         "vocab",
@@ -462,13 +539,45 @@
         "dtype": {
           "type": "string",
           "const": "float32"
+        },
+        "passagePrefix": {
+          "type": "string",
+          "const": "passage: "
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "momentId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "lang": {
+                "type": "string",
+                "enum": [
+                  "en",
+                  "de",
+                  "nl",
+                  "sv"
+                ]
+              }
+            },
+            "required": [
+              "momentId",
+              "lang"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [
         "file",
         "count",
         "dim",
-        "dtype"
+        "dtype",
+        "passagePrefix",
+        "rows"
       ],
       "additionalProperties": false
     },

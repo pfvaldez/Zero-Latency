@@ -1,0 +1,210 @@
+{
+  "note": "Machine drafts from facebook/nllb-200-distilled-600M (CC-BY-NC-4.0). Not checked by anyone. Wolof lines are translations of the English text, not a transcript of the AI-dubbed audio.",
+  "model": "facebook/nllb-200-distilled-600M",
+  "revision": "f8d333a098d19b4fd9a8b18f94170487ad3f821d",
+  "license": "CC-BY-NC-4.0",
+  "draft": true,
+  "clips": {
+    "1": {
+      "sourceSha256": "2c921a75dce68b30cfde00bdc8eafefadf074ff19862d9e3736400ee74afe414",
+      "sentences": [
+        {
+          "en": "Welcome to my farm.",
+          "de": "Willkommen auf meiner Farm.",
+          "nl": "Welkom op mijn boerderij.",
+          "sv": "Välkommen till min gård.",
+          "wo": "Bienvenu à ma ferme."
+        },
+        {
+          "en": "I'm Noor.",
+          "de": "Ich bin Noor.",
+          "nl": "Ik ben Noor.",
+          "sv": "Jag heter Noor.",
+          "wo": "Maa ngi Noor."
+        },
+        {
+          "en": "My family has worked on this hillside for years.",
+          "de": "Meine Familie arbeitet seit Jahren auf diesem Hügel.",
+          "nl": "Mijn familie werkt al jaren op deze heuvel.",
+          "sv": "Min familj har arbetat här i åratal.",
+          "wo": "Sama bokk di liggéey ci tund bii ba yàgg."
+        },
+        {
+          "en": "Today I'll show you how our coffee goes from a flower to your cup.",
+          "de": "Heute zeige ich dir, wie unser Kaffee von einer Blume zu deiner Tasse wird.",
+          "nl": "Vandaag zal ik je laten zien hoe onze koffie van een bloem naar je kopje gaat.",
+          "sv": "Idag ska jag visa dig hur vårt kaffe går från en blomma till din kopp.",
+          "wo": "Léegi dinaa la feeñal ni sunu caféy di jóge ci xale ba nekk ci sa tas."
+        }
+      ]
+    },
+    "2": {
+      "sourceSha256": "b3c7469d0a504bae1b9492b7bcd11cd1c06306ac01a44da24dda3a32c339b25c",
+      "sentences": [
+        {
+          "en": "Our coffee grows on the upper slope, in the shade.",
+          "de": "Unser Kaffee wächst am oberen Hang, im Schatten.",
+          "nl": "Onze koffie groeit op de bovenste helling, in de schaduw.",
+          "sv": "Vår kaffe växer på den övre baksidan, i skuggan.",
+          "wo": "sunu kafe bi ngi juddoo ci kaw suuf, ci ndàq."
+        },
+        {
+          "en": "We pick only the red, ripe cherries, by hand, one by one.",
+          "de": "Wir sammeln nur die roten, reifen Kirschen, eine nach der anderen.",
+          "nl": "We plukken alleen de rode rijpe kersen, met de hand, één voor één.",
+          "sv": "Vi plockar bara de röda, mogna körsbärarna, i hand, en efter en.",
+          "wo": "Dunu jël rekk, ci loxo, benn ci benn."
+        },
+        {
+          "en": "It's slow, but that's why the coffee tastes sweet.",
+          "de": "Es ist langsam, aber deshalb schmeckt der Kaffee süß.",
+          "nl": "Het is langzaam, maar daarom smaakt de koffie zoet.",
+          "sv": "Det är långsamt, men det är därför kaffet smakar sött.",
+          "wo": "Moom laañ la, waaye moo tax kafe bi neex na."
+        }
+      ]
+    },
+    "3": {
+      "sourceSha256": "402e85f4e4ee2cbb78a07f5601bd5b7b3662bdb017ed4f4fb86d77c2ccb5b896",
+      "sentences": [
+        {
+          "en": "We roast in a pan over the fire, and we never stop stirring.",
+          "de": "Wir braten in einer Pfanne über dem Feuer, und wir hören nie auf zu rühren.",
+          "nl": "We roosteren in een pan over het vuur, en we stoppen nooit met roeren.",
+          "sv": "Vi rostar i en pann över elden och vi slutar aldrig röra.",
+          "wo": "Daanu ko ci kaw safara bi, ba noppi daanu ko."
+        },
+        {
+          "en": "Listen: when the beans crack, like popcorn, they're almost ready.",
+          "de": "Hören Sie: Wenn die Bohnen zerbrechen, wie Popcorn, sind sie fast fertig.",
+          "nl": "Luister: als de bonen scheuren, zoals popcorn, zijn ze bijna klaar.",
+          "sv": "När bönorna knackar, som popcorn, är de nästan klara.",
+          "wo": "Dégluleen: bu féew yi daanu, mel ni popcorn, dañu féete."
+        },
+        {
+          "en": "Smell that?",
+          "de": "Du riechst das?",
+          "nl": "Ruik je dat?",
+          "sv": "Kan du lukta det?",
+          "wo": "Xam naa ko?"
+        },
+        {
+          "en": "That's my favorite time of the day.",
+          "de": "Das ist meine Lieblingszeit des Tages.",
+          "nl": "Dat is mijn favoriete tijd van de dag.",
+          "sv": "Det är min favorittid på dagen.",
+          "wo": "Moom la ma gën a bëgg ci bés bi."
+        }
+      ]
+    },
+    "4": {
+      "sourceSha256": "9541cc073d5d387a349ef3116462c1410d80a77cdc1c81544e8b912026dda00e",
+      "sentences": [
+        {
+          "en": "I've been a member of the Ondera Coffee Cooperative for 11 years.",
+          "de": "Ich bin seit 11 Jahren Mitglied der Ondera Coffee Cooperative.",
+          "nl": "Ik ben al 11 jaar lid van de Ondera Coffee Cooperative.",
+          "sv": "Jag har varit medlem i Ondera Coffee Cooperative i 11 år.",
+          "wo": "Maa ngi bokk ci coopératif kafe Ondera ci fukki at ak benn."
+        },
+        {
+          "en": "Together we get better prices, and we teach each other.",
+          "de": "Gemeinsam bekommen wir bessere Preise und lehren uns gegenseitig.",
+          "nl": "Samen krijgen we betere prijzen en leren we elkaar.",
+          "sv": "Tillsammans får vi bättre priser, och vi lär varandra.",
+          "wo": "Ci biir, nanu gën a gën a rafet, te nuy jàngal seen biir."
+        },
+        {
+          "en": "My daughter helps me on weekends; she's the one who set up this tour.",
+          "de": "Meine Tochter hilft mir am Wochenende, sie hat diese Tour organisiert.",
+          "nl": "Mijn dochter helpt me in het weekend. Zij heeft deze tour georganiseerd.",
+          "sv": "Min dotter hjälper mig på helgerna. Hon har organiserat denna turné.",
+          "wo": "Sama doom ju jigéen di ma dimbali ci bésu noflaay bi; moom la sàkk tour bii."
+        }
+      ]
+    },
+    "5": {
+      "sourceSha256": "2c35cd060414a9aed325334c66b6047f6a7c54cd46b886165eda8c98ff487656",
+      "sentences": [
+        {
+          "en": "Below the coffee, we grow maize and beans.",
+          "de": "Unter dem Kaffee wachsen Mais und Bohnen.",
+          "nl": "Onder de koffie groeien wij maïs en bonen.",
+          "sv": "Under kaffet odlar vi majs och bönor.",
+          "wo": "Ci biir kafe bi, nu ngi toroxal corn ak fasool."
+        },
+        {
+          "en": "They feed my family through the year.",
+          "de": "Sie füttern meine Familie das ganze Jahr über.",
+          "nl": "Ze voeden mijn familie het hele jaar door.",
+          "sv": "De matar min familj året runt.",
+          "wo": "Dañu dundal sama njaboot ci at gi."
+        }
+      ]
+    },
+    "6": {
+      "sourceSha256": "3c10bd573d948086f0ecb07e91f355a87c4f622597b391f9c1290c2eb38ab110",
+      "sentences": [
+        {
+          "en": "Yes, you can take our coffee home!",
+          "de": "Ja, du kannst unseren Kaffee mit nach Hause nehmen!",
+          "nl": "Ja, je kunt onze koffie mee naar huis nemen!",
+          "sv": "Ja, du kan ta vårt kaffe hem!",
+          "wo": "Waaw, mën nga yóbbu sunu kafe kër gi!"
+        },
+        {
+          "en": "Ask your guide, and we'll pack it fresh for you.",
+          "de": "Fragen Sie Ihren Guide, und wir packen es frisch für Sie.",
+          "nl": "Vraag je gids en we pakken het vers voor je.",
+          "sv": "Fråga din guide, och vi packerar det färskt för dig.",
+          "wo": "laaj sa njiit, dinañuy wax tamit bérab."
+        }
+      ]
+    },
+    "7": {
+      "sourceSha256": "0104673f66c7434ed6ff39e750917793c22da7b7ea066a0fb651a952c713ed9c",
+      "sentences": [
+        {
+          "en": "The path up to the coffee is steep and takes some time.",
+          "de": "Der Weg zum Kaffee ist steil und dauert einige Zeit.",
+          "nl": "Het pad naar de koffie is steil en duurt even.",
+          "sv": "Vägen upp till kaffet är brant och tar tid.",
+          "wo": "Seen yoon ba jëm ca kaw bi dafa rafet te am na lu yàgg."
+        },
+        {
+          "en": "Wear good shoes and bring water.",
+          "de": "Tragen Sie gute Schuhe und bringen Sie Wasser mit.",
+          "nl": "Draag goede schoenen en breng water.",
+          "sv": "Ta bra skor och ta med vatten.",
+          "wo": "Jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jëf-jë"
+        },
+        {
+          "en": "If the climb is hard for you, tell your guide and we'll stay down here.",
+          "de": "Wenn der Aufstieg schwer für Sie ist, sagen Sie es Ihrem Guide und wir bleiben unten.",
+          "nl": "Als het moeilijk is om te klimmen, zeg het dan aan je gids en we blijven hier.",
+          "sv": "Om det är svårt för dig, säg det till guiden så stannar vi här nere.",
+          "wo": "Bu sa wàcc a metti, waxal sa njiit, nu toog fi suuf."
+        }
+      ]
+    },
+    "8": {
+      "sourceSha256": "77ccbd1aadb7b0dc3b45e942bb8536891ada55fa5dea33d5408d81e9dd9724b8",
+      "sentences": [
+        {
+          "en": "We don't have rooms yet, but so many of you have asked that I'm thinking about it.",
+          "de": "Wir haben noch keine Zimmer, aber so viele von euch haben gefragt, dass ich darüber nachdenke.",
+          "nl": "We hebben nog geen kamers, maar veel van jullie hebben gevraagd dat ik erover nadenkt.",
+          "sv": "Vi har inte rum än, men så många av er har frågat att jag tänker på det.",
+          "wo": "Du nanu am ay xët, waaye ñu bare ci yéen laaj nañu ma, ba may xalaat ci mbirum loolu."
+        },
+        {
+          "en": "For now, your guide can suggest a place nearby.",
+          "de": "Der Führer kann Ihnen einen Ort in der Nähe vorschlagen.",
+          "nl": "Voorlopig kan je gids je een locatie in de buurt voorstellen.",
+          "sv": "För närvarande kan din guide föreslå ett ställe i närheten.",
+          "wo": "Ci biir loolu, sa njiit mën na la xamal lu ko gën a mel."
+        }
+      ]
+    }
+  }
+}

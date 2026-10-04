@@ -38,6 +38,9 @@ export interface Moment {
   subtitles: LocalizedText; // production packs contain checked text only
   topic: LocalizedText; // short label for the confirm card
   draft?: Partial<Record<VisitorLang, boolean>>; // demo packs only
+  // How the subtitle cues were timed: from the transcript's word timestamps, or estimated from
+  // the script (labeled in the player).
+  timing: "estimated" | "word-timestamps";
 }
 
 export interface Clip {
@@ -47,6 +50,20 @@ export interface Clip {
   audio: string;
   durationMs: number;
   momentIds: string[];
+  // WebVTT file per language (paths inside the pack).
+  subtitles: Partial<Record<VisitorLang, string>>;
+  // AI-dubbed Wolof version of this clip. Demo packs only; labeled; draft until a Wolof speaker
+  // checks it. Its subtitles are a machine translation of the English, not a transcript of the dub.
+  dubbed?: {
+    lang: "wo";
+    audio: string;
+    durationMs: number;
+    subtitles?: string;
+    // Present with `subtitles`: they are NLLB's machine translation of the English text, not a
+    // transcript of what the AI-dubbed audio says. The player must say so.
+    subtitlesDraft?: true;
+    label: "AI-dubbed (ElevenLabs)";
+  };
 }
 
 // TRD 6.1 references Addon without defining it. Shape follows the content files in
@@ -87,12 +104,23 @@ export interface FarmPackManifest {
   model: {
     id: "multilingual-e5-small";
     dir: string;
+    source: string; // Hugging Face repo, for example Xenova/multilingual-e5-small
+    revision: string; // the exact commit the files came from (40 hex)
+    queryPrefix: "query: ";
     dim: 384;
     quantization: "int8";
     vocab: "full" | "trimmed";
     sizeBytes: number;
   };
-  embeddings: { file: string; count: number; dim: 384; dtype: "float32" };
+  embeddings: {
+    file: string;
+    count: number;
+    dim: 384;
+    dtype: "float32";
+    passagePrefix: "passage: ";
+    // Row i of the matrix is the passage of this moment in this language.
+    rows: { momentId: string; lang: VisitorLang }[];
+  };
   thresholds: Thresholds; // calibrated by pipeline/eval
   sizes: Record<string, number>;
   checksums: Record<string, string>;

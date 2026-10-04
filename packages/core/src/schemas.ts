@@ -95,6 +95,7 @@ const momentSchema = z
     subtitles: localizedText,
     topic: localizedText,
     draft: z.partialRecord(visitorLang, z.boolean()).optional(),
+    timing: z.enum(["estimated", "word-timestamps"]),
   })
   .refine((m) => m.endMs > m.startMs, {
     error: "endMs must be after startMs",
@@ -108,6 +109,17 @@ const clipSchema = z.strictObject({
   audio: z.string().min(1),
   durationMs: nonNegInt,
   momentIds: z.array(z.string().min(1)),
+  subtitles: z.partialRecord(visitorLang, z.string().min(1)),
+  dubbed: z
+    .strictObject({
+      lang: z.literal("wo"),
+      audio: z.string().min(1),
+      durationMs: nonNegInt,
+      subtitles: z.string().min(1).optional(),
+      subtitlesDraft: z.literal(true).optional(),
+      label: z.literal("AI-dubbed (ElevenLabs)"),
+    })
+    .optional(),
 }) satisfies z.ZodType<Clip>;
 
 const addonNeed = z.enum(["source", "price", "phone"]);
@@ -166,6 +178,9 @@ export const FarmPackManifestSchema = z
     model: z.strictObject({
       id: z.literal("multilingual-e5-small"),
       dir: z.string().min(1),
+      source: z.string().min(1),
+      revision: z.string().regex(/^[0-9a-f]{40}$/),
+      queryPrefix: z.literal("query: "),
       dim: z.literal(384),
       quantization: z.literal("int8"),
       vocab: z.enum(["full", "trimmed"]),
@@ -176,6 +191,8 @@ export const FarmPackManifestSchema = z
       count: nonNegInt,
       dim: z.literal(384),
       dtype: z.literal("float32"),
+      passagePrefix: z.literal("passage: "),
+      rows: z.array(z.strictObject({ momentId: z.string().min(1), lang: visitorLang })),
     }),
     thresholds: z.strictObject({ match: unitInterval, margin: unitInterval }),
     sizes: z.record(z.string(), nonNegInt),
@@ -194,7 +211,35 @@ export const FarmPackManifestSchema = z
   // A disclosed stand-in voice (labels.standInVoice) is allowed: the player shows its label. The pack builder
   // excludes these; this refusal is the second line of defence on the device and in CI.
   .superRefine((pack, ctx) => {
+    // The embedding matrix has one row per (moment, language) passage, and every row must name a
+    // moment in the pack and a language the pack declares.
+    if (pack.embeddings.count !== pack.embeddings.rows.length) {
+      ctx.addIssue({
+        code: "custom",
+        message: "embeddings.count must equal embeddings.rows.length",
+        path: ["embeddings", "count"],
+      });
+    }
+    const momentIds = new Set(pack.moments.map((m) => m.id));
+    pack.embeddings.rows.forEach((row, i) => {
+      if (!momentIds.has(row.momentId) || !pack.visitorLangs.includes(row.lang)) {
+        ctx.addIssue({
+          code: "custom",
+          message: `embedding row ${i} names an unknown moment or language`,
+          path: ["embeddings", "rows", i],
+        });
+      }
+    });
     if (pack.mode !== "production") return;
+    pack.clips.forEach((clip, i) => {
+      if (clip.dubbed) {
+        ctx.addIssue({
+          code: "custom",
+          message: `clip ${clip.id} has AI-dubbed audio, which is demo-only`,
+          path: ["clips", i, "dubbed"],
+        });
+      }
+    });
     pack.moments.forEach((moment, i) => {
       if (Object.values(moment.draft ?? {}).some(Boolean)) {
         ctx.addIssue({

@@ -1,0 +1,41 @@
+{
+  "note": "SYNTHETIC generated tones for the fixture pack. Not a voice and not anyone's recording.",
+  "clips": {
+    "en/clip01.m4a": {
+      "source_channels": 1,
+      "mono_method": "mean",
+      "mono_loss_db": 0.0,
+      "trimmed_head_s": 0.0,
+      "trimmed_tail_s": 0.0,
+      "lufs": -15.9,
+      "true_peak": -7.8,
+      "duration_ms": 5611,
+      "head_silence_s": 0.3,
+      "tail_silence_s": 0.291
+    },
+    "en/clip02.m4a": {
+      "source_channels": 1,
+      "mono_method": "mean",
+      "mono_loss_db": 0.0,
+      "trimmed_head_s": 0.0,
+      "trimmed_tail_s": 0.0,
+      "lufs": -15.8,
+      "true_peak": -8.0,
+      "duration_ms": 6613,
+      "head_silence_s": 0.3,
+      "tail_silence_s": 0.313
+    },
+    "en/clip03.m4a": {
+      "source_channels": 1,
+      "mono_method": "mean",
+      "mono_loss_db": 0.0,
+      "trimmed_head_s": 0.0,
+      "trimmed_tail_s": 0.0,
+      "lufs": -15.9,
+      "true_peak": -8.2,
+      "duration_ms": 6101,
+      "head_silence_s": 0.3,
+      "tail_silence_s": 0.301
+    }
+  }
+}

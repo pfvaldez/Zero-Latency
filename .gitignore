@@ -259,3 +259,10 @@ pipeline/**/*.m4a
 pipeline/**/*.flac
 pipeline/**/*.wav
 pipeline/**/*.mp3
+
+# Real farm packs and the model files are built locally and never committed (they hold the
+# recordings and a 135 MB model). The synthetic fixture pack in apps/web/public/packs/fixture/
+# is committed, without its model folder.
+apps/web/public/packs/*
+!apps/web/public/packs/fixture
+apps/web/public/packs/*/model/

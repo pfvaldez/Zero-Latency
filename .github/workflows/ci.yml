@@ -66,3 +66,34 @@ jobs:
 
       - run: uv sync --frozen
       - run: uv run pytest
+
+  # The pinned e5 model (118 MB model plus 17 MB tokenizer) is downloaded once per revision and
+  # cached, then the embedding, fixture and evaluation checks run on the real files. Kept out of
+  # `verify` so the fast path stays offline and cannot be broken by a Hugging Face outage.
+  model:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install
+        run: test -f bun.lock && bun install --frozen-lockfile
+
+      - uses: actions/cache@v6
+        with:
+          path: .cache/models
+          key: e5-model-${{ hashFiles('packages/pack/model.lock.json') }}
+
+      # Downloads only what is missing and verifies every file against model.lock.json.
+      - run: bun run pack:model
+      - run: bun run test:model
