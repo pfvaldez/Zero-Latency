@@ -75,7 +75,7 @@ export function Shop({ lang, manifest }: { lang: VisitorLang; manifest: FarmPack
         {products.map((p) => (
           <li
             key={p.id}
-            className="flex items-center justify-between gap-2 rounded-md border border-input bg-card p-3"
+            className="flex items-center justify-between gap-2 rounded-2xl bg-card p-3"
           >
             <span className="text-lg">
               {productName(p, lang)}
@@ -116,7 +116,7 @@ export function Shop({ lang, manifest }: { lang: VisitorLang; manifest: FarmPack
 
       <Sheet open={open} onOpenChange={setOpen}>
         {/* Fits its content and scrolls on a small phone, so the confirm button is always reachable. */}
-        <SheetContent side="bottom" className="h-auto max-h-[90dvh] overflow-y-auto">
+        <SheetContent side="bottom" className="h-auto max-h-[90dvh] overflow-y-auto rounded-t-3xl">
           <SheetHeader>
             <SheetTitle>{t(lang, "shop.showNoor")}</SheetTitle>
             <SheetDescription>{t(lang, "shop.noPayment")}</SheetDescription>

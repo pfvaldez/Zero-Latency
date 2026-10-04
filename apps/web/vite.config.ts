@@ -54,7 +54,7 @@ export default defineConfig({
       injectManifest: {
         // The shell and the ONNX runtime. The farm pack is NOT precached: it is downloaded once into
         // its own cache. The bundler also emits a hashed copy of the wasm that we never load.
-        globPatterns: ["**/*.{js,css,html,svg,woff,woff2,wasm,mjs,webmanifest}"],
+        globPatterns: ["**/*.{js,css,html,svg,webp,avif,woff,woff2,wasm,mjs,webmanifest}"],
         globIgnores: ["packs/**", "assets/ort-wasm-*"],
         maximumFileSizeToCacheInBytes: 40_000_000,
       },
