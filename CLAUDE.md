@@ -105,7 +105,7 @@ The brief's workflow we name in the video: **learning from visitor feedback**. T
 | End-to-end tests (includes offline) | `bun run e2e` |
 | Lint and format | `bun run check` |
 | Type check | `bun run typecheck` |
-| Local Supabase | `bunx supabase start`, `bunx supabase db reset`, `bunx supabase functions serve` |
+| Supabase | We use a hosted Supabase project, not a local one: no Docker and no `bunx supabase start`. Migrations and Edge Functions go to the hosted project (Slice 3) |
 | Build a farm pack | `cd pipeline && uv sync && uv run python -m asknoor.build --farm ondera-noor --mode demo` |
 | Run evaluations | `cd pipeline && uv run python -m asknoor.eval --farm ondera-noor` |
 

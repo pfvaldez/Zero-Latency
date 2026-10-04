@@ -9,7 +9,7 @@ Version 1.0, October 3, 2026. Companion to `docs/PRD.md`. If they disagree, the 
 | Runs on a device the user already has | Guests use their own phones (PWA). Noor uses her own phone for SMS only. Recording happens once on her daughter's smartphone. No new hardware. |
 | Core feature works offline | Tour, ask flow, feedback and shop run with zero network after one pack download. Proven by a Playwright test with the browser context offline. |
 | Model files small enough to side-load or send over a weak connection | One on-device model (multilingual-e5-small, int8). Size measured and reported; vocabulary trimming as P1. |
-| One interaction in a named local language | Noor's recordings and Noor's monthly text are in her language (Wolof, or a labeled stand-in). |
+| One interaction in a named local language | Noor's monthly text and her order line are in Wolof, checked by a Wolof speaker. Guests hear Preet's English recordings as Noor's labeled stand-in voice; AI-dubbed Wolof clips are labeled synthetic data (demo mode only until a Wolof speaker checks them). |
 | Human in the loop; avoid hallucinations | No generative model on the guest path. Guest confirms matches. Fixed templates for Noor. Reviewer approves sends. |
 | Fail-safe ("not sure, ask a person") | Threshold and safety routing in `packages/core`, covered by tests. |
 
@@ -186,7 +186,7 @@ ask-noor/
 │           ├── services/        # interfaces + implementations (see section 6.2)
 │           ├── workers/e5.worker.ts
 │           ├── animations/      # GSAP timelines, reduced-motion guard
-│           ├── components/ui/   # Animate UI components (shadcn CLI)
+│           ├── components/animate-ui/   # Animate UI components (shadcn CLI)
 │           ├── lib/             # supabase client, env, formatting
 │           └── styles/          # Tailwind v4 theme tokens
 ├── supabase/
@@ -462,6 +462,7 @@ create policy "members read questions" on questions for select using (is_member(
 
 - `pipeline/asknoor/tts_addons.py` converts checked add-on text in each visitor language into narrator audio with a stock voice. No cloning.
 - Files are listed in `manifest.labels.syntheticVoice`, and the UI shows "AI narrator voice" next to them.
+- **Guest audio and Wolof (decided with the captain):** the clips guests hear in the tour are Preet's English recordings of Noor's script, labeled in the app as Noor's stand-in voice (`manifest.labels.standIn`). The AI-dubbed Wolof versions (ElevenLabs, made with Preet's consent) are synthetic data: they feed the pipeline and the Wolof evaluation, are listed in `labels.syntheticVoice`, and ship only in demo packs until a Wolof speaker checks them. A production pack excludes the dubbed Wolof audio. The schema also rejects any production pack that lists a stand-in, so the English stand-in voice cannot ship in production until Noor's own recordings replace it. **Open conflict:** non-negotiable 10 in CLAUDE.md and the PRD non-goal say never to clone a teammate's voice, and an ElevenLabs dub reproduces the speaker's voice. Preet has consented, but the wording must be amended by the captain before the dubbing step runs.
 - Optional evaluation: compare ElevenLabs speech-to-text against MMS on the same recordings, and report both.
 
 ### 6.9 Pipeline (Python)
