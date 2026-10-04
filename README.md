@@ -142,7 +142,7 @@ tasks           build plan, lessons and team tasks
 | Guardrails (`packages/core`) | Done |
 | Content, audio prep and test questions | Done |
 | Translation drafts, farm pack and evaluation | Done |
-| Wolof evidence and a smaller model | Done: measured (`docs/EVAL.md`); 44 MB trimmed model as a GitHub Release asset |
+| Wolof evidence and a smaller model | Done: measured (`docs/EVAL.md`); 44 MB trimmed model as a private GitHub Release asset |
 | Guest app | Demo path built: pack download, stops, stop links and QR scanner, player, ask, feedback, shop, offline PWA, airplane-mode test. Not built: sync, pack updates, polish. The real-audio pack waits for a consent row |
 | Backend and dashboard | Not started: nothing in the repository yet |
 | Monthly text and reviewer approval | Not started (checked template and held-report logic exist in `packages/core`) |
