@@ -138,17 +138,17 @@ Best moment score per question, in 8 bins from 0.6 to 1.
 | Embedding matrix | 0.0 MB |
 | Prepared audio (local, if built) | 0.5 MB |
 | Estimated pack | 135.9 MB against the 150.0 MB P0 budget |
-| Model load (Node, build machine) | 618 ms |
-| Embedding the passages | 111 ms |
-| One question, median / p95 (116 questions) | 1.8 ms / 2.2 ms |
+| Model load (Node, build machine) | 505 ms |
+| Embedding the passages | 116 ms |
+| One question, median / p95 (116 questions) | 1.8 ms / 2.3 ms |
 
 **These timings are Node on the build machine, not a mid-range Android phone.** The phone numbers (model first load, question to outcome) come from the offline end-to-end run with the real worker.
 
 ## Honest limits
 
 - The questions are synthetic and were written by the team who also chose the clips; real guests will phrase things differently and make other mistakes. German, Dutch and Swedish questions were not checked by native speakers.
-- The threshold is in sample. With 100 ordinary questions, a 5% limit is about 5 questions, so the intervals above are wide.
+- The shipped threshold (0.855) is the strictest of three picks, one of which was chosen on all the questions, so the table at the chosen threshold is still in sample. The pooled held-out figure is the honest estimate, but it is **not a measurement of 0.855 itself**: each fold used its own threshold. With 100 ordinary questions, a 5% limit is about 5 questions, so the intervals are wide and one fold alone can be far from the pooled number.
 - Passages are the English script until Preet's transcript is checked; the subtitle text, and so the match text, will then change slightly. Run `bun run eval` again.
-- **Embeddings differ a little between CPUs and runtimes.** The pack's passage vectors are made here with ONNX Runtime on Node; the phone embeds each question with ONNX Runtime Web. It is the same int8 model file, but the int8 kernels round differently: in CI the same passages on Linux x64 were at cosine 0.995 or better against the same passages on macOS arm64 (one passage at 0.9948). That can move a question's score by a few thousandths, which is the size of one threshold step. The threshold has not been checked against vectors made on a phone; do that with the offline end-to-end run before relying on 0.8525 to the last decimal.
+- **Embeddings differ a little between CPUs and runtimes.** The pack's passage vectors are made here with ONNX Runtime on Node; the phone embeds each question with ONNX Runtime Web. It is the same int8 model file, but the int8 kernels round differently: in CI the same passages on Linux x64 were at cosine 0.995 or better against the same passages on macOS arm64 (one passage at 0.9948). That can move a question's score by a few thousandths, which is the size of one threshold step. The threshold has not been checked against vectors made on a phone; do that with the offline end-to-end run before relying on 0.855 to the last decimal.
 - Every guest confirms a match, so a false confirmation shows a wrong card the guest can reject; it never plays unconfirmed.
 
