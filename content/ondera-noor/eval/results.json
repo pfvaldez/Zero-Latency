@@ -476,7 +476,7 @@
       },
       {
         "name": "trim 0.5 (41 MB)",
-        "root": "/Users/bhagi/Zero-Latency/.cache/trim/q0.5",
+        "root": ".cache/trim/q0.5",
         "modelBytes": 41066980,
         "loadMs": 76,
         "queryMedianMs": 1.8,
@@ -496,7 +496,7 @@
       },
       {
         "name": "trim 0.75 (43 MB)",
-        "root": "/Users/bhagi/Zero-Latency/.cache/trim/q0.75",
+        "root": ".cache/trim/q0.75",
         "modelBytes": 42871505,
         "loadMs": 84,
         "queryMedianMs": 1.9,
@@ -516,7 +516,7 @@
       },
       {
         "name": "trim 1.0 (44 MB)",
-        "root": "/Users/bhagi/Zero-Latency/.cache/trim/q1.0",
+        "root": ".cache/trim/q1.0",
         "modelBytes": 44283350,
         "loadMs": 111,
         "queryMedianMs": 1.9,
@@ -536,7 +536,7 @@
       },
       {
         "name": "trim 1.25 (46 MB)",
-        "root": "/Users/bhagi/Zero-Latency/.cache/trim/q1.25",
+        "root": ".cache/trim/q1.25",
         "modelBytes": 45502858,
         "loadMs": 110,
         "queryMedianMs": 1.7,
@@ -556,7 +556,7 @@
       },
       {
         "name": "control: untrimmed, re-quantized from fp32",
-        "root": "/Users/bhagi/Zero-Latency/.cache/trim/all",
+        "root": ".cache/trim/all",
         "modelBytes": 127878258,
         "loadMs": 321,
         "queryMedianMs": 1.9,
@@ -576,7 +576,7 @@
       },
       {
         "name": "control: trim 1.0, re-quantized from fp32",
-        "root": "/Users/bhagi/Zero-Latency/.cache/trim/s1.0",
+        "root": ".cache/trim/s1.0",
         "modelBytes": 44284033,
         "loadMs": 128,
         "queryMedianMs": 1.7,
@@ -597,7 +597,7 @@
     ],
     "chosen": "trim 0.5 (41 MB)",
     "shipped": "trim 1.0 (44 MB)",
-    "shippedReason": "it keeps 52,005 rows and tracks the full model's vectors closely (mean cosine 0.9995) with the best coverage of the near-smallest, 3 MB larger than the smallest; the pack is still under 50 MB"
+    "shippedReason": "it keeps 52,005 rows and tracks the full model's vectors closely (mean cosine 0.9995), 3 MB larger than the smallest; the pack is still under 50 MB"
   },
   "study": [
     {
