@@ -2,6 +2,18 @@
 
 Everything below this block was written earlier for Pablo and is kept for reference; where it says the guest app is on a draft PR, this block is newer: **it is merged**.
 
+## Deploy (Vercel, static)
+
+Live demo: https://ask-noor.vercel.app (Vercel project `ask-noor`, deployed 2026-10-04 with the **synthetic fixture pack**, because Preet's publishing row is still pending). It is a static deploy of the built app, uploaded from this machine:
+
+```sh
+bun run pack:model --trimmed --into apps/web/public/packs/fixture   # the model is not in git
+bun run --cwd apps/web build
+cd apps/web/dist && vercel link --project ask-noor --yes && vercel deploy --prod --yes
+```
+
+`apps/web/public/vercel.json` rewrites `/stop/n` to `index.html` (first visit to a stop link) and keeps `sw.js` revalidating; `apps/web/public/.vercelignore` keeps the local production pack and an unused hashed copy of the runtime wasm out of the upload. Vercel Hobby allows 100 MB per CLI upload in total (no separate per-file limit); this upload is about 84 MB, so a bigger pack (the real demo pack with audio and the AI-dubbed Wolof) needs checking against it. `vite build` empties `dist`, so run `vercel link` again before each deploy.
+
 ## What merged (all with CI green, including the Playwright airplane-mode test, and a guardrail-reviewer PASS)
 | PR | What |
 |---|---|
