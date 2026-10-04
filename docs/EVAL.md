@@ -70,14 +70,15 @@ Each row is a different set of passages for the same moments, evaluated the same
 | subtitle text, English only | 9.0% (5% to 16%) | 37.5% (26% to 51%) | 75.0% | 88.6% | 0.0% / 8.9% / 75.0% |
 | before: subtitle text in all languages | 5.0% (2% to 11%) | 51.8% (39% to 64%) | 83.9% | 97.7% | 0.0% / 33.9% / 83.9% |
 | after: plus index-only passages (demo pack, shipped) | 3.0% (1% to 8%) | 73.2% (60% to 83%) | 91.1% | 97.7% | 2.0% / 67.9% / 91.1% |
-| production pack today: English subtitle text plus index-only | 3.0% (1% to 8%) | 60.7% (48% to 72%) | 89.3% | 97.7% | 2.0% / 57.1% / 89.3% |
+| production pack once English is checked: English subtitle text plus index-only | 3.0% (1% to 8%) | 60.7% (48% to 72%) | 89.3% | 97.7% | 2.0% / 57.1% / 89.3% |
 | after, without index phrasings that overlap a test question by 0.6 or more | 4.0% (2% to 10%) | 80.4% (68% to 89%) | 96.4% | 93.2% | 0.0% / 69.6% / 96.4% |
 
 ### Index-only phrasings: how they were made and how independent they are
 
 - 93 short question-style phrasings (3 per clip and language) were written by an isolated assistant that was given only the clip scripts and topics, and read no repository file. They are **never shown to a guest or to Noor**; they only add matrix rows for a moment, are marked `indexOnly` in the manifest, and the guest still confirms every match.
 - Leakage audit against the 116 test questions (same language, token overlap after normalization): 3 phrasings that repeated a question exactly were **removed** (not rewritten); the closest remaining phrasing overlaps a question by 0.86 ("How do you roast the coffee beans?" and q005). Best overlap per phrasing in fifths from 0 to 1: 33, 35, 14, 9, 2.
-- **Sensitivity:** the last row of the table drops the 11 phrasings that overlap a question by 0.6 or more. If the gain mostly survives, it does not come from near-copies.
+- **Sensitivity:** the last row of the table drops the 11 phrasings that overlap a question by 0.6 or more. Held-out coverage goes from 73.2% to 80.4%, so the gain does not come from near-copies; but false confirm goes from 3.0% to 4.0% and fail-safe from 97.7% to 93.2%, so removing them is not free either. With this few questions these differences are within the noise of the intervals.
+- **What the audit cannot see:** it measures token overlap within one language, so a phrasing that is a paraphrase or a translation of a test question is not detected. Paraphrase leakage is not measured.
 - **Limits I cannot remove:** the team's assistant also wrote the test questions and has seen them in this project, and both come from the same model family, so the style of the phrasings and of the questions is correlated. That can make the gain look larger than real guests would give. They are unchecked machine text (a draft), shipped labeled; see `docs/RESPONSIBLE_AI.md`.
 
 ## The overnight loop (clip 8 held back, then published)
@@ -148,9 +149,9 @@ Best moment score per question, in 8 bins from 0.6 to 1.
 | Embedding matrix | 0.2 MB |
 | Prepared audio (local, if built) | 0.5 MB |
 | Estimated pack | 136.1 MB against the 150.0 MB P0 budget |
-| Model load (Node, build machine) | 486 ms |
-| Embedding the passages | 220 ms |
-| One question, median / p95 (116 questions) | 1.7 ms / 2.2 ms |
+| Model load (Node, build machine) | 532 ms |
+| Embedding the passages | 219 ms |
+| One question, median / p95 (116 questions) | 1.8 ms / 2.2 ms |
 
 **These timings are Node on the build machine, not a mid-range Android phone.** The phone numbers (model first load, question to outcome) come from the offline end-to-end run with the real worker.
 

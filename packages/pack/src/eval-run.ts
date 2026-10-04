@@ -106,10 +106,8 @@ export async function buildPassages(
     }
   }
   // Index-only phrasings (never shown): extra rows per moment, when the file exists.
-  try {
-    const idx = IndexPassagesFileSchema.parse(
-      JSON.parse(await readFile(join(contentDir(farm), "index-passages.json"), "utf8")),
-    );
+  const idx = await readIndexFile(farm);
+  if (idx) {
     for (const clip of clips.clips) {
       const byLang = idx.clips[String(clip.id)];
       if (!byLang) continue;
@@ -119,8 +117,6 @@ export async function buildPassages(
         }
       }
     }
-  } catch {
-    // no index passages yet
   }
   const fromTranscript = transcripts.size;
   const source =
@@ -144,15 +140,19 @@ async function dirBytes(dir: string): Promise<number | null> {
   }
 }
 
-async function removedCount(farm: string): Promise<number> {
+/** The index-passages file, or null if it does not exist. Any other problem (bad JSON, bad shape) throws. */
+async function readIndexFile(farm: string) {
   try {
-    const idx = IndexPassagesFileSchema.parse(
-      JSON.parse(await readFile(join(contentDir(farm), "index-passages.json"), "utf8")),
-    );
-    return idx.removedAsDuplicates.length;
-  } catch {
-    return 0;
+    const raw = JSON.parse(await readFile(join(contentDir(farm), "index-passages.json"), "utf8"));
+    return IndexPassagesFileSchema.parse(raw);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw error;
   }
+}
+
+async function removedCount(farm: string): Promise<number> {
+  return (await readIndexFile(farm))?.removedAsDuplicates.length ?? 0;
 }
 
 export async function runEval(
@@ -250,7 +250,7 @@ export async function runEval(
       ? [
           { name: "after: plus index-only passages (demo pack, shipped)", filter: () => true },
           {
-            name: "production pack today: English subtitle text plus index-only",
+            name: "production pack once English is checked: English subtitle text plus index-only",
             filter: (p: Passage) => p.kind === "index" || p.lang === "en",
           },
           {

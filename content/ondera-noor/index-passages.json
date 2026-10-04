@@ -1,6 +1,6 @@
 {
   "note": "Short question-style phrasings per clip, written without looking at the test questions and NEVER shown to a guest or to Noor. They only help the matcher find the clip; the guest still confirms every match. Unchecked machine text: draft, labeled indexOnly in the manifest.",
-  "writer": "an isolated Claude subagent that was given only the clip scripts and topics in its prompt and read no repository file (its transcript shows no access to the test questions)",
+  "writer": "an isolated Claude subagent that was given only the clip scripts and topics in its prompt and read no repository file (as stated by the person who ran it; the repository cannot verify this)",
   "draft": true,
   "neverShown": true,
   "removedAsDuplicates": [

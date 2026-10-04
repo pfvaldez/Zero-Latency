@@ -144,6 +144,15 @@ function honestSection(r: EvalResults): string[] {
   return out;
 }
 
+function sensitivity(r: EvalResults): string {
+  const shipped = r.study.find((x) => x.name.startsWith("after:"));
+  const strict = r.study.find((x) => x.name.startsWith("after, without"));
+  if (!shipped?.pooled || !strict?.pooled) return "";
+  const a = shipped.pooled;
+  const b = strict.pooled;
+  return `Held-out coverage goes from ${pct(a.coverage)} to ${pct(b.coverage)}, so the gain does not come from near-copies; but false confirm goes from ${pct(a.falseConfirmRate)} to ${pct(b.falseConfirmRate)} and fail-safe from ${pct(a.failSafeRate)} to ${pct(b.failSafeRate)}, so removing them is not free either. With this few questions these differences are within the noise of the intervals.`;
+}
+
 function studySection(r: EvalResults): string[] {
   const out: string[] = ["## Which passages: before and after index-only phrasings", ""];
   out.push(
@@ -166,7 +175,8 @@ function studySection(r: EvalResults): string[] {
       "",
       `- ${l.passages} short question-style phrasings (3 per clip and language) were written by an isolated assistant that was given only the clip scripts and topics, and read no repository file. They are **never shown to a guest or to Noor**; they only add matrix rows for a moment, are marked \`indexOnly\` in the manifest, and the guest still confirms every match.`,
       `- Leakage audit against the ${r.questions.total} test questions (same language, token overlap after normalization): ${l.removedAsDuplicates} phrasings that repeated a question exactly were **removed** (not rewritten); the closest remaining phrasing overlaps a question by ${l.maxOverlap.toFixed(2)}${l.worst ? ` ("${l.worst.text}" and ${l.worst.questionId})` : ""}. Best overlap per phrasing in fifths from 0 to 1: ${l.bestOverlapBins.join(", ")}.`,
-      `- **Sensitivity:** the last row of the table drops the ${l.excludedAtCutoff} phrasings that overlap a question by ${l.strictCutoff} or more. If the gain mostly survives, it does not come from near-copies.`,
+      `- **Sensitivity:** the last row of the table drops the ${l.excludedAtCutoff} phrasings that overlap a question by ${l.strictCutoff} or more. ${sensitivity(r)}`,
+      "- **What the audit cannot see:** it measures token overlap within one language, so a phrasing that is a paraphrase or a translation of a test question is not detected. Paraphrase leakage is not measured.",
       "- **Limits I cannot remove:** the team's assistant also wrote the test questions and has seen them in this project, and both come from the same model family, so the style of the phrasings and of the questions is correlated. That can make the gain look larger than real guests would give. They are unchecked machine text (a draft), shipped labeled; see `docs/RESPONSIBLE_AI.md`.",
       "",
     );

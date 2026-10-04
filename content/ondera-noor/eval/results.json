@@ -463,7 +463,7 @@
       }
     },
     {
-      "name": "production pack today: English subtitle text plus index-only",
+      "name": "production pack once English is checked: English subtitle text plus index-only",
       "fullSetPick": 0.86,
       "foldPicks": [
         0.8675,
@@ -951,9 +951,9 @@
     ]
   },
   "timings": {
-    "modelLoadMs": 486,
-    "passagesMs": 220,
-    "queryMedianMs": 1.7,
+    "modelLoadMs": 532,
+    "passagesMs": 219,
+    "queryMedianMs": 1.8,
     "queryP95Ms": 2.2,
     "queries": 116
   },

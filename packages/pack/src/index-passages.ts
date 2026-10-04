@@ -15,7 +15,7 @@ import { contentDir, loadQuestions } from "./load-content.ts";
 type Raw = Record<string, Record<"en" | "de" | "nl" | "sv", string[]>>;
 
 export const WRITER =
-  "an isolated Claude subagent that was given only the clip scripts and topics in its prompt and read no repository file (its transcript shows no access to the test questions)";
+  "an isolated Claude subagent that was given only the clip scripts and topics in its prompt and read no repository file (as stated by the person who ran it; the repository cannot verify this)";
 
 export async function importIndexPassages(
   farm: string,
