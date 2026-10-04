@@ -1,17 +1,46 @@
-import type { FarmPackManifest, VisitorLang } from "@asknoor/core";
+import { type FarmPackManifest, t, type VisitorLang } from "@asknoor/core";
+import { Button } from "@/components/animate-ui/components/buttons/button";
+import { AskPanel } from "@/components/guest/AskPanel.tsx";
 import { Player } from "@/components/guest/Player.tsx";
 import { StopList } from "@/components/guest/StopList.tsx";
-import { useGuest } from "@/state/guest-store.ts";
+import { type Tab, useGuest } from "@/state/guest-store.ts";
 
-/** The tour once the pack is saved. Grows step by step: stops, player, ask, feedback, shop. */
+const TABS: { id: Tab; key: "nav.stops" | "nav.ask" }[] = [
+  { id: "stops", key: "nav.stops" },
+  { id: "ask", key: "nav.ask" },
+];
+
+/** The tour once the pack is saved: stops and player, ask. Feedback and shop follow. */
 export function GuestTour({ lang, manifest }: { lang: VisitorLang; manifest: FarmPackManifest }) {
-  const { clipId, momentId, openClip, closeClip } = useGuest();
+  const { tab, setTab, clipId, momentId, openClip, closeClip } = useGuest();
   const clip = manifest.clips.find((c) => c.id === clipId);
+  const moment = manifest.moments.find((m) => m.id === momentId);
+
   if (clip) {
-    const moment = manifest.moments.find((m) => m.id === momentId);
     return (
       <Player lang={lang} manifest={manifest} clip={clip} moment={moment} onClose={closeClip} />
     );
   }
-  return <StopList lang={lang} clips={manifest.clips} onOpen={(c) => openClip(c.id)} />;
+  return (
+    <div className="flex flex-col gap-4">
+      <nav aria-label={t(lang, "app.name")} className="flex gap-2">
+        {TABS.map(({ id, key }) => (
+          <Button
+            key={id}
+            variant={tab === id ? "default" : "outline"}
+            aria-pressed={tab === id}
+            onClick={() => setTab(id)}
+          >
+            {t(lang, key)}
+          </Button>
+        ))}
+      </nav>
+      {tab === "stops" && (
+        <StopList lang={lang} clips={manifest.clips} onOpen={(c) => openClip(c.id)} />
+      )}
+      {tab === "ask" && (
+        <AskPanel lang={lang} manifest={manifest} onPlay={(m) => openClip(m.clipId, m.id)} />
+      )}
+    </div>
+  );
 }
