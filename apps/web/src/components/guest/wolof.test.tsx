@@ -57,7 +57,7 @@ describe("the Wolof order line on Noor's order sheet", () => {
   });
 });
 
-describe("Hear Noor in Wolof (AI-dubbed)", () => {
+describe("Hear this stop in Wolof (AI-dubbed)", () => {
   const withDub = (): FarmPackManifest => {
     const m = fixtureManifest();
     const clip = m.clips[1];
@@ -97,13 +97,20 @@ describe("Hear Noor in Wolof (AI-dubbed)", () => {
   it("in demo mode offers the dub, switches to the dubbed file, and labels it AI-dubbed, a draft and not Noor's own voice", async () => {
     const blob = await mountPlayer(withDub());
     await waitFor(() => expect(blob).toHaveBeenCalledWith("audio/clip02.m4a"));
-    fireEvent.click(await screen.findByRole("button", { name: "Hear Noor in Wolof (AI-dubbed)" }));
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Hear this stop in Wolof (AI-dubbed)" }),
+    );
     await waitFor(() => expect(blob).toHaveBeenCalledWith("audio/clip03.m4a"));
     expect((await screen.findAllByText("AI-dubbed")).length).toBeGreaterThan(0);
     expect(screen.getByText("Draft, not yet checked by a Wolof speaker")).toBeInTheDocument();
     expect(screen.getByText(t("en", "player.dubNote"))).toBeInTheDocument();
+    // Never framed as Noor speaking: a neutral heading, and the subtitles are said to be a machine translation.
+    expect(screen.getByRole("heading", { name: "AI-dubbed Wolof version" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Noor's own recording" })).not.toBeInTheDocument();
+    expect(screen.getByText(t("en", "player.dubSubtitlesNote"))).toBeInTheDocument();
+    expect(screen.queryByText(/Hear Noor/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Hear the original recording" }));
-    await screen.findByRole("button", { name: "Hear Noor in Wolof (AI-dubbed)" });
+    await screen.findByRole("button", { name: "Hear this stop in Wolof (AI-dubbed)" });
     expect(screen.queryByText(t("en", "player.dubNote"))).not.toBeInTheDocument();
   });
 
@@ -178,6 +185,7 @@ describe("Noor's month (demo only)", () => {
     expect(phone).toHaveTextContent("Ci weer bii: 1 ay doxandéem");
     expect(phone).toHaveTextContent(noor().themeLabels.stay.wo);
     expect(screen.getByText("English preview of the same text")).toBeInTheDocument();
+    expect(screen.getByText("English draft, not yet checked")).toBeInTheDocument();
     expect(screen.getByText(/This month: 1 guests/)).toBeInTheDocument();
   });
 

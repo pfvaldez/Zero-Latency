@@ -120,9 +120,13 @@ export const nl: Strings = {
   "month.size": "{chars} tekens, {segments} sms",
   "month.dropped": "Weggelaten om in twee sms'jes te passen: {parts}",
   "labels.wolofDraft": "Concept, nog niet gecontroleerd door een Wolof-spreker",
-  "player.hearWolof": "Hoor Noor in het Wolof (AI-gedubd)",
+  "player.hearWolof": "Hoor deze stop in het Wolof (AI-gedubd)",
   "player.hearOriginal": "Hoor de originele opname",
   "player.dubNote":
-    "AI-gedubd Wolof: een door een machine gemaakte stem op basis van de Engelse opname. Het is niet Noors eigen stem of woorden.",
+    "AI-gedubd Wolof: een door een machine gemaakte stem op basis van de Engelse opname. Het is niet Noors stem en niet de eigen woorden van de spreker.",
   "shop.orderLineWolof": "Voor Noor, in het Wolof",
+  "player.dubTitle": "AI-gedubde Wolof-versie",
+  "player.dubSubtitlesNote":
+    "Wolof-ondertitels: een machinevertaling van het Engels, geen transcriptie van deze audio.",
+  "month.englishDraft": "Engels concept, nog niet gecontroleerd",
 };

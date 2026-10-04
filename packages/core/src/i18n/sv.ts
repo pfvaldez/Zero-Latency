@@ -117,9 +117,13 @@ export const sv: Strings = {
   "month.size": "{chars} tecken, {segments} sms",
   "month.dropped": "Utelämnat för att få plats i två sms: {parts}",
   "labels.wolofDraft": "Utkast, ännu inte kontrollerat av en wolof-talare",
-  "player.hearWolof": "Hör Noor på wolof (AI-dubbat)",
+  "player.hearWolof": "Hör det här stoppet på wolof (AI-dubbat)",
   "player.hearOriginal": "Hör originalinspelningen",
   "player.dubNote":
-    "AI-dubbad wolof: en maskinskapad röst byggd på den engelska inspelningen. Det är inte Noors egen röst eller hennes ord.",
+    "AI-dubbad wolof: en maskinskapad röst byggd på den engelska inspelningen. Det är inte Noors röst och inte talarens egna ord.",
   "shop.orderLineWolof": "För Noor, på wolof",
+  "player.dubTitle": "AI-dubbad version på wolof",
+  "player.dubSubtitlesNote":
+    "Undertexter på wolof: en maskinöversättning av engelskan, inte en transkription av det här ljudet.",
+  "month.englishDraft": "Engelskt utkast, ännu inte kontrollerat",
 };

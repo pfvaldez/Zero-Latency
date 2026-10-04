@@ -125,9 +125,13 @@ export const de: Strings = {
   "month.size": "{chars} Zeichen, {segments} SMS",
   "month.dropped": "Weggelassen, damit es in zwei SMS passt: {parts}",
   "labels.wolofDraft": "Entwurf, noch nicht von einer Wolof-sprechenden Person geprüft",
-  "player.hearWolof": "Noor auf Wolof hören (KI-vertont)",
+  "player.hearWolof": "Diese Station auf Wolof hören (KI-vertont)",
   "player.hearOriginal": "Originalaufnahme hören",
   "player.dubNote":
-    "KI-vertontes Wolof: eine maschinell erzeugte Stimme aus der englischen Aufnahme. Es ist nicht Noors eigene Stimme oder ihre Worte.",
+    "KI-vertontes Wolof: eine maschinell erzeugte Stimme aus der englischen Aufnahme. Es ist nicht Noors Stimme und nicht die eigenen Worte der sprechenden Person.",
   "shop.orderLineWolof": "Für Noor, auf Wolof",
+  "player.dubTitle": "KI-vertonte Wolof-Fassung",
+  "player.dubSubtitlesNote":
+    "Wolof-Untertitel: eine maschinelle Übersetzung des Englischen, keine Abschrift dieser Aufnahme.",
+  "month.englishDraft": "Englischer Entwurf, noch nicht geprüft",
 };

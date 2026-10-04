@@ -60,6 +60,7 @@ export function MonthScreen({ lang, manifest }: { lang: VisitorLang; manifest: F
           </section>
           <div className="flex flex-col gap-1">
             <h3 className="text-xl font-bold">{t(lang, "month.englishPreview")}</h3>
+            <p className="text-base font-bold">{t(lang, "month.englishDraft")}</p>
             <p className="text-base">{english.body}</p>
           </div>
         </>

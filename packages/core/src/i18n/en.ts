@@ -122,9 +122,13 @@ export const en = {
   "month.size": "{chars} characters, {segments} SMS",
   "month.dropped": "Left out to fit two SMS: {parts}",
   "labels.wolofDraft": "Draft, not yet checked by a Wolof speaker",
-  "player.hearWolof": "Hear Noor in Wolof (AI-dubbed)",
+  "player.hearWolof": "Hear this stop in Wolof (AI-dubbed)",
   "player.hearOriginal": "Hear the original recording",
   "player.dubNote":
-    "AI-dubbed Wolof: a machine-made voice built from the English recording. It is not Noor's own voice or words.",
+    "AI-dubbed Wolof: a machine-made voice built from the English recording. It is not Noor's voice, and not the speaker's own words.",
   "shop.orderLineWolof": "For Noor, in Wolof",
+  "player.dubTitle": "AI-dubbed Wolof version",
+  "player.dubSubtitlesNote":
+    "Wolof subtitles: a machine translation of the English, not a transcript of this audio.",
+  "month.englishDraft": "English draft, not yet checked",
 } as const;

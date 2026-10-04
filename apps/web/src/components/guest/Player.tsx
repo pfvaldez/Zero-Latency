@@ -78,7 +78,7 @@ export function Player({
   return (
     <section aria-labelledby="player-title" className="flex flex-col gap-3">
       <h2 id="player-title" className="text-2xl font-bold">
-        {t(lang, "player.noorSays")}
+        {wolof ? t(lang, "player.dubTitle") : t(lang, "player.noorSays")}
       </h2>
       <VoiceLabels lang={lang} manifest={manifest} audio={audioPath} />
       {wolof && (
@@ -86,6 +86,9 @@ export function Player({
           <p className="text-base font-bold">{t(lang, "labels.aiDubbed")}</p>
           <p className="text-base font-bold">{t(lang, "labels.wolofDraft")}</p>
           <p className="text-base">{t(lang, "player.dubNote")}</p>
+          {dubbed?.subtitlesDraft && (
+            <p className="text-base">{t(lang, "player.dubSubtitlesNote")}</p>
+          )}
         </div>
       )}
       <DemoNotes lang={lang} manifest={manifest} drafts={draft} />
@@ -102,7 +105,7 @@ export function Player({
         }}
       />
       {dubbed && (
-        <Button variant="outline" onClick={() => setDub((d) => !d)} aria-pressed={dub}>
+        <Button variant="outline" onClick={() => setDub((d) => !d)}>
           {dub ? t(lang, "player.hearOriginal") : t(lang, "player.hearWolof")}
         </Button>
       )}
@@ -110,7 +113,11 @@ export function Player({
         {playing ? t(lang, "player.pause") : t(lang, "player.play")}
       </Button>
       {fellBack && <p className="text-base">{t(lang, "player.sourceFallback")}</p>}
-      <section aria-label={t(lang, "player.subtitles")} className="flex flex-col gap-2 text-xl">
+      <section
+        aria-label={t(lang, "player.subtitles")}
+        lang={wolof ? "wo" : lang}
+        className="flex flex-col gap-2 text-xl"
+      >
         {shown.map((cue) => (
           <p
             key={cue.startMs}
