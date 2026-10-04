@@ -42,7 +42,6 @@ export function ScanStop({
       {denied ? (
         <p role="alert">{t(lang, "stops.cameraDenied")}</p>
       ) : (
-        // biome-ignore lint/a11y/useMediaCaption: a live camera preview has no audio to caption
         <video
           ref={video}
           muted
