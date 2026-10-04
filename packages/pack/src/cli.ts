@@ -4,10 +4,18 @@
 import { join } from "node:path";
 import { PackError } from "@asknoor/core";
 import { buildPack } from "./build.ts";
+import { compareModels, writeComparison } from "./compare-models.ts";
 import { runEval } from "./eval-run.ts";
 import { buildFixture } from "./fixture.ts";
 import { importIndexPassages } from "./index-passages.ts";
-import { ensureModelCache, REPO_ROOT, stageModel } from "./model.ts";
+import {
+  ensureModelCache,
+  REPO_ROOT,
+  stageModel,
+  stageTrimmedModel,
+  writeTrimmedLock,
+} from "./model.ts";
+import { writeVocabSeed } from "./vocab-seed.ts";
 
 const [command, ...rest] = process.argv.slice(2);
 const flag = (name: string) => {
@@ -19,8 +27,13 @@ async function main(): Promise<number> {
   switch (command) {
     case "model": {
       const into = flag("--into");
-      if (into) {
-        const dir = await stageModel(join(REPO_ROOT, into));
+      if (rest.includes("--write-trimmed-lock")) {
+        const lock = await writeTrimmedLock(flag("--from"));
+        console.log(`wrote model-trimmed.lock.json (${lock.keepCount} rows kept)`);
+      } else if (into) {
+        const dir = rest.includes("--trimmed")
+          ? await stageTrimmedModel(join(REPO_ROOT, into))
+          : await stageModel(join(REPO_ROOT, into));
         console.log(`model staged at ${dir}`);
       } else {
         console.log(`model cached and verified at ${await ensureModelCache()}`);
@@ -50,6 +63,37 @@ async function main(): Promise<number> {
       );
       return 0;
     }
+    case "vocab-seed": {
+      const n = await writeVocabSeed(
+        flag("--farm") ?? "ondera-noor",
+        join(REPO_ROOT, ".cache", "data", "vocab", "seed_content.txt"),
+      );
+      console.log(`vocab seed: ${n} lines of our own content (no test questions)`);
+      return 0;
+    }
+    case "compare-models": {
+      // compare-models full s0.75=.cache/trim/s0.75 ... : the first is always the full model.
+      const roots = [{ name: "full (118 MB int8)", root: "full" }];
+      for (const arg of rest.filter((a) => a.includes("="))) {
+        const [name, path] = arg.split("=");
+        roots.push({ name: name as string, root: join(REPO_ROOT, path as string) });
+      }
+      const ship = flag("--ship");
+      const result = await compareModels(
+        flag("--farm") ?? "ondera-noor",
+        roots,
+        new Date(),
+        ship ? { name: ship, reason: flag("--reason") ?? "" } : undefined,
+      );
+      await writeComparison(flag("--farm") ?? "ondera-noor", result);
+      for (const r of result.rows) {
+        console.log(
+          `${r.name}: ${(r.modelBytes / 1e6).toFixed(1)} MB, held-out top-1 ${r.heldOut ? (r.heldOut.top1 * 100).toFixed(1) : "-"}% (${r.top1VsFull >= 0 ? "+" : ""}${r.top1VsFull} vs full), coverage ${r.heldOut ? (r.heldOut.coverage * 100).toFixed(1) : "-"}%, cosine to full ${r.meanCosineToFull}, threshold ${r.threshold}, within 2 points: ${r.withinTolerance}`,
+        );
+      }
+      console.log(`chosen: ${result.chosen ?? "none within tolerance"}`);
+      return 0;
+    }
     case "fixture": {
       const built = await buildFixture();
       console.log(
@@ -63,7 +107,12 @@ async function main(): Promise<number> {
         .split(",")
         .filter(Boolean)
         .map((c) => Number(c.replace(/^clip0*/, "")));
-      const built = await buildPack({ farm: flag("--farm") ?? "ondera-noor", mode, publish });
+      const built = await buildPack({
+        farm: flag("--farm") ?? "ondera-noor",
+        mode,
+        publish,
+        model: flag("--model") === "trimmed" ? "trimmed" : "full",
+      });
       const m = built.manifest;
       console.log(
         `${m.mode} pack ${m.packId} v${m.version} (${built.changed ? "changed" : "unchanged"}) at ${built.dir}: ` +
@@ -78,7 +127,7 @@ async function main(): Promise<number> {
     }
     default:
       console.error(
-        "usage: cli.ts model [--into dir] | index-import --from raw.json | eval [--farm slug] | build [--mode demo|production] [--publish clip08]",
+        "usage: cli.ts model [--into dir] | index-import --from raw.json | eval [--farm slug] | build [--mode demo|production] [--publish clip08] [--model trimmed]",
       );
       return 2;
   }

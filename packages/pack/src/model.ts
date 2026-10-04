@@ -27,6 +27,31 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = join(HERE, "..", "..", "..");
 export const DEFAULT_CACHE = join(REPO_ROOT, ".cache", "models");
 
+/** The trimmed-vocabulary variant: the same int8 model with the embedding rows we do not need cut away. */
+export interface TrimmedLock {
+  baseRepo: string;
+  baseRevision: string;
+  license: string;
+  dtype: string;
+  recipe: string;
+  /** sha256 of packages/pack/trim/keep-ids.json (the kept rows of the base vocabulary, in order). */
+  keepIdsSha256: string;
+  keepCount: number;
+  files: ModelFile[];
+}
+
+/** Where `pipeline asknoor.trim.run apply` (or a release download) puts the trimmed folder. */
+export const TRIMMED_CACHE = join(REPO_ROOT, ".cache", "trimmed", PACK_MODEL_ID);
+export const KEEP_IDS_PATH = join(HERE, "..", "trim", "keep-ids.json");
+export const TRIMMED_RECIPE =
+  "Slice the rows of the 8-bit word-embedding table of the base int8 model to the kept ids; renumber the tokenizer; change nothing else";
+
+export async function readTrimmedLock(): Promise<TrimmedLock> {
+  return JSON.parse(
+    await readFile(join(HERE, "..", "model-trimmed.lock.json"), "utf8"),
+  ) as TrimmedLock;
+}
+
 export async function readLock(): Promise<ModelLock> {
   return JSON.parse(await readFile(join(HERE, "..", "model.lock.json"), "utf8")) as ModelLock;
 }
@@ -82,4 +107,63 @@ export async function verifyModelDir(dir: string, lock?: ModelLock): Promise<boo
   const l = lock ?? (await readLock());
   for (const file of l.files) if (!(await fileMatches(join(dir, file.path), file))) return false;
   return true;
+}
+
+/** True when every file of the trimmed folder matches the trimmed lock, and the kept-id list is the locked one. */
+export async function verifyTrimmedDir(
+  dir = TRIMMED_CACHE,
+  lock?: TrimmedLock,
+  keepIdsPath = KEEP_IDS_PATH,
+): Promise<boolean> {
+  const l = lock ?? (await readTrimmedLock());
+  try {
+    if (sha256(await readFile(keepIdsPath)) !== l.keepIdsSha256) return false;
+  } catch {
+    return false;
+  }
+  for (const file of l.files) if (!(await fileMatches(join(dir, file.path), file))) return false;
+  return true;
+}
+
+/** Copy the verified trimmed model to `<root>/model/<PACK_MODEL_ID>/…`. It is never downloaded unverified. */
+export async function stageTrimmedModel(root: string, from = TRIMMED_CACHE): Promise<string> {
+  const lock = await readTrimmedLock();
+  if (!(await verifyTrimmedDir(from, lock))) {
+    throw new Error(
+      `the trimmed model in ${from} is missing or does not match model-trimmed.lock.json. Rebuild it: ` +
+        "cd pipeline && uv run --group translate python -m asknoor.trim.run apply --keep ../packages/pack/trim/keep-ids.json --out ../.cache/trimmed",
+    );
+  }
+  const dest = join(root, "model", PACK_MODEL_ID);
+  for (const file of lock.files) {
+    await mkdir(dirname(join(dest, file.path)), { recursive: true });
+    await copyFile(join(from, file.path), join(dest, file.path));
+  }
+  return dest;
+}
+
+/** Write model-trimmed.lock.json from a folder (the maintainer's step after a new trim). */
+export async function writeTrimmedLock(dir = TRIMMED_CACHE): Promise<TrimmedLock> {
+  const base = await readLock();
+  const keep = JSON.parse(await readFile(KEEP_IDS_PATH, "utf8")) as number[];
+  const files: ModelFile[] = [];
+  for (const f of base.files) {
+    const bytes = await readFile(join(dir, f.path));
+    files.push({ path: f.path, size: bytes.length, sha256: sha256(bytes) });
+  }
+  const lock: TrimmedLock = {
+    baseRepo: base.repo,
+    baseRevision: base.revision,
+    license: base.license,
+    dtype: base.dtype,
+    recipe: TRIMMED_RECIPE,
+    keepIdsSha256: sha256(await readFile(KEEP_IDS_PATH)),
+    keepCount: keep.length,
+    files,
+  };
+  await writeFile(
+    join(HERE, "..", "model-trimmed.lock.json"),
+    `${JSON.stringify(lock, null, 2)}\n`,
+  );
+  return lock;
 }

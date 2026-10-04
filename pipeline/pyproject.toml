@@ -16,6 +16,9 @@ dev = [
     "jiwer==4.0.0",
     "pyarrow==25.0.1",
     "sacrebleu==2.6.0",
+    "onnx==1.23.1",
+    "onnxruntime==1.30.0",
+    "tokenizers==0.23.2",
 ]
 # Heavy (several GB of models): the translation drafts and the Wolof evidence runs. Never in CI.
 translate = [

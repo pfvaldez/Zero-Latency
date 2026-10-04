@@ -501,6 +501,30 @@
             "trimmed"
           ]
         },
+        "trim": {
+          "type": "object",
+          "properties": {
+            "keptRows": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            "keepIdsSha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "recipe": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "keptRows",
+            "keepIdsSha256",
+            "recipe"
+          ],
+          "additionalProperties": false
+        },
         "sizeBytes": {
           "type": "integer",
           "exclusiveMinimum": 0,

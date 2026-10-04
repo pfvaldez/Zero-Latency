@@ -89,7 +89,7 @@ Evidence still to collect (Preet, with source, year and country): tourism arriva
 | FR-15 | Demo mode: drafts visible with labels, example questions shown | P0 | Production build hides drafts |
 | FR-16 | Groq theme cross-check with review queue | P1 | Disagreements appear for a reviewer; nothing reaches guests or Noor unreviewed |
 | FR-17 | ElevenLabs narrator audio for add-ons | P1 | Every clip labeled "AI narrator voice"; generated only from checked text |
-| FR-18 | Trimmed-vocabulary model | P1 | Pack size reduced; matching accuracy within 2 points of the full model |
+| FR-18 | Trimmed-vocabulary model | P1 | Pack size reduced; matching accuracy within 2 points of the full model. Done: 44.3 MB model, held-out top-1 equal (`docs/EVAL.md`) |
 
 ## 8. Guardrails (pass/fail requirement)
 

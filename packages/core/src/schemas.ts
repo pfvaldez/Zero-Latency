@@ -175,17 +175,29 @@ export const FarmPackManifestSchema = z
     clips: z.array(clipSchema),
     moments: z.array(momentSchema),
     addons: z.array(addonSchema),
-    model: z.strictObject({
-      id: z.literal("multilingual-e5-small"),
-      dir: z.string().min(1),
-      source: z.string().min(1),
-      revision: z.string().regex(/^[0-9a-f]{40}$/),
-      queryPrefix: z.literal("query: "),
-      dim: z.literal(384),
-      quantization: z.literal("int8"),
-      vocab: z.enum(["full", "trimmed"]),
-      sizeBytes: z.number().int().positive(),
-    }),
+    model: z
+      .strictObject({
+        id: z.literal("multilingual-e5-small"),
+        dir: z.string().min(1),
+        source: z.string().min(1),
+        revision: z.string().regex(/^[0-9a-f]{40}$/),
+        queryPrefix: z.literal("query: "),
+        dim: z.literal(384),
+        quantization: z.literal("int8"),
+        vocab: z.enum(["full", "trimmed"]),
+        /** Present exactly when the vocabulary is trimmed: what was kept, and how to check it. */
+        trim: z
+          .strictObject({
+            keptRows: z.number().int().positive(),
+            keepIdsSha256: z.string().regex(/^[0-9a-f]{64}$/),
+            recipe: z.string().min(1),
+          })
+          .optional(),
+        sizeBytes: z.number().int().positive(),
+      })
+      .refine((m) => (m.vocab === "trimmed") === (m.trim !== undefined), {
+        message: "model.trim is required for a trimmed vocabulary and not allowed otherwise",
+      }),
     embeddings: z.strictObject({
       file: z.string().min(1),
       count: nonNegInt,

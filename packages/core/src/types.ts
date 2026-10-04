@@ -110,6 +110,8 @@ export interface FarmPackManifest {
     dim: 384;
     quantization: "int8";
     vocab: "full" | "trimmed";
+    /** Present exactly when vocab is "trimmed": the kept rows, the hash of the kept-id list, the recipe. */
+    trim?: { keptRows: number; keepIdsSha256: string; recipe: string };
     sizeBytes: number;
   };
   embeddings: {

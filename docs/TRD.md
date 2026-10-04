@@ -8,7 +8,7 @@ Version 1.0, October 3, 2026. Companion to `docs/PRD.md`. If they disagree, the 
 |---|---|
 | Runs on a device the user already has | Guests use their own phones (PWA). Noor uses her own phone for SMS only. Recording happens once on her daughter's smartphone. No new hardware. |
 | Core feature works offline | Tour, ask flow, feedback and shop run with zero network after one pack download. Proven by a Playwright test with the browser context offline. |
-| Model files small enough to side-load or send over a weak connection | One on-device model (multilingual-e5-small, int8). Size measured and reported; vocabulary trimming as P1. |
+| Model files small enough to side-load or send over a weak connection | One on-device model (multilingual-e5-small, int8). Size measured and reported; the trimmed-vocabulary variant (44 MB instead of 135 MB, same held-out top-1) is built from the same int8 file and chosen with `--model trimmed`. |
 | One interaction in a named local language | Noor's monthly text and her order line are in Wolof, checked by a Wolof speaker. Guests hear Preet's English recordings as Noor's labeled stand-in voice; AI-dubbed Wolof clips are labeled synthetic data (demo mode only until a Wolof speaker checks them). |
 | Human in the loop; avoid hallucinations | No generative model on the guest path. Guest confirms matches. Fixed templates for Noor. Reviewer approves sends. |
 | Fail-safe ("not sure, ask a person") | Threshold and safety routing in `packages/core`, covered by tests. |
@@ -67,7 +67,7 @@ flowchart LR
 4. `translate` creates draft subtitles for each visitor language with NLLB and marks them unchecked.
 5. A person checks drafts and edits `checks.json`. Nothing is auto-approved.
 6. `embed` encodes each moment as `passage: <checked text>` in every available language and stores normalized vectors.
-7. `export_model` exports e5 to ONNX and quantizes to int8 (P1: vocabulary trimming).
+7. `export_model` exports e5 to ONNX and quantizes to int8. Vocabulary trimming is `asknoor/trim`: it slices the int8 embedding rows of the shipped model to a kept-id list (it does not re-quantize; that cost 5.4 points).
 8. `pack` writes `manifest.json`, audio (mono AAC `.m4a`, 48 kbps, -16 LUFS: AAC plays on iOS Safari where Opus in a web container is unreliable), WebVTT subtitles, embeddings and model files, with sizes and SHA-256 checksums. In `--mode production`, unchecked items are excluded. In `--mode demo`, they're included and flagged.
 9. `eval` (`bun run eval`, packages/pack) calibrates the match threshold on the test set, writes it to `content/<farm>/eval/threshold.json` (the builder puts it in the manifest) and writes `docs/EVAL.md`.
 
@@ -577,7 +577,7 @@ The offline test is the single most important test. Run it before every checkpoi
 | Risk | Fallback |
 |---|---|
 | Matcher worker not ready by the Slice 1 checkpoint (11 PM) | Temporary `KeywordMatcher` implementing `Matcher`, labeled as a stand-in in demo mode; replaced before submission |
-| Model too large | Int8 plus side-load; vocabulary trimming as P1 |
+| Model too large | Int8, plus the trimmed vocabulary (44 MB model, verified by lock) and side-load |
 | Supabase or SMS provider issues | Demo-mode logging; seed data labeled synthetic |
 | Groq unavailable | Device themes only; classification stays P1 |
 | Time pressure | Apply the cut list in `tasks/todo.md` in order |

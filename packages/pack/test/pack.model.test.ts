@@ -8,7 +8,16 @@ import { buildPack } from "../src/build.ts";
 import { dot, loadEmbedder } from "../src/embed.ts";
 import { MARGIN_PLACEHOLDER, runEval } from "../src/eval-run.ts";
 import { FIXTURE_DIR, fixtureInput } from "../src/fixture.ts";
-import { DEFAULT_CACHE, ensureModelCache, REPO_ROOT, stageModel } from "../src/model.ts";
+import {
+  DEFAULT_CACHE,
+  ensureModelCache,
+  PACK_MODEL_ID,
+  REPO_ROOT,
+  readTrimmedLock,
+  stageModel,
+  stageTrimmedModel,
+  verifyTrimmedDir,
+} from "../src/model.ts";
 
 const STAGE = join(REPO_ROOT, ".cache", "stage");
 
@@ -173,5 +182,71 @@ describe("the evaluation (smoke test on the real content, nothing written)", () 
     expect(r.primary.answered + r.primary.neverAnswered).toBe(r.primary.questions);
     expect(r.study.length).toBe(5); // English only, before, after, production today, strict
     expect(r.leakage?.passages).toBeGreaterThan(80);
+  });
+});
+
+// The trimmed model is a local build product (`cd pipeline && uv run --group translate python -m
+// asknoor.trim.run apply ...`), verified against model-trimmed.lock.json. The CI model job does not
+// build it, so these tests run where the folder exists and are reported as skipped where it does not.
+const trimmedPresent = await verifyTrimmedDir();
+
+describe.skipIf(!trimmedPresent)("the trimmed model", () => {
+  it("loads through Transformers.js on Node and gives vectors close to the full model's, in every language", async () => {
+    await ensureModelCache(DEFAULT_CACHE);
+    await stageModel(STAGE, DEFAULT_CACHE);
+    const trimmedStage = join(await mkdtemp(join(tmpdir(), "trimmed-stage-")));
+    await stageTrimmedModel(trimmedStage);
+    const full = await loadEmbedder(join(STAGE, "model"));
+    const trimmed = await loadEmbedder(join(trimmedStage, "model"));
+    const sentences = [
+      "We roast the beans in a pan over the fire.",
+      "Wir rösten die Bohnen in einer Pfanne über dem Feuer.",
+      "We branden de bonen in een pan boven het vuur.",
+      "Vi rostar bönorna i en panna över elden.",
+      "Dama bëgg a jënd kafe.",
+      "Can I stay overnight on the farm?",
+    ];
+    const a = await full.embed(sentences, "passage: ");
+    const b = await trimmed.embed(sentences, "passage: ");
+    await full.dispose();
+    await trimmed.dispose();
+    for (const [i, v] of a.entries()) {
+      expect(dot(v, b[i] as Float32Array)).toBeGreaterThan(0.98);
+    }
+  });
+
+  it("builds a pack that says it is trimmed, verifies, and stays under 50 MB", async () => {
+    const out = await mkdtemp(join(tmpdir(), "trimmed-pack-"));
+    const built = await buildPack({
+      farm: "fixture",
+      mode: "demo",
+      input: await fixtureInput(),
+      outDir: out,
+      audioDir: join(REPO_ROOT, "packages", "pack", "fixtures", "audio"),
+      now: new Date("2026-10-04T00:00:00Z"),
+      farmId: "00000000-0000-4000-8000-0000000000f1",
+      includeModel: true,
+      allowSyntheticTones: true,
+      thresholds: { match: 0.8675, margin: 0.05 },
+      model: "trimmed",
+    });
+    const lock = await readTrimmedLock();
+    const m = built.manifest.model;
+    expect(m.vocab).toBe("trimmed");
+    expect(m.revision).toBe(lock.baseRevision);
+    expect(m.trim).toMatchObject({ keptRows: lock.keepCount, keepIdsSha256: lock.keepIdsSha256 });
+    expect(m.dir).toBe(`model/${PACK_MODEL_ID}`);
+    for (const f of lock.files) {
+      expect(built.manifest.checksums[`model/${PACK_MODEL_ID}/${f.path}`]).toBe(f.sha256);
+    }
+    const total = Object.values(built.manifest.sizes).reduce((a, b) => a + b, 0);
+    expect(total).toBeLessThan(50_000_000);
+  });
+
+  it("refuses a trimmed model whose files do not match the lock", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "bad-trimmed-"));
+    await expect(stageTrimmedModel(join(dir, "out"), dir)).rejects.toThrow(
+      /model-trimmed\.lock\.json/,
+    );
   });
 });
