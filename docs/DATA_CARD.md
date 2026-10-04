@@ -1,0 +1,48 @@
+# Data card: Ask Noor
+
+**DRAFT for Preet to complete and check** (the TRD assigns this document to her). Written 2026-10-04 by Bee with Claude Code from the repository as it stands on `main`; rows for e5 and NLLB are pinned in the repository (`packages/pack/model.lock.json`, `pipeline/asknoor/translate.py`) and a test checks the revisions; **rows marked planned (MMS, FLORES-200, FLEURS, Wikipedia, Tatoeba) were taken from the upstream cards and are not pinned or used in the repository yet.**
+
+> **Non-commercial licenses.** Two models used by this project are **CC-BY-NC-4.0 (non-commercial): NLLB-200 and Meta MMS**. That is fine for a hackathon submission and for research, and it **limits any commercial use and the "any farm, any language" story**: a cooperative that sells the tool would need other models or a license. Everything that comes out of them is labeled a machine draft.
+
+## 1. Models and datasets
+
+| Name | Source | Version or revision | License | Size | Used for | What it does not cover |
+|---|---|---|---|---|---|---|
+| multilingual-e5-small, int8 ONNX | Hugging Face `Xenova/multilingual-e5-small` (conversion of `intfloat/multilingual-e5-small`) | revision `761b726dd34fb83930e26aab4e9ac3899aa1fa78` | MIT upstream (the intfloat model card); the Xenova conversion repo declares no license of its own | 118.3 MB model + 17.1 MB tokenizer = 135.4 MB in each pack | Matching a guest's question to a moment of Noor's recordings, on the phone | **Wolof is not one of its languages**: it matches en, de, nl and sv questions. Trained mostly on web text, so everyday tour wording is covered but typos and slang are weaker |
+| NLLB-200 distilled 600M | Hugging Face `facebook/nllb-200-distilled-600M` | revision `f8d333a098d19b4fd9a8b18f94170487ad3f821d` | **CC-BY-NC-4.0 (non-commercial)** | 2.46 GB | Build-time machine drafts of subtitles, add-ons and the Wolof SMS template (de, nl, sv, wo) | Wolof quality has **not been measured** (planned, Slice 4 step 4); expect it to be weaker than German; no domain vocabulary for coffee; output is never checked by this project |
+| Meta MMS-1b-all with the `wol` adapter | Hugging Face `facebook/mms-1b-all` | upstream revision `3d33597edbdaaba14a8e858e2c8caa76e3cec0cd`, not pinned in the repository | **CC-BY-NC-4.0 (non-commercial)** | 3.86 GB model + 9 MB Wolof adapter | Evaluation only (Wolof word error rate, round trip on the AI-dubbed clips); not in the product. Status: planned in Slice 4 step 4, results go to `docs/EVAL.md` | Wolof spelling varies, so word error rate overstates errors; read speech is easier than a farm tour |
+| ElevenLabs (AI dubbing, speech-to-text) | elevenlabs.io, used at build time only | n/a (hosted service) | The service's terms; outputs are used only for people with a confirmed consent row (`docs/CONSENT.md`) | 8 dubbed clips (about 5 MB of FLAC) | Dubbing Preet's English recordings into Wolof (consent confirmed 2026-10-03); speech-to-text of her recordings (consent **pending**, not run) | Dubbed Wolof has not been checked by a Wolof speaker; the dub's wording is ElevenLabs' own translation, not Noor's |
+| FLORES-200 `devtest` | `dl.fbaipublicfiles.com/nllb/flores200_dataset.tar.gz` | the published tarball | CC-BY-SA-4.0 | 25.6 MB (1012 sentences per language) | Measuring NLLB translation quality (chrF), English to Wolof against English to German. Status: planned in Slice 4 step 4 | Written, general-topic sentences; says nothing about tour speech |
+| FLEURS `wo_sn` test | Hugging Face `google/fleurs`, revision `70bb2e84b976b7e960aa89f1c648e09c59f894dd` | the parquet test split | CC-BY-4.0 | 396 MB (a seeded sample of 100 utterances is used) | Measuring MMS Wolof speech recognition. Status: planned in Slice 4 step 4 | Read speech by volunteers, not spontaneous speech or a recorded dub |
+| Wikipedia text (wo, en, de, nl, sv) | Hugging Face `wikimedia/wikipedia`, 20231101 | a streamed sample | CC-BY-SA-4.0 (and GFDL) | a sample of a few tens of MB per language | Choosing which tokens to keep when the e5 vocabulary is trimmed (text only, never shown). Status: planned in Slice 4 step 3 | Encyclopedic style, not conversational questions |
+| Tatoeba sentences | tatoeba.org exports | the current export | CC-BY-2.0 FR | a few MB per language | Short conversational wording for the vocabulary sample. Status: planned in Slice 4 step 3 | Very little Wolof |
+| Preet Patel's English recordings (8 clips) | Recorded by Preet for this project | 2026-10-03 | Not public: consent rows in `docs/CONSENT.md` (dubbing confirmed; transcription and publishing **pending**) | 8 files, 6 to 14 s | The guest-facing audio, as a disclosed stand-in voice for Noor | Preet is not Noor; one speaker; read from a script |
+| Clip scripts (8) | Written for Noor by Preet; text in `content/ondera-noor/clips.json` | 2026-10-03 | Project content (MIT repository) | 8 short texts | The words of the tour; the expected text the transcript is compared with | Not yet confirmed as Noor's own wording |
+| 116 test questions | Written by the team (Claude Code, for Bee) in `content/ondera-noor/eval/test-questions.csv` | 2026-10-03 | Project content | 116 rows, 29 per language | Evaluating matching and the safety card | **Synthetic**: not asked by any guest; de, nl and sv were not checked by native speakers; written by the same assistant that built the matcher, so style is correlated |
+| Safety lexicon and theme hints | `packages/core/src/guardrails/safety.ts`, `themes/themes.ts` | first drafts | Project content | a few hundred entries | Routing health and emergency questions; tagging themes | Inflected forms are listed one by one, so gaps exist; typos in a safety question are not covered |
+| de, nl, sv interface strings and topic labels | `packages/core/src/i18n/`, `content/ondera-noor/clips.json` | drafts | Project content | about 80 strings per language | What guests read in the app | Written by an AI assistant, **not checked by a native speaker** |
+| Generated test tones (fixture pack) | `pipeline/asknoor/fixture_audio.py` | generated | Project content | 3 clips, about 110 KB | Letting CI and the app's offline tests run without anyone's voice | Not speech |
+
+## 2. Labels: what is synthetic, a stand-in, AI-dubbed or a machine draft
+
+| Item | Label | Where the label is carried | Reaches guests? |
+|---|---|---|---|
+| Preet's English recordings | Disclosed stand-in voice: "Voice: Preet, standing in for Noor" | `manifest.labels.standInVoice`; i18n key `labels.standInVoice` in en, de, nl, sv | Yes, with the label (production allowed only with her confirmed publishing row) |
+| AI-dubbed Wolof clips | "AI-dubbed (ElevenLabs)", draft, demo only | `clip.dubbed.label`, `manifest.labels.aiDubbed`, `recordings.json` | Demo packs only |
+| Wolof subtitles for the dubs | Machine translation of the English, **not a transcript of the dub** | `clip.dubbed.subtitlesDraft`, a note in the WebVTT file | Demo packs only |
+| NLLB translations (de, nl, sv, wo) | Machine draft, `draft: true`, model and revision recorded | `content/ondera-noor/translations/*.json`; `moment.draft` flags | Demo packs only until a person checks each language (a check is bound to the exact translated text) |
+| Wolof SMS template | `status: "draft"` | `content/ondera-noor/sms-templates.json` | No: Noor's text is held until a Wolof speaker checks it |
+| Fun facts without a source, products without a price, the farm card without a phone | `needs: ["source"]`, `["price"]`, `["phone"]` | the add-on files and `manifest.addons[].needs` | Demo packs only, labeled; refused in production |
+| Fixture pack | "Synthetic test tone, not a voice" | `manifest.labels.standIn` | No (demo pack for tests) |
+| The 116 test questions | `synthetic = true` on every row | the CSV column | Never shown |
+| Index-only passages (**planned, Slice 4 step 2, not built**) | will be marked `indexOnly` on their embedding rows and never displayed | will be in `manifest.embeddings.rows` | Would never be shown; they would influence which clip is offered, and the guest confirms |
+
+## 3. Gaps, in plain words
+
+- **No real guest has used this.** All numbers come from synthetic questions.
+- **Nobody who speaks Wolof has checked anything.** Machine Wolof (text and audio) is a draft; its quality **will be measured** (planned, Slice 4 step 4) and nothing is measured yet.
+- **de, nl and sv have not been checked by native speakers**, including the safety card text and the stand-in voice label.
+- **The e5 model does not cover Wolof questions.**
+- **Cross-CPU differences:** the same model gave slightly different vectors on Linux x64 and macOS arm64 (cosine 0.9948 for one passage). A threshold has not been checked against vectors made on a phone.
+- **Open content decisions** from the PRD: the final visitor languages from The Gambia's arrival data, and Noor's real language and recording.
+- **Licenses** limit commercial use (NLLB, MMS) and share-alike would apply to the Wikipedia and FLORES text once it is used for evaluation and vocabulary (planned; never shipped).
