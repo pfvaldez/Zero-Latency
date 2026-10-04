@@ -213,3 +213,185 @@ export function breakdown(
     [...groups].map(([k, qs]) => [k, evaluate(qs, threshold, published, margin)]),
   );
 }
+
+// ---- honest estimate: split by question slot, tune on one half, report on the other --------------
+//
+// The test questions are parallel across languages: slot i of every language is the same question
+// (same expected answer, same variant). Splitting by row would put a German question in the tuning
+// half and its English twin in the report half. So the unit of the split is the slot.
+
+/** Slot of each question: its position within its own language, in id order. Throws if the
+ *  languages are not parallel (same expected answer and variant at every slot). */
+export function assignSlots(questions: readonly ScoredQuestion[]): number[] {
+  const byLang = new Map<string, ScoredQuestion[]>();
+  for (const q of questions) byLang.set(q.lang, [...(byLang.get(q.lang) ?? []), q]);
+  const blocks = [...byLang.values()].map((qs) => [...qs].sort((a, b) => a.id.localeCompare(b.id)));
+  const shape = (qs: readonly ScoredQuestion[]) =>
+    qs.map((q) => `${q.expected}|${q.variant}`).join(",");
+  const first = blocks[0] ?? [];
+  if (blocks.some((b) => shape(b) !== shape(first)))
+    throw new Error("the questions are not parallel across languages");
+  const slot = new Map<string, number>();
+  for (const block of blocks) for (const [i, q] of block.entries()) slot.set(q.id, i);
+  return questions.map((q) => slot.get(q.id) as number);
+}
+
+export interface Halves {
+  a: ReadonlySet<number>;
+  b: ReadonlySet<number>;
+}
+
+/**
+ * Deterministic split of the slots into halves A and B. Stratified by expected answer (each clip,
+ * the never-answered questions, the safety questions), and inside each stratum every slot goes to
+ * the half that has fewer of that stratum so far (then fewer overall, then A). So each stratum
+ * differs by at most one slot between the halves and the whole split stays balanced.
+ */
+export function splitSlots(questions: readonly ScoredQuestion[]): Halves {
+  const slots = assignSlots(questions);
+  const stratum = new Map<number, string>();
+  for (const [i, q] of questions.entries()) stratum.set(slots[i] as number, q.expected);
+  const groups = new Map<string, number[]>();
+  for (const slot of [...stratum.keys()].sort((x, y) => x - y)) {
+    const key = stratum.get(slot) as string;
+    groups.set(key, [...(groups.get(key) ?? []), slot]);
+  }
+  const a = new Set<number>();
+  const b = new Set<number>();
+  for (const key of [...groups.keys()].sort()) {
+    let inA = 0;
+    let inB = 0;
+    for (const slot of groups.get(key) as number[]) {
+      const toA = inA !== inB ? inA < inB : a.size <= b.size;
+      if (toA) {
+        a.add(slot);
+        inA++;
+      } else {
+        b.add(slot);
+        inB++;
+      }
+    }
+  }
+  return { a, b };
+}
+
+export type PooledMetrics = Omit<Metrics, "threshold">;
+
+/** Sum the counts of several held-out reports and recompute every rate from the sums. */
+export function pool(list: readonly Metrics[]): PooledMetrics {
+  const sum = (f: (m: Metrics) => number) => list.reduce((n, m) => n + f(m), 0);
+  const p = {
+    questions: sum((m) => m.questions),
+    answered: sum((m) => m.answered),
+    neverAnswered: sum((m) => m.neverAnswered),
+    top1: sum((m) => m.top1),
+    correctConfirm: sum((m) => m.correctConfirm),
+    wrongClipConfirm: sum((m) => m.wrongClipConfirm),
+    confirmOnNever: sum((m) => m.confirmOnNever),
+    missed: sum((m) => m.missed),
+    savedOnNever: sum((m) => m.savedOnNever),
+    safetyQuestions: sum((m) => m.safetyQuestions),
+    safetyFalsePositives: sum((m) => m.safetyFalsePositives),
+  }; // fmt: skip
+  const safetyHits = list.reduce((n, m) => n + Math.round(m.safetyRecall * m.safetyQuestions), 0);
+  return {
+    ...p,
+    falseConfirmRate: ratio(p.wrongClipConfirm + p.confirmOnNever, p.questions),
+    top1Rate: ratio(p.top1, p.answered),
+    coverage: ratio(p.correctConfirm, p.answered),
+    failSafeRate: ratio(p.savedOnNever, p.neverAnswered),
+    safetyRecall: ratio(safetyHits, p.safetyQuestions),
+  };
+}
+
+export interface Fold {
+  tuneOn: "A" | "B";
+  reportOn: "A" | "B";
+  /** The threshold chosen on the tuning half alone; null if none meets the limit there. */
+  threshold: number | null;
+  /** The same threshold measured on the tuning half (in sample). */
+  inSample: Metrics | null;
+  /** The honest number: that threshold measured on the other half. */
+  heldOut: Metrics | null;
+}
+
+export interface CrossValidation {
+  slotsA: number;
+  slotsB: number;
+  folds: [Fold, Fold];
+  /** Both held-out reports pooled (each fold's own threshold, counts summed). */
+  pooled: PooledMetrics | null;
+  /** Pooled held-out numbers per language. */
+  byLang: Record<string, PooledMetrics>;
+}
+
+/**
+ * Choose the threshold on one half and report on the other, then swap. Tuning never sees the
+ * report half: each fold's threshold is a function of its tuning questions only.
+ */
+export function crossValidate(
+  questions: readonly ScoredQuestion[],
+  grid: readonly number[],
+  published: ReadonlySet<string>,
+  maxFalseConfirm = 0.05,
+  margin = 0,
+): CrossValidation {
+  const halves = splitSlots(questions);
+  const slots = assignSlots(questions);
+  const inHalf = (set: ReadonlySet<number>) =>
+    questions.filter((_, i) => set.has(slots[i] as number));
+  const fold = (tuneOn: "A" | "B"): Fold => {
+    const tune = inHalf(tuneOn === "A" ? halves.a : halves.b);
+    const report = inHalf(tuneOn === "A" ? halves.b : halves.a);
+    const picked = pickThreshold(sweep(tune, grid, published, margin), maxFalseConfirm);
+    if (picked === null)
+      return {
+        tuneOn,
+        reportOn: tuneOn === "A" ? "B" : "A",
+        threshold: null,
+        inSample: null,
+        heldOut: null,
+      };
+    return {
+      tuneOn,
+      reportOn: tuneOn === "A" ? "B" : "A",
+      threshold: picked.threshold,
+      inSample: picked,
+      heldOut: evaluate(report, picked.threshold, published, margin),
+    };
+  };
+  const folds: [Fold, Fold] = [fold("A"), fold("B")];
+  const held = folds.map((f) => f.heldOut).filter((m): m is Metrics => m !== null);
+  const byLang: Record<string, PooledMetrics> = {};
+  for (const lang of [...new Set(questions.map((q) => q.lang))]) {
+    const parts: Metrics[] = [];
+    for (const f of folds) {
+      if (f.threshold === null) continue;
+      const set = f.reportOn === "A" ? halves.a : halves.b;
+      const own = questions.filter((q, i) => q.lang === lang && set.has(slots[i] as number));
+      parts.push(evaluate(own, f.threshold, published, margin));
+    }
+    byLang[lang] = pool(parts);
+  }
+  return {
+    slotsA: halves.a.size,
+    slotsB: halves.b.size,
+    folds,
+    pooled: held.length === folds.length ? pool(held) : null,
+    byLang,
+  };
+}
+
+/**
+ * The threshold that ships: the strictest of the full-set pick and both fold picks, so it is never
+ * looser than any honest estimate. If any pick is missing, fall back to the top of the grid.
+ */
+export function shippedThreshold(
+  fullSetPick: number | null,
+  foldPicks: readonly (number | null)[],
+  gridMax: number,
+): number {
+  const picks = [fullSetPick, ...foldPicks];
+  if (picks.some((p) => p === null)) return gridMax;
+  return Math.max(...(picks as number[]));
+}

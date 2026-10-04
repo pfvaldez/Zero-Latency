@@ -221,3 +221,193 @@ describe("histogram and breakdown", () => {
     ]);
   });
 });
+
+// ---- honest estimate ---------------------------------------------------------------------------
+import { assignSlots, crossValidate, pool, shippedThreshold, splitSlots } from "../src/eval.ts";
+
+// 4 languages x 6 slots, parallel: slot 0..1 answered (clip01, clip02), 2..3 never answered, 4 held back, 5 safety.
+const SHAPE: [string, string][] = [
+  ["clip01", "plain"],
+  ["clip02", "plain"],
+  ["none", "plain"],
+  ["none", "typo"],
+  ["clip01", "paraphrase"],
+  ["safety", "plain"],
+]; // fmt: skip
+const LANGS = ["en", "de", "nl", "sv"];
+function parallel(score: (lang: string, slot: number) => number): ScoredQuestion[] {
+  return LANGS.flatMap((lang, li) =>
+    SHAPE.map(([expected, variant], slot) => {
+      const id = `q${String(li * 6 + slot + 1).padStart(3, "0")}`;
+      const answer = expected === "clip01" ? "c1-m1" : expected === "clip02" ? "c2-m1" : "c3-m1";
+      return q(id, expected, expected === "safety" ? [] : [[answer, score(lang, slot)]], {
+        lang,
+        variant,
+        safetyHit: expected === "safety",
+      }); // fmt: skip
+    }),
+  );
+}
+
+describe("assignSlots and splitSlots", () => {
+  const qs = parallel(() => 0.9);
+  it("gives the same slot to the same question in every language", () => {
+    const slots = assignSlots(qs);
+    expect(slots.slice(0, 6)).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(slots.slice(6, 12)).toEqual([0, 1, 2, 3, 4, 5]);
+  });
+
+  it("refuses questions that are not parallel across languages", () => {
+    const broken = qs.map((x, i) => (i === 7 ? { ...x, expected: "none" } : x));
+    expect(() => assignSlots(broken)).toThrow(/not parallel/);
+    expect(() => assignSlots(qs.slice(0, 20))).toThrow(/not parallel/);
+  });
+
+  it("splits the slots into disjoint halves that cover everything", () => {
+    const { a, b } = splitSlots(qs);
+    expect([...a].filter((s) => b.has(s))).toEqual([]);
+    expect([...a, ...b].sort()).toEqual([0, 1, 2, 3, 4, 5]);
+  });
+
+  it("is deterministic and keeps each stratum balanced (sizes differ by at most one)", () => {
+    expect(splitSlots(qs)).toEqual(splitSlots(qs));
+    const { a, b } = splitSlots(qs);
+    // Strata by expected answer: clip01 {0, 4}, clip02 {1}, none {2, 3}, safety {5}.
+    expect(Math.abs(a.size - b.size)).toBeLessThanOrEqual(1);
+    for (const stratum of [
+      [0, 4],
+      [2, 3],
+    ]) {
+      expect(stratum.filter((s) => a.has(s)).length).toBe(1); // a stratum of two is split one and one
+    }
+  });
+
+  it("puts every language in both halves, and a slot's twins always land together", () => {
+    const { a } = splitSlots(qs);
+    const slots = assignSlots(qs);
+    for (const lang of LANGS) {
+      const own = qs
+        .map((x, i) => [x, slots[i] as number] as const)
+        .filter(([x]) => x.lang === lang);
+      expect(own.some(([, s]) => a.has(s))).toBe(true);
+      expect(own.some(([, s]) => !a.has(s))).toBe(true);
+    }
+  });
+
+  it("balances a real-sized table: 29 slots, strata alternating", () => {
+    const shape29 = Array.from({ length: 29 }, (_, i): [string, string] => [
+      i < 14 ? `clip0${(i % 7) + 1}` : i < 18 ? "clip08" : i < 25 ? "none" : "safety",
+      ["plain", "paraphrase", "typo"][i % 3] as string,
+    ]);
+    const big = LANGS.flatMap((lang, li) =>
+      shape29.map(([e, v], s) =>
+        q(`q${String(li * 29 + s + 1).padStart(3, "0")}`, e, [["c1-m1", 0.8]], {
+          lang,
+          variant: v,
+        }),
+      ),
+    );
+    const { a, b } = splitSlots(big);
+    expect(a.size + b.size).toBe(29);
+    expect(Math.abs(a.size - b.size)).toBeLessThanOrEqual(1);
+    // Each clip's two slots are split between the halves, and the 7 never-answered slots 4 and 3.
+    const slotsOf = (e: string) =>
+      big
+        .filter((x) => x.lang === "en" && x.expected === e)
+        .map((x) => assignSlots(big)[big.indexOf(x)] as number);
+    for (const e of ["clip01", "clip02", "clip07"])
+      expect(slotsOf(e).filter((s) => a.has(s)).length).toBe(1);
+    expect(
+      Math.abs(
+        slotsOf("none").filter((s) => a.has(s)).length -
+          slotsOf("none").filter((s) => b.has(s)).length,
+      ),
+    ).toBe(1);
+  });
+});
+
+describe("pool", () => {
+  it("sums counts and recomputes the rates", () => {
+    const x = evaluate(TABLE, 0.7, PUBLISHED);
+    const y = evaluate(TABLE, 0.9, PUBLISHED);
+    const p = pool([x, y]);
+    expect(p.questions).toBe(x.questions + y.questions);
+    expect(p.correctConfirm).toBe(x.correctConfirm + y.correctConfirm);
+    expect(p.falseConfirmRate).toBeCloseTo(
+      (x.wrongClipConfirm + x.confirmOnNever + y.wrongClipConfirm + y.confirmOnNever) / p.questions,
+    );
+    expect(pool([]).falseConfirmRate).toBe(0);
+  });
+});
+
+describe("crossValidate", () => {
+  const grid = thresholdGrid(0.5, 1.0, 0.01);
+  // Scores that make a single global threshold overfit: in slot 0 and 1 (answered) the score depends
+  // on the half, so a threshold tuned on one half is wrong for the other.
+  const qs = parallel((_lang, slot) =>
+    slot === 2 ? 0.86 : slot === 3 ? 0.7 : slot === 0 ? 0.88 : slot === 1 ? 0.8 : 0.9,
+  );
+
+  it("tunes on one half and reports on the other, in both directions", () => {
+    const cv = crossValidate(qs, grid, PUBLISHED, 0.05);
+    expect(cv.folds.map((f) => [f.tuneOn, f.reportOn])).toEqual([
+      ["A", "B"],
+      ["B", "A"],
+    ]);
+    expect(cv.slotsA + cv.slotsB).toBe(6);
+    for (const f of cv.folds) {
+      expect(f.threshold).not.toBeNull();
+      expect(f.inSample?.threshold).toBe(f.threshold);
+      expect(f.heldOut?.threshold).toBe(f.threshold);
+    }
+  });
+
+  it("never lets tuning see the report half: poisoning the report half changes nothing about the threshold", () => {
+    const halves = splitSlots(qs);
+    const slots = assignSlots(qs);
+    const clean = crossValidate(qs, grid, PUBLISHED, 0.05);
+    // Make every question in half B score 1.0 on a wrong moment: a leak would raise fold A's threshold.
+    const poisoned = qs.map((x, i) =>
+      halves.b.has(slots[i] as number) && x.expected !== "safety"
+        ? { ...x, results: [{ momentId: "c3-m1", score: 1 }] }
+        : x,
+    );
+    const dirty = crossValidate(poisoned, grid, PUBLISHED, 0.05);
+    expect(dirty.folds[0].threshold).toBe(clean.folds[0].threshold); // fold A tuned on half A only
+    expect(dirty.folds[1].threshold).not.toBe(clean.folds[1].threshold); // fold B tuned on the poisoned half
+  });
+
+  it("is worse on the held-out half than in sample when the threshold overfits", () => {
+    const cv = crossValidate(qs, grid, PUBLISHED, 0.05);
+    const pooled = cv.pooled;
+    expect(pooled).not.toBeNull();
+    for (const f of cv.folds) expect(f.inSample?.falseConfirmRate).toBeLessThanOrEqual(0.05);
+    expect(pooled?.questions).toBe(20); // 4 languages x 5 ordinary slots, each reported once
+  });
+
+  it("reports every language and pools each question exactly once", () => {
+    const cv = crossValidate(qs, grid, PUBLISHED, 0.05);
+    expect(Object.keys(cv.byLang).sort()).toEqual([...LANGS].sort());
+    expect(Object.values(cv.byLang).reduce((n, m) => n + m.questions, 0)).toBe(
+      cv.pooled?.questions,
+    );
+  });
+
+  it("returns nulls when a half has no threshold that meets the limit", () => {
+    const impossible = parallel(() => 2); // every score is above the grid: nothing can be saved
+    const cv = crossValidate(impossible, grid, PUBLISHED, 0);
+    expect(cv.folds.every((f) => f.threshold === null)).toBe(true);
+    expect(cv.pooled).toBeNull();
+  });
+});
+
+describe("shippedThreshold: the strictest of the three picks", () => {
+  it("takes the maximum", () => {
+    expect(shippedThreshold(0.85, [0.83, 0.87], 0.99)).toBe(0.87);
+    expect(shippedThreshold(0.9, [0.83, 0.87], 0.99)).toBe(0.9);
+  });
+  it("falls back to the top of the grid when any pick is missing", () => {
+    expect(shippedThreshold(0.85, [null, 0.87], 0.99)).toBe(0.99);
+    expect(shippedThreshold(null, [0.8, 0.8], 0.99)).toBe(0.99);
+  });
+});

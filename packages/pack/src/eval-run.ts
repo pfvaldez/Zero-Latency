@@ -7,6 +7,7 @@ import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
   breakdown,
+  crossValidate,
   decideSafety,
   evaluate,
   histogram,
@@ -15,6 +16,7 @@ import {
   momentOfClip,
   pickThreshold,
   type ScoredQuestion,
+  shippedThreshold,
   sweep,
   thresholdGrid,
   VISITOR_LANGS,
@@ -177,8 +179,18 @@ export async function runEval(
   const grid = thresholdGrid(0.6, 0.99, 0.0025);
   const rowsA = sweep(scoredA, grid, publishedA, MARGIN_PLACEHOLDER);
   const picked = pickThreshold(rowsA, MAX_FALSE_CONFIRM);
-  const threshold = picked?.threshold ?? (grid.at(-1) as number);
+  const gridMax = grid.at(-1) as number;
+
+  // The honest estimate: tune on one half of the question slots, report on the other, then swap.
+  const cv = crossValidate(scoredA, grid, publishedA, MAX_FALSE_CONFIRM, MARGIN_PLACEHOLDER);
+  const fullSetPick = picked?.threshold ?? null;
+  const foldPicks = cv.folds.map((f) => f.threshold);
+  // The threshold that ships is the strictest of the three picks (never looser than an honest estimate).
+  const threshold = shippedThreshold(fullSetPick, foldPicks, gridMax);
   const primary = evaluate(scoredA, threshold, publishedA, MARGIN_PLACEHOLDER);
+  const fullSet = picked
+    ? evaluate(scoredA, picked.threshold, publishedA, MARGIN_PLACEHOLDER)
+    : null;
 
   const passageLangs = [...new Set(passages.map((p) => p.lang))];
   const englishOnly =
@@ -258,6 +270,26 @@ export async function runEval(
     maxFalseConfirm: MAX_FALSE_CONFIRM,
     margin: MARGIN_PLACEHOLDER,
     primary,
+    fullSet,
+    fullSetPick,
+    foldPicks,
+    honest: {
+      slotsA: cv.slotsA,
+      slotsB: cv.slotsB,
+      folds: cv.folds,
+      pooled: cv.pooled,
+      pooledCi: cv.pooled
+        ? {
+            falseConfirm: wilson(
+              cv.pooled.wrongClipConfirm + cv.pooled.confirmOnNever,
+              cv.pooled.questions,
+            ),
+            coverage: wilson(cv.pooled.correctConfirm, cv.pooled.answered),
+            top1: wilson(cv.pooled.top1, cv.pooled.answered),
+          }
+        : null,
+      byLang: Object.entries(cv.byLang).map(([name, m]) => ({ name, m })),
+    },
     primaryCi: {
       falseConfirm: wilson(primary.wrongClipConfirm + primary.confirmOnNever, primary.questions),
       coverage: wilson(primary.correctConfirm, primary.answered),
@@ -308,12 +340,22 @@ export async function runEval(
       {
         match: threshold,
         margin: MARGIN_PLACEHOLDER,
-        limitMet: picked !== null,
+        rule: "the strictest of the full-set pick and the two fold picks",
+        fullSetPick,
+        foldPicks,
+        heldOut: cv.pooled
+          ? {
+              falseConfirmRate: cv.pooled.falseConfirmRate,
+              coverage: cv.pooled.coverage,
+              top1: cv.pooled.top1Rate,
+            }
+          : null,
+        limitMet: primary.falseConfirmRate <= MAX_FALSE_CONFIRM,
         maxFalseConfirm: MAX_FALSE_CONFIRM,
         falseConfirmRate: primary.falseConfirmRate,
         coverage: primary.coverage,
         questions: primary.questions,
-        inSample: true,
+        inSample: true, // match is measured on the questions it was partly chosen on; heldOut is the honest estimate
         modelRepo: lock.repo,
         modelRevision: lock.revision,
         passageSource: source,

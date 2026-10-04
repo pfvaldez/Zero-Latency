@@ -252,7 +252,7 @@
     ]
   },
   "thresholds": {
-    "match": 0.8525,
+    "match": 0.855,
     "margin": 0.05
   },
   "sizes": {

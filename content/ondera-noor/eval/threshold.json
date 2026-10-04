@@ -1,10 +1,21 @@
 {
-  "match": 0.8525,
+  "match": 0.855,
   "margin": 0.05,
+  "rule": "the strictest of the full-set pick and the two fold picks",
+  "fullSetPick": 0.8525,
+  "foldPicks": [
+    0.855,
+    0.8475
+  ],
+  "heldOut": {
+    "falseConfirmRate": 0.05,
+    "coverage": 0.5178571428571429,
+    "top1": 0.8392857142857143
+  },
   "limitMet": true,
   "maxFalseConfirm": 0.05,
-  "falseConfirmRate": 0.03,
-  "coverage": 0.5,
+  "falseConfirmRate": 0.02,
+  "coverage": 0.48214285714285715,
   "questions": 100,
   "inSample": true,
   "modelRepo": "Xenova/multilingual-e5-small",
