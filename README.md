@@ -151,5 +151,5 @@ tasks           build plan, lessons and team tasks
 ## Licenses and credits
  
 - multilingual-e5-small is MIT licensed. NLLB-200 and MMS are CC-BY-NC 4.0, so they're limited to non-commercial use, and a commercial rollout would need other models or licenses.
-- Colors are inspired by the World Bank palette. Ask Noor is not affiliated with or endorsed by the World Bank.
+
  
