@@ -273,6 +273,11 @@ const woText = z
   .strictObject({
     text: z.string().min(1).nullable(),
     status: z.enum(["needs-nllb-draft", "draft"]),
+    // sha256 of the English it was translated from; a changed English text makes it stale.
+    sourceSha256: z
+      .string()
+      .regex(/^[0-9a-f]{64}$/)
+      .optional(),
   })
   .refine((w) => (w.text === null) === (w.status === "needs-nllb-draft"), {
     error: "wo text is null exactly when its status is needs-nllb-draft",
