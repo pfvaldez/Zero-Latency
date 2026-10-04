@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Third-party action, so it is pinned by commit SHA. The Bun version is the "packageManager"
+      # field of the root package.json (bun@1.3.10): one pin for local runs and CI.
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: package.json
+
+      # Node-based tools (Vite, tsc, Vitest, Biome) run on this Node, not on Bun.
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Check the installed Bun matches the pin
+        run: |
+          test "$(bun --version)" = "$(jq -r '.packageManager | split("@")[1]' package.json)"
+          echo "bun $(bun --version), node $(node --version)"
+
+      # --frozen-lockfile alone passes when bun.lock is missing, so check the file exists first.
+      - name: Install
+        run: test -f bun.lock && bun install --frozen-lockfile
+
+      - run: bun run check
+      - run: bun run typecheck
+      - run: bun run test
