@@ -14,9 +14,12 @@ const services = createServices();
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing #root element");
 
-// The offline tour needs the service worker, so it is registered in production builds only.
+// The offline tour needs the service worker, so it is registered in production builds only. It is a
+// classic (not module) worker: the build bundles it into one file with no imports, and older iOS
+// Safari cannot register a module service worker at all, which would leave the tour without
+// offline navigation (a stop link opened from the Camera app in airplane mode).
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/sw.js", { type: "module" }).catch(() => {});
+  navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
 }
 
 createRoot(root).render(
