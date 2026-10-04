@@ -145,7 +145,7 @@ tasks           build plan, lessons and team tasks
  
 ## Team
  
-- **Bhagyasri Uddandam**, captain: AI and data
+- **Bhagyasri Uddandam**, AI and data
 - **Pablo Valdez**: app and backend
 - **Preet Patel**: content, research and the video
 ## Licenses and credits
