@@ -44,3 +44,25 @@ jobs:
       - run: bun run check
       - run: bun run typecheck
       - run: bun run test:coverage
+
+  # The build-time pipeline: audio prep, the consent gate, transcript comparison. ffmpeg comes from
+  # the pinned imageio-ffmpeg wheel, so there is no system install. Real recordings are not in
+  # git, so these tests run on generated signals.
+  pipeline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: pipeline
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Third-party action, pinned by commit SHA (v10.2.0, verified with `gh api`).
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: "0.9.26"
+
+      - run: uv sync --frozen
+      - run: uv run pytest
