@@ -45,6 +45,8 @@ export interface BuildOptions {
   input?: PackInput;
   /** Copy the model into the pack. The committed fixture leaves it out (it is 135 MB). */
   includeModel?: boolean;
+  /** Only the fixture builder sets this: generated tones need no consent row. */
+  allowSyntheticTones?: boolean;
   stageRoot?: string;
 }
 
@@ -134,7 +136,10 @@ async function readThreshold(farm: string): Promise<{ match: number; margin: num
 
 export async function buildPack(opts: BuildOptions): Promise<BuiltPack> {
   const input = opts.input ?? (await loadPackInput(opts.farm));
-  const plan = planPack(input, opts.mode, { publish: opts.publish ?? [] });
+  const plan = planPack(input, opts.mode, {
+    publish: opts.publish ?? [],
+    allowSyntheticTones: opts.allowSyntheticTones ?? false,
+  });
 
   const outDir =
     opts.outDir ?? join(REPO_ROOT, "apps", "web", "public", "packs", opts.farm, opts.mode);

@@ -125,6 +125,10 @@
                 "type": "string",
                 "minLength": 1
               },
+              "subtitlesDraft": {
+                "type": "boolean",
+                "const": true
+              },
               "label": {
                 "type": "string",
                 "const": "AI-dubbed (ElevenLabs)"

@@ -65,6 +65,7 @@ Plan approved 2026-10-04 (answers: clip 8 held back in every pack and published 
 - [x] CI `model` job (cached download of the pinned model, `bun run test:model`) Proof: see the PR
 - [x] `docs/PACK.md` (how teammates get the real audio privately; `recordings/audio.sha256` verifies the 16 originals, all OK); `docs/CONSENT.md` says "demo app" means the hackathon demo site in both modes and real guests need new consent
 - [ ] The real demo pack from Preet's audio waits for her **publishing** row to be `confirmed` (and the live transcript for her transcription row and the API key); then `pack:build --mode demo` and re-run `bun run eval` with the checked transcript
+- [ ] **Finding (CI, 2026-10-04):** the int8 model gives slightly different vectors on different CPUs: the same fixture passages on Linux x64 were at cosine 0.9948 (worst) against the macOS arm64 vectors. The threshold 0.8525 was chosen with Node vectors for passages and queries; the phone embeds queries with ONNX Runtime Web. Re-check the threshold with phone-made query vectors in the offline e2e (Pablo) and keep a margin; if it matters, ship passage vectors made by the phone runtime
 - [ ] Phone timings (model first load, question to outcome) come from Pablo's offline e2e with the real worker
 
 ### Slice 3: backend, sync, dashboard and a real text

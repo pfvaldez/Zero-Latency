@@ -116,6 +116,7 @@ const clipSchema = z.strictObject({
       audio: z.string().min(1),
       durationMs: nonNegInt,
       subtitles: z.string().min(1).optional(),
+      subtitlesDraft: z.literal(true).optional(),
       label: z.literal("AI-dubbed (ElevenLabs)"),
     })
     .optional(),

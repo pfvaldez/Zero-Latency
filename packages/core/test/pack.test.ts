@@ -245,7 +245,7 @@ describe("production pack", () => {
     const p = planPack(input({ checks: good }), "production");
     expect(p.moments[0]?.subtitles.de).toBe("de:Welcome to my farm. de:I'm Noor.");
     expect(p.moments[0]?.draft).toBeUndefined();
-    // A check bound to some other text does not count.
+    // A check bound to some other text (or to the English source) does not count.
     expect(
       planPack(input({ checks: CHECKED }), "production").moments[0]?.subtitles.de,
     ).toBeUndefined();
@@ -503,14 +503,36 @@ describe("synthetic tones (the committed fixture)", () => {
     });
 
   it("need no consent row, are labeled as a stand-in, and list no stand-in voice", () => {
-    const p = planPack(toneInput(), "demo");
+    const p = planPack(toneInput(), "demo", { allowSyntheticTones: true });
     expect(ids(p)).toEqual([1, 2, 3]);
     expect(p.labels.standIn).toEqual(["Synthetic test tone, not a voice"]);
     expect(p.labels.standInVoice).toEqual([]);
   });
 
+  it("are refused unless the caller allows them, so a real recording cannot be relabeled to skip consent", () => {
+    const disguised = RecordingsFileSchema.parse({
+      farmSlug: "ondera-noor",
+      recordings: [1, 2, 3].map((n) => ({
+        clip: n,
+        lang: "en",
+        file: `en/clip0${n}.m4a`,
+        person: "Preet Patel",
+        kind: "synthetic-tone",
+        label: "Synthetic, honest",
+      })),
+    });
+    for (const mode of ["demo", "production"] as const) {
+      expect(() =>
+        planPack(
+          input({ recordings: disguised, consent: CONSENT_NO_PUBLISHING, checks: CHECKED }),
+          mode,
+        ),
+      ).toThrow(/only allowed in the fixture pack/);
+    }
+  });
+
   it("can never ship in production: the manifest schema refuses a stand-in", () => {
-    const p = planPack(toneInput(), "production");
+    const p = planPack(toneInput(), "production", { allowSyntheticTones: true });
     expect(p.labels.standIn).toEqual(["Synthetic test tone, not a voice"]);
   });
 });

@@ -60,7 +60,9 @@ or the prepared audio is missing.
    `passage: ` prefix, mean pooling, normalized, one row per moment and language (`embeddings.rows`).
    The builder embeds with the **copies of the model files that go into the pack**, so the phone runs the same bytes.
 6. **Manifest**: sizes and SHA-256 of every file, the model revision, the evaluated match threshold; validated by the core schema, then every file is re-checked.
-7. **Version**: bumps only when the content changes (same inputs give the same pack).
+7. **Version**: bumps only when the content changes (same inputs give the same pack on the same machine).
+
+**Vectors differ a little between CPUs.** The int8 model rounds differently on different machines (Linux x64 against macOS arm64 gave cosine 0.9948 for one passage). So a pack built on another machine is the same except for `embeddings.f32` and the pack id; tests compare the embeddings by cosine (at least 0.99), not byte for byte. The committed fixture was built on macOS arm64.
 
 ## Size
 

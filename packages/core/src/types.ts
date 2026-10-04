@@ -59,6 +59,9 @@ export interface Clip {
     audio: string;
     durationMs: number;
     subtitles?: string;
+    // Present with `subtitles`: they are NLLB's machine translation of the English text, not a
+    // transcript of what the AI-dubbed audio says. The player must say so.
+    subtitlesDraft?: true;
     label: "AI-dubbed (ElevenLabs)";
   };
 }

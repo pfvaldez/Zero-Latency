@@ -182,6 +182,7 @@ export async function buildFixture(): Promise<BuiltPack> {
     now: FIXED_TIME,
     farmId: FIXTURE_FARM_ID,
     includeModel: false,
+    allowSyntheticTones: true,
     thresholds: await realThreshold(),
   });
 }

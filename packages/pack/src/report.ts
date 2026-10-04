@@ -121,7 +121,15 @@ export function renderEval(r: EvalResults): string {
       "| Passages | Questions | Top-1 | Coverage | False confirm | Fail-safe |",
       "|---|---|---|---|---|---|",
     );
-    lines.push(row("all languages (shipped)", p), row("English only", r.englishOnly), "");
+    lines.push(
+      row("demo pack: English plus draft translations", p),
+      row("production pack today: English only (translations are unchecked)", r.englishOnly),
+      "",
+    );
+    lines.push(
+      "The threshold was chosen on the demo pack. Today a production pack would carry English passages only, where the same threshold gives the second row. Once a language is checked it joins the production pack and this table should be rerun.",
+      "",
+    );
   }
   lines.push("## The overnight loop (clip 8 held back, then published)", "");
   lines.push(
@@ -188,9 +196,9 @@ export function renderEval(r: EvalResults): string {
   lines.push("## Honest limits", "");
   lines.push(
     "- The questions are synthetic and were written by the team who also chose the clips; real guests will phrase things differently and make other mistakes. German, Dutch and Swedish questions were not checked by native speakers.",
-    "- The threshold is in sample. With about 112 ordinary questions, a 5% limit is about 5 questions, so the intervals above are wide.",
+    `- The threshold is in sample. With ${r.questions.nonSafety} ordinary questions, a 5% limit is about ${Math.round(r.questions.nonSafety * 0.05)} questions, so the intervals above are wide.`,
     "- Passages are the English script until Preet's transcript is checked; the subtitle text, and so the match text, will then change slightly. Run `bun run eval` again.",
-    "- The phone runs the same quantized model through ONNX Runtime Web; scores can differ in the last decimals from Node. The pack's committed fixture is re-embedded in CI to guard the build side.",
+    "- **Embeddings differ a little between CPUs and runtimes.** The pack's passage vectors are made here with ONNX Runtime on Node; the phone embeds each question with ONNX Runtime Web. It is the same int8 model file, but the int8 kernels round differently: in CI the same passages on Linux x64 were at cosine 0.995 or better against the same passages on macOS arm64 (one passage at 0.9948). That can move a question's score by a few thousandths, which is the size of one threshold step. The threshold has not been checked against vectors made on a phone; do that with the offline end-to-end run before relying on 0.8525 to the last decimal.",
     "- Every guest confirms a match, so a false confirmation shows a wrong card the guest can reject; it never plays unconfirmed.",
     "",
   );

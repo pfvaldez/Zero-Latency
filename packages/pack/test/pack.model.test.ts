@@ -44,7 +44,10 @@ describe("the embedder", () => {
 });
 
 describe("the pack builder", () => {
-  it("rebuilds the committed fixture byte for byte (same checksums, same version)", async () => {
+  // The int8 model gives slightly different vectors on different CPUs (found in CI on Linux x64:
+  // cosine 0.9948 against the vectors committed from macOS arm64). So everything that is not an
+  // embedding must match byte for byte, and the embeddings must match to a documented tolerance.
+  it("rebuilds the committed fixture: every file but the embeddings byte for byte", async () => {
     const out = await mkdtemp(join(tmpdir(), "fixture-"));
     const built = await buildPack({
       farm: "fixture",
@@ -55,14 +58,17 @@ describe("the pack builder", () => {
       now: new Date("2026-10-04T00:00:00Z"),
       farmId: "00000000-0000-4000-8000-0000000000f1",
       includeModel: false,
+      allowSyntheticTones: true,
       thresholds: { match: 0.8525, margin: 0.05 },
     });
     const committed = JSON.parse(await readFile(join(FIXTURE_DIR, "manifest.json"), "utf8"));
-    expect(built.manifest.checksums).toEqual(committed.checksums);
-    expect(built.manifest.packId).toBe(committed.packId);
+    const without = (c: Record<string, string>) =>
+      Object.fromEntries(Object.entries(c).filter(([k]) => k !== "embeddings.f32"));
+    expect(without(built.manifest.checksums)).toEqual(without(committed.checksums));
+    expect(built.manifest.embeddings.rows).toEqual(committed.embeddings.rows);
   });
 
-  it("re-embedding the fixture passages matches the committed vectors (cosine at least 0.999)", async () => {
+  it("re-embedding the fixture passages matches the committed vectors (cosine at least 0.99 across CPUs)", async () => {
     const committed = JSON.parse(await readFile(join(FIXTURE_DIR, "manifest.json"), "utf8"));
     const buf = await readFile(join(FIXTURE_DIR, "embeddings.f32"));
     const matrix = new Float32Array(buf.buffer, buf.byteOffset, buf.byteLength / 4);
@@ -78,7 +84,7 @@ describe("the pack builder", () => {
     const fresh = await e.embed(texts, "passage: ");
     await e.dispose();
     for (const [i, v] of fresh.entries()) {
-      expect(dot(v, matrix.slice(i * 384, (i + 1) * 384))).toBeGreaterThan(0.999);
+      expect(dot(v, matrix.slice(i * 384, (i + 1) * 384))).toBeGreaterThan(0.99); // worst seen: 0.9948 (Linux x64 vs macOS arm64)
     }
   });
 
@@ -90,6 +96,7 @@ describe("the pack builder", () => {
       outDir: out,
       audioDir: join(REPO_ROOT, "packages", "pack", "fixtures", "audio"),
       includeModel: false,
+      allowSyntheticTones: true,
       thresholds: { match: 0.85, margin: 0.05 },
     };
     const first = await buildPack({ ...base, input: await fixtureInput() });

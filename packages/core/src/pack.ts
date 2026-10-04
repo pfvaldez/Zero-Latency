@@ -129,7 +129,7 @@ function isChecked(checks: ChecksFile, id: string, boundTo?: string): boolean {
 export function planPack(
   input: PackInput,
   mode: PackMode,
-  options: { publish?: readonly number[] } = {},
+  options: { publish?: readonly number[]; allowSyntheticTones?: boolean } = {},
 ): PackPlan {
   const production = mode === "production";
   const publish = new Set(options.publish ?? []);
@@ -170,6 +170,13 @@ export function planPack(
     if (!rec) throw new PackError(`clip ${clip.id} has no English recording in recordings.json`);
     // A person's voice needs that person's confirmed publishing row. Generated tones are not a voice.
     if (rec.kind === "synthetic-tone") {
+      // Only the fixture builder may use tones. Anywhere else this kind could be used to skip the
+      // consent check for a real recording, so it is refused.
+      if (!options.allowSyntheticTones) {
+        throw new PackError(
+          `${rec.file}: synthetic-tone recordings are only allowed in the fixture pack; a real recording needs a consent row`,
+        );
+      }
       if (!plan.labels.standIn.includes(rec.label)) plan.labels.standIn.push(rec.label); // refused in production by the manifest schema
     } else {
       try {
@@ -292,6 +299,7 @@ export function planPack(
       plan.files.push({ dest: dubbed.audio, source: { recording: dub.file } });
       if (woLines) {
         dubbed.subtitles = `subtitles/clip${n}.wo.vtt`;
+        dubbed.subtitlesDraft = true; // a machine translation of the English, not a transcript of the dub
         const woCues = cuesEstimated(
           woLines,
           dubMeta.durationMs,
