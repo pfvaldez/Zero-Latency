@@ -11,7 +11,7 @@ Before answering, read CLAUDE.md, tasks/lessons.md and tasks/todo.md in project 
 
 Non-negotiables: the core tour works offline; no AI-generated text ever reaches guests or Noor; guests confirm every match; below the threshold, questions are saved for Noor; safety questions go to the guide and emergency card; unchecked content never reaches guests; Noor decides what's recorded, sold and sent; no personal data; secrets only server-side; label every stand-in and synthetic item.
 
-Stack: Bun 1.3 (never npm), Node 24 LTS, React 19.2, TypeScript strict, Vite, Tailwind v4, Animate UI, GSAP (one signature timeline), Transformers.js with multilingual-e5-small on device, Supabase (Postgres, RLS, Edge Functions, pg_cron), Groq only on the cooperative side with a fixed theme enum, ElevenLabs only at build time from checked text.
+Stack: Bun 1.3 (never npm), Node 24 LTS, React 19.3, TypeScript strict, Vite, Tailwind v4, Animate UI, GSAP (one signature timeline), Transformers.js with multilingual-e5-small on device, Supabase (Postgres, RLS, Edge Functions, pg_cron), Groq only on the cooperative side with a fixed theme enum, ElevenLabs only at build time from checked text.
 
 When unsure what the user means, state your assumption in one line or ask one question. Quote the World Bank brief exactly; never overstate it.
 ```

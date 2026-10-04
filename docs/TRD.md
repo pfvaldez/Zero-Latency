@@ -100,7 +100,7 @@ flowchart LR
 |---|---|---|
 | Package manager | Bun 1.3.x | Fast installs; workspaces; one tool for scripts |
 | Tooling runtime | Node.js 24 LTS | Active LTS today; Node 26 becomes LTS later in October 2026. Node 16 is end-of-life. |
-| UI | React 19.2, TypeScript strict | Current stable React |
+| UI | React 19.3, TypeScript strict | Current stable React (19.3.0, released 2026-09-09) |
 | Build | Vite with `@vitejs/plugin-react` | Fast; first-class PWA plugin |
 | Styling | Tailwind CSS v4 | Design tokens as CSS variables |
 | Components | Animate UI (shadcn CLI registry; uses Motion) | Accessible, animated primitives we own in our repo |
@@ -308,19 +308,25 @@ Routes: `/` (guest tour), `/coop` (sign-in required), `/coop/review`, `/coop/rep
 
 - **One signature animation:** a GSAP timeline that advances the subtitle progress indicator in sync with the audio's `timeupdate`. Under `prefers-reduced-motion`, it switches to an instant state change (`gsap.matchMedia`).
 - **Everything else:** Animate UI's built-in Motion transitions for dialogs, sheets and buttons. No scroll-triggered entrance animations.
-- **World Bank–inspired tokens (palette only, never the logo or any implied endorsement):**
+- **World Bank–inspired tokens (palette only, never the logo or any implied endorsement).** Navy and bright blue are confirmed against the World Bank Group Branding and Visual Identity Guidelines (February 2016, p.18). The status colors come from its secondary palette (p.19). Light-mode values are below, with the ratio on the page background (`--surface`) where it matters; dark mode is in `apps/web/src/styles/theme.css`.
 
 | Token | Value | Use |
 |---|---|---|
-| `--wb-navy` | `#002244` | Text, headings, primary surfaces in dark mode |
-| `--wb-cyan` | `#009FDA` | Fills, icons, focus rings, large text only |
+| `--wb-navy` | `#002244` | Text and headings; primary surfaces in dark mode |
+| `--wb-cyan` | `#009FDA` | **Fills only**, with navy text on top (5.31:1). Never text, an icon, a border or a focus ring |
 | `--surface` | `#F5F8FB` | Page background (light) |
-| `--line` | `#D6E1EA` | Borders |
-| `--ok`, `--draft`, `--safety` | Pick from the World Bank secondary palette | Status only |
+| `--line` | `#D6E1EA` | Decorative dividers only (1.25:1) |
+| `--input` | `#6B7F94` | Borders of interactive components (3.87:1) |
+| `--ring` | navy in light mode, `--surface` in dark mode | Focus rings, drawn at 50% opacity (3.20:1 and 4.69:1) |
+| `--ok` | `#006450` | Status text and icons. Official secondary color, PMS 336 C (6.70:1) |
+| `--draft` | `#876400` | Status text and icons. Derived: the official dark gold, PMS 7556 C (`#B88C1D`, 2.89:1), darkened until it passes (5.11:1). No official amber or gold reaches 4.5:1 as text |
+| `--safety` | `#98252B` | Status text and icons. Official secondary color, PMS 7622 C (7.48:1) |
 
-  Contrast: `#009FDA` on white is about 3:1, so it fails AA for body text. Use navy text on cyan fills (about 5.3:1) for primary buttons.
+  In dark mode `--ok` and `--draft` are the official bright green `#00AB51` (5.29:1 on navy) and amber `#FDB714` (9.11:1). The official red `#EB1C2D` is only 3.61:1 on navy, so `--safety` there is that red lightened to `#F56B74` (5.52:1). The guide prints that red's hex with a typo; `#EB1C2D` is derived from its printed RGB value 235, 28, 45.
 
-- **Type:** subtitles and body in Atkinson Hyperlegible (designed for legibility; include a system fallback). Headings in an Arial-compatible stack, matching the World Bank guideline pairing of Andes and Arial without licensing Andes.
+  **Contrast rule (cyan is a fill only).** `#009FDA` is 3.01:1 on white and 2.83:1 on `--surface`, so it fails 4.5:1 for text and 3:1 for icons, borders and focus rings. In light mode it is a fill, and the text on it is navy (5.31:1, primary buttons). Status colors reach 4.5:1 for text on the page background and on cards, in both modes. Every pair the components use is recorded with its ratio in `apps/web/src/styles/theme-pairs.ts` and checked by `theme.test.ts`. `cyan-rule.test.ts` fails if any source file uses cyan as text, an icon, a border or a ring. The 2016 guide was the only public palette found, and no license covering palette reuse was found (only the logo needs written permission), so keep palette use light.
+
+- **Type:** subtitles and body in Atkinson Hyperlegible Next, self-hosted through Fontsource and bundled by Vite, so it works in airplane mode (no font CDN; the e2e smoke test fails on any request to another origin). It has a system fallback. Headings in an Arial-compatible stack, matching the World Bank guideline pairing of Andes and Arial without licensing Andes.
 
 ### 6.6 Supabase
 
@@ -552,7 +558,7 @@ The offline test is the single most important test. Run it before every checkpoi
 
 | Risk | Fallback |
 |---|---|
-| Matcher worker not ready by the 8 PM checkpoint | Temporary `KeywordMatcher` implementing `Matcher`, labeled as a stand-in in demo mode; replaced before submission |
+| Matcher worker not ready by the Slice 1 checkpoint (11 PM) | Temporary `KeywordMatcher` implementing `Matcher`, labeled as a stand-in in demo mode; replaced before submission |
 | Model too large | Int8 plus side-load; vocabulary trimming as P1 |
 | Supabase or SMS provider issues | Demo-mode logging; seed data labeled synthetic |
 | Groq unavailable | Device themes only; classification stays P1 |

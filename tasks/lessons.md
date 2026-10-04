@@ -23,6 +23,8 @@ Read at the start of every session. After any correction or bug, add an entry: w
 17. Write shell commands for zsh; find files with `find` and quoted patterns, never bare globs that may match nothing.
 18. When a file is found by search, take the newest match and verify its contents before using it.
 19. When a new approach replaces an old one, say which steps to stop using and give one path at a time.
+20. Tell research subagents to write only to the scratchpad, run `git status` after every research batch, and choose the local scope when approving "always allow".
+21. Start every shell command with `cd <repo root> &&`, or use `--cwd`: a `cd` in one call stays in effect for the next.
 
 ## Entries
 
@@ -101,8 +103,22 @@ Read at the start of every session. After any correction or bug, add an entry: w
 - **Rule:** When a new approach replaces an old one, say which steps to stop using and give one path at a time.
 - **Check:** A message that replaces earlier steps opens with a "Stop using" line naming them, then gives a single numbered path.
 
+### L-016: Research left files in the repo and rules in shared settings
+- **What happened:** Research subagents downloaded a web page into the repo root, and "always allow" approvals during the research saved 36 permission rules into the tracked `.claude/settings.json`, two of them very broad (`python3 -c` and `gh pr *`).
+- **Rule:** Tell every research subagent to write only to the scratchpad, run `git status` after each research batch, and approve "always allow" at the local scope.
+- **Check:** `git status` is clean before the first commit, `.claude/settings.json` has no diff, and the rules live in `.claude/settings.local.json`, which `.gitignore` covers.
+
+### L-017: Shell directory leaked between commands
+- **What happened:** A `cd apps/web` in one shell call stayed in effect, so the next commands ran in the wrong folder.
+- **Rule:** Start every shell command with `cd <repo root> &&`, and run package-manager commands with `--cwd` instead of `cd`.
+- **Check:** Every command begins with the `cd` to the repo root, or uses `--cwd`.
+
 ## Bug log
 
 | Date | Bug | Root cause | Fix | Test added |
 |---|---|---|---|---|
-| | | | | |
+| 2026-10-03 | `theme.css?raw` was an empty string in Vitest | Vitest replaces every CSS file with an empty string unless `test.css.include` matches it, `?raw` imports included | `css: { include: [/\.css\?raw$/] }` in `apps/web/vitest.config.ts` | `theme.test.ts` and `cyan-rule.test.ts` read the real CSS; a deliberately bad token fails them |
+| 2026-10-03 | `bun add react@19.3 --exact` saved `"19.3"`, not an exact version | Bun saves a partial range literally | Re-added with full versions (the lockfile pinned them either way) | None; `apps/web/package.json` shows exact versions |
+| 2026-10-03 | The generated Animate UI Button used cyan text (`link`) and the decorative border (`outline`) | Vendored classes assume shadcn's default tokens, not our contrast rule | Edited our copy, documented at the top of the file | `cyan-rule.test.ts` scans all source; `theme-pairs.ts` records every pair's ratio |
+| 2026-10-03 | The offline guard accepted `http://localhost:41730` | It matched the origin with `startsWith` | Compare `new URL(url).origin` | A control run with a lookalike link makes `e2e/smoke.spec.ts` fail |
+| 2026-10-03 | A test in `packages/core/test/` (the TRD's location) would have been skipped | Core's Vitest and tsconfig included only `src/` | Include `test/` in both | A control run: a test and a type error in `test/` are picked up |
