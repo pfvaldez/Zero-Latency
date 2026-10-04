@@ -24,7 +24,7 @@ The brief's workflow we name in the video: **learning from visitor feedback**. T
 7. Privacy: never ask for names or contacts. Redact emails and phone numbers at ingest. Noor's text contains counts only.
 8. Secrets live only in Supabase Edge Function secrets or a gitignored local `.env`. Never in the client bundle.
 9. Label every stand-in, placeholder and synthetic record in the UI, data, docs and video.
-10. Groq and ElevenLabs are never called at guest runtime. Groq classifies synced text into a fixed theme enum on the cooperative side, validated with Zod. ElevenLabs generates narrator audio at build time from checked text only, labeled as an AI voice. Never clone Noor's or a teammate's voice.
+10. Groq and ElevenLabs are never called at guest runtime. Groq classifies synced text into a fixed theme enum on the cooperative side, validated with Zod. ElevenLabs generates narrator audio at build time from checked text only, labeled as an AI voice. Never clone or dub a person's voice without their explicit, written consent. AI-dubbed audio is always labeled 'AI-dubbed' and is never presented as the person's own words. Noor's voice is never synthesized. Consents are listed in `docs/CONSENT.md`.
 
 ## Workflow orchestration
 

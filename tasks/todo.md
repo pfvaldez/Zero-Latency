@@ -44,7 +44,7 @@ Each slice ends working and tested, and no mocks ship: a stand-in used while a l
 - Done when: a question asked offline syncs, shows in `/coop`, and an approved monthly text arrives on the demo phone
 
 ### Slice 4: Wolof evidence, Groq and narrator audio
-- [ ] Wolof evidence: FLORES-200 chrF with NLLB, FLEURS word error rate with MMS, and a round trip on the AI-dubbed Wolof clips
+- [ ] Wolof evidence: FLORES-200 chrF with NLLB, FLEURS word error rate with MMS, and a round trip on the AI-dubbed Wolof clips (only once Preet's row in `docs/CONSENT.md` is `confirmed`)
 - [ ] Groq theme cross-check on the cooperative side (strict schema, Zod, review queue)
 - [ ] ElevenLabs narrator audio from checked text, labeled as an AI voice
 - Done when: the numbers are in `docs/EVAL.md` with their limits, and every AI-voice file is listed in `labels.syntheticVoice`
@@ -209,6 +209,7 @@ Open items for the captain and Preet (found while building):
 - [ ] `translate.py` to draft subtitles; all marked unchecked
 - [ ] `embed.py` and `export_model.py` (ONNX int8); record the model size
 - [ ] `pack.py` in demo and production modes; pytest proves production excludes unchecked items
+- [ ] Consent gate: the pipeline refuses to use any dubbed audio whose row in `docs/CONSENT.md` is not `confirmed`, in every mode, and labels it "AI-dubbed"; pytest proves a `pending` row stops the build and that no dubbed file is listed without a matching confirmed row
 - [ ] `eval/` threshold sweep, matching accuracy, fail-safe rate, translation chrF, WER, latency; writes `docs/EVAL.md`
 
 ## Phase 4: Guest PWA (Pablo, about 4 h)
