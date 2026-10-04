@@ -1,0 +1,441 @@
+{
+  "date": "2026-10-04",
+  "modelRepo": "Xenova/multilingual-e5-small",
+  "modelRevision": "761b726dd34fb83930e26aab4e9ac3899aa1fa78",
+  "contentHash": "6bd812ef949ab26a",
+  "questions": {
+    "total": 116,
+    "safety": 16,
+    "nonSafety": 100,
+    "answered": 56,
+    "neverAnswered": 44,
+    "heldBackAsNone": 16
+  },
+  "passageSource": "the English script of each clip (no transcript yet), plus draft translations where they exist",
+  "passageLangs": [
+    "en",
+    "de",
+    "nl",
+    "sv"
+  ],
+  "threshold": 0.8525,
+  "maxFalseConfirm": 0.05,
+  "margin": 0.05,
+  "primary": {
+    "threshold": 0.8525,
+    "questions": 100,
+    "answered": 56,
+    "neverAnswered": 44,
+    "top1": 47,
+    "correctConfirm": 28,
+    "wrongClipConfirm": 3,
+    "confirmOnNever": 0,
+    "missed": 25,
+    "savedOnNever": 44,
+    "falseConfirmRate": 0.03,
+    "top1Rate": 0.8392857142857143,
+    "coverage": 0.5,
+    "failSafeRate": 1,
+    "safetyQuestions": 16,
+    "safetyRecall": 1,
+    "safetyFalsePositives": 0
+  },
+  "primaryCi": {
+    "falseConfirm": {
+      "low": 0.010254338223414816,
+      "high": 0.08452078080402699
+    },
+    "coverage": {
+      "low": 0.37331520958682995,
+      "high": 0.62668479041317
+    }
+  },
+  "englishOnly": {
+    "threshold": 0.8525,
+    "questions": 100,
+    "answered": 56,
+    "neverAnswered": 44,
+    "top1": 42,
+    "correctConfirm": 10,
+    "wrongClipConfirm": 1,
+    "confirmOnNever": 0,
+    "missed": 45,
+    "savedOnNever": 44,
+    "falseConfirmRate": 0.01,
+    "top1Rate": 0.75,
+    "coverage": 0.17857142857142858,
+    "failSafeRate": 1,
+    "safetyQuestions": 16,
+    "safetyRecall": 1,
+    "safetyFalsePositives": 0
+  },
+  "afterPublish": {
+    "threshold": 0.8525,
+    "questions": 100,
+    "answered": 72,
+    "neverAnswered": 28,
+    "top1": 57,
+    "correctConfirm": 36,
+    "wrongClipConfirm": 3,
+    "confirmOnNever": 2,
+    "missed": 33,
+    "savedOnNever": 26,
+    "falseConfirmRate": 0.05,
+    "top1Rate": 0.7916666666666666,
+    "coverage": 0.5,
+    "failSafeRate": 0.9285714285714286,
+    "safetyQuestions": 16,
+    "safetyRecall": 1,
+    "safetyFalsePositives": 0
+  },
+  "byLang": [
+    {
+      "name": "en",
+      "m": {
+        "threshold": 0.8525,
+        "questions": 25,
+        "answered": 14,
+        "neverAnswered": 11,
+        "top1": 13,
+        "correctConfirm": 9,
+        "wrongClipConfirm": 1,
+        "confirmOnNever": 0,
+        "missed": 4,
+        "savedOnNever": 11,
+        "falseConfirmRate": 0.04,
+        "top1Rate": 0.9285714285714286,
+        "coverage": 0.6428571428571429,
+        "failSafeRate": 1,
+        "safetyQuestions": 4,
+        "safetyRecall": 1,
+        "safetyFalsePositives": 0
+      }
+    },
+    {
+      "name": "de",
+      "m": {
+        "threshold": 0.8525,
+        "questions": 25,
+        "answered": 14,
+        "neverAnswered": 11,
+        "top1": 12,
+        "correctConfirm": 7,
+        "wrongClipConfirm": 0,
+        "confirmOnNever": 0,
+        "missed": 7,
+        "savedOnNever": 11,
+        "falseConfirmRate": 0,
+        "top1Rate": 0.8571428571428571,
+        "coverage": 0.5,
+        "failSafeRate": 1,
+        "safetyQuestions": 4,
+        "safetyRecall": 1,
+        "safetyFalsePositives": 0
+      }
+    },
+    {
+      "name": "nl",
+      "m": {
+        "threshold": 0.8525,
+        "questions": 25,
+        "answered": 14,
+        "neverAnswered": 11,
+        "top1": 11,
+        "correctConfirm": 4,
+        "wrongClipConfirm": 1,
+        "confirmOnNever": 0,
+        "missed": 9,
+        "savedOnNever": 11,
+        "falseConfirmRate": 0.04,
+        "top1Rate": 0.7857142857142857,
+        "coverage": 0.2857142857142857,
+        "failSafeRate": 1,
+        "safetyQuestions": 4,
+        "safetyRecall": 1,
+        "safetyFalsePositives": 0
+      }
+    },
+    {
+      "name": "sv",
+      "m": {
+        "threshold": 0.8525,
+        "questions": 25,
+        "answered": 14,
+        "neverAnswered": 11,
+        "top1": 11,
+        "correctConfirm": 8,
+        "wrongClipConfirm": 1,
+        "confirmOnNever": 0,
+        "missed": 5,
+        "savedOnNever": 11,
+        "falseConfirmRate": 0.04,
+        "top1Rate": 0.7857142857142857,
+        "coverage": 0.5714285714285714,
+        "failSafeRate": 1,
+        "safetyQuestions": 4,
+        "safetyRecall": 1,
+        "safetyFalsePositives": 0
+      }
+    }
+  ],
+  "byVariant": [
+    {
+      "name": "plain",
+      "m": {
+        "threshold": 0.8525,
+        "questions": 56,
+        "answered": 28,
+        "neverAnswered": 28,
+        "top1": 23,
+        "correctConfirm": 16,
+        "wrongClipConfirm": 3,
+        "confirmOnNever": 0,
+        "missed": 9,
+        "savedOnNever": 28,
+        "falseConfirmRate": 0.05357142857142857,
+        "top1Rate": 0.8214285714285714,
+        "coverage": 0.5714285714285714,
+        "failSafeRate": 1,
+        "safetyQuestions": 12,
+        "safetyRecall": 1,
+        "safetyFalsePositives": 0
+      }
+    },
+    {
+      "name": "paraphrase",
+      "m": {
+        "threshold": 0.8525,
+        "questions": 28,
+        "answered": 20,
+        "neverAnswered": 8,
+        "top1": 17,
+        "correctConfirm": 8,
+        "wrongClipConfirm": 0,
+        "confirmOnNever": 0,
+        "missed": 12,
+        "savedOnNever": 8,
+        "falseConfirmRate": 0,
+        "top1Rate": 0.85,
+        "coverage": 0.4,
+        "failSafeRate": 1,
+        "safetyQuestions": 4,
+        "safetyRecall": 1,
+        "safetyFalsePositives": 0
+      }
+    },
+    {
+      "name": "typo",
+      "m": {
+        "threshold": 0.8525,
+        "questions": 16,
+        "answered": 8,
+        "neverAnswered": 8,
+        "top1": 7,
+        "correctConfirm": 4,
+        "wrongClipConfirm": 0,
+        "confirmOnNever": 0,
+        "missed": 4,
+        "savedOnNever": 8,
+        "falseConfirmRate": 0,
+        "top1Rate": 0.875,
+        "coverage": 0.5,
+        "failSafeRate": 1,
+        "safetyQuestions": 0,
+        "safetyRecall": 0,
+        "safetyFalsePositives": 0
+      }
+    }
+  ],
+  "leaveOneOut": [
+    {
+      "lang": "en",
+      "threshold": 0.8525,
+      "falseConfirmRate": 0.04,
+      "coverage": 0.6428571428571429
+    },
+    {
+      "lang": "de",
+      "threshold": 0.8525,
+      "falseConfirmRate": 0,
+      "coverage": 0.5
+    },
+    {
+      "lang": "nl",
+      "threshold": 0.8525,
+      "falseConfirmRate": 0.04,
+      "coverage": 0.2857142857142857
+    },
+    {
+      "lang": "sv",
+      "threshold": 0.8525,
+      "falseConfirmRate": 0.04,
+      "coverage": 0.5714285714285714
+    }
+  ],
+  "sweepSample": [
+    {
+      "threshold": 0.6,
+      "falseConfirmRate": 0.53,
+      "coverage": 0.8392857142857143,
+      "failSafeRate": 0
+    },
+    {
+      "threshold": 0.62,
+      "falseConfirmRate": 0.53,
+      "coverage": 0.8392857142857143,
+      "failSafeRate": 0
+    },
+    {
+      "threshold": 0.64,
+      "falseConfirmRate": 0.53,
+      "coverage": 0.8392857142857143,
+      "failSafeRate": 0
+    },
+    {
+      "threshold": 0.66,
+      "falseConfirmRate": 0.53,
+      "coverage": 0.8392857142857143,
+      "failSafeRate": 0
+    },
+    {
+      "threshold": 0.68,
+      "falseConfirmRate": 0.53,
+      "coverage": 0.8392857142857143,
+      "failSafeRate": 0
+    },
+    {
+      "threshold": 0.7,
+      "falseConfirmRate": 0.53,
+      "coverage": 0.8392857142857143,
+      "failSafeRate": 0
+    },
+    {
+      "threshold": 0.72,
+      "falseConfirmRate": 0.53,
+      "coverage": 0.8392857142857143,
+      "failSafeRate": 0
+    },
+    {
+      "threshold": 0.74,
+      "falseConfirmRate": 0.53,
+      "coverage": 0.8392857142857143,
+      "failSafeRate": 0
+    },
+    {
+      "threshold": 0.76,
+      "falseConfirmRate": 0.53,
+      "coverage": 0.8392857142857143,
+      "failSafeRate": 0
+    },
+    {
+      "threshold": 0.78,
+      "falseConfirmRate": 0.52,
+      "coverage": 0.8214285714285714,
+      "failSafeRate": 0.022727272727272728
+    },
+    {
+      "threshold": 0.8,
+      "falseConfirmRate": 0.43,
+      "coverage": 0.8214285714285714,
+      "failSafeRate": 0.22727272727272727
+    },
+    {
+      "threshold": 0.82,
+      "falseConfirmRate": 0.3,
+      "coverage": 0.7321428571428571,
+      "failSafeRate": 0.5
+    },
+    {
+      "threshold": 0.84,
+      "falseConfirmRate": 0.11,
+      "coverage": 0.6607142857142857,
+      "failSafeRate": 0.8863636363636364
+    },
+    {
+      "threshold": 0.86,
+      "falseConfirmRate": 0.02,
+      "coverage": 0.44642857142857145,
+      "failSafeRate": 1
+    },
+    {
+      "threshold": 0.88,
+      "falseConfirmRate": 0,
+      "coverage": 0.14285714285714285,
+      "failSafeRate": 1
+    },
+    {
+      "threshold": 0.9,
+      "falseConfirmRate": 0,
+      "coverage": 0.05357142857142857,
+      "failSafeRate": 1
+    },
+    {
+      "threshold": 0.92,
+      "falseConfirmRate": 0,
+      "coverage": 0.017857142857142856,
+      "failSafeRate": 1
+    },
+    {
+      "threshold": 0.94,
+      "falseConfirmRate": 0,
+      "coverage": 0.017857142857142856,
+      "failSafeRate": 1
+    },
+    {
+      "threshold": 0.96,
+      "falseConfirmRate": 0,
+      "coverage": 0,
+      "failSafeRate": 1
+    },
+    {
+      "threshold": 0.98,
+      "falseConfirmRate": 0,
+      "coverage": 0,
+      "failSafeRate": 1
+    }
+  ],
+  "histogram": {
+    "lo": 0.6,
+    "hi": 1,
+    "bins": 8,
+    "answered": [
+      0,
+      0,
+      0,
+      1,
+      18,
+      34,
+      3,
+      0
+    ],
+    "never": [
+      0,
+      0,
+      0,
+      10,
+      32,
+      2,
+      0,
+      0
+    ]
+  },
+  "timings": {
+    "modelLoadMs": 560,
+    "passagesMs": 107,
+    "queryMedianMs": 1.7,
+    "queryP95Ms": 2.3,
+    "queries": 116
+  },
+  "size": {
+    "modelBytes": 135392183,
+    "embeddingsBytes": 49152,
+    "audioBytes": 503766,
+    "totalBytes": 135945101,
+    "budgetBytes": 150000000
+  },
+  "unsafe": {
+    "safetyRecall": 1,
+    "safetyFalsePositives": 0,
+    "safetyQuestions": 16
+  }
+}

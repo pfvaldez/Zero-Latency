@@ -11,9 +11,15 @@ dependencies = [
 
 [dependency-groups]
 dev = ["pytest==8.4.1"]
+translate = [
+    "torch==2.14.1",
+    "transformers==5.18.0",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-m 'not slow'"
+markers = ["slow: runs the real NLLB model (several GB); local only, never in CI"]
 pythonpath = ["."]
 
 [build-system]

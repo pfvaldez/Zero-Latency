@@ -96,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="asknoor.build")
     parser.add_argument("--farm", required=True)
     parser.add_argument("--mode", choices=["demo", "production"], default="demo")
-    parser.add_argument("--steps", default="audio", help="comma list: audio, transcribe")
+    parser.add_argument("--steps", default="audio", help="comma list: audio, translate, transcribe")
     args = parser.parse_args(argv)
     steps = [s.strip() for s in args.steps.split(",") if s.strip()]
     try:
@@ -104,6 +104,14 @@ def main(argv: list[str] | None = None) -> int:
             report = step_audio(args.farm, args.mode)
             path = write_audio_report(args.farm, report)
             print(f"audio: {len(report)} clips prepared and audited; report at {path.relative_to(REPO)}")
+        if "translate" in steps:
+            from .translate import TranslateError, step_translate
+
+            try:
+                done = step_translate(args.farm)
+            except TranslateError as error:
+                raise BuildError(str(error)) from error
+            print("translate: " + ("; ".join(done) if done else "up to date"))
         if "transcribe" in steps:
             from .transcribe import step_transcribe
 

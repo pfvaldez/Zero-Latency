@@ -1,0 +1,15 @@
+{
+  "match": 0.8525,
+  "margin": 0.05,
+  "limitMet": true,
+  "maxFalseConfirm": 0.05,
+  "falseConfirmRate": 0.03,
+  "coverage": 0.5,
+  "questions": 100,
+  "inSample": true,
+  "modelRepo": "Xenova/multilingual-e5-small",
+  "modelRevision": "761b726dd34fb83930e26aab4e9ac3899aa1fa78",
+  "passageSource": "the English script of each clip (no transcript yet), plus draft translations where they exist",
+  "evaluatedOn": "2026-10-04",
+  "note": "margin is a recorded placeholder; the A-or-B step is P1. The threshold is chosen and measured on the same synthetic questions (see docs/EVAL.md)."
+}
