@@ -232,23 +232,46 @@ describe("production pack", () => {
     expect(p.labels.standIn).toEqual([]);
   });
 
-  it("includes a draft language only once that language is checked against the same translation", () => {
-    const t = translationsFor();
+  it("includes a draft language only once its check is bound to exactly that translated text", () => {
+    const deText = ["de:Welcome to my farm.", "de:I'm Noor."].join("\n");
     const good = ChecksFileSchema.parse({
       checks: [
         signed("clip-1/subtitles/en"),
-        signed("clip-1/subtitles/de", {
-          transcriptSha256: (t["1"] as { sourceSha256: string }).sourceSha256,
-        }),
+        signed("clip-1/subtitles/de", { transcriptSha256: sha256(deText) }),
       ],
     });
     const p = planPack(input({ checks: good }), "production");
     expect(p.moments[0]?.subtitles.de).toBe("de:Welcome to my farm. de:I'm Noor.");
     expect(p.moments[0]?.draft).toBeUndefined();
-    // A check bound to some other text (or to the English source) does not count.
+    // A check bound to some other text does not count.
     expect(
       planPack(input({ checks: CHECKED }), "production").moments[0]?.subtitles.de,
     ).toBeUndefined();
+  });
+
+  it("withdraws a language check when the translated text changes under the same English", () => {
+    const deText = ["de:Welcome to my farm.", "de:I'm Noor."].join("\n");
+    const checks = ChecksFileSchema.parse({
+      checks: [
+        signed("clip-1/subtitles/en"),
+        signed("clip-1/subtitles/de", { transcriptSha256: sha256(deText) }),
+      ],
+    });
+    expect(planPack(input({ checks }), "production").moments[0]?.subtitles.de).toBeDefined();
+    // The same English, regenerated or hand-edited German: the old check no longer applies.
+    const regenerated = translationsFor();
+    (
+      (regenerated["1"] as { sentences: Record<string, string>[] }).sentences[0] as Record<
+        string,
+        string
+      >
+    ).de = "de:Willkommen, ganz anders.";
+    const p = planPack(input({ checks, clipTranslations: regenerated }), "production");
+    expect(p.moments[0]?.subtitles.de).toBeUndefined();
+    expect(p.excluded).toContainEqual({
+      what: "clip 1 de subtitles",
+      why: "draft translation, not checked",
+    });
   });
 
   it("is empty today: nothing is checked yet", () => {

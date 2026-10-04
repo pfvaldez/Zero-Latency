@@ -215,9 +215,15 @@ export function planPack(
     );
     for (const lang of TRANSLATED) {
       const lines = translation ? joinTranslated(translation, lang) : null;
+      // A check approves exactly this translated text: its hash must match, so regenerated or
+      // hand-edited text under the same English is a draft again.
       const textChecked =
-        !!translation &&
-        isChecked(input.checks, `clip-${clip.id}/subtitles/${lang}`, translation.sourceSha256);
+        !!lines &&
+        isChecked(
+          input.checks,
+          `clip-${clip.id}/subtitles/${lang}`,
+          input.sha256(lines.join("\n")),
+        );
       if (lines && (!production || textChecked)) {
         subtitles[lang] = lines.join(" ");
         draft[lang] = !textChecked;
