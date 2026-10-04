@@ -114,16 +114,32 @@ class Translator:
         self.tokenizer = AutoTokenizer.from_pretrained(MODEL, revision=REVISION, src_lang="eng_Latn")
         self.model = AutoModelForSeq2SeqLM.from_pretrained(MODEL, revision=REVISION).eval()
 
-    def translate(self, sentences: list[str], lang: str) -> list[str]:
-        batch = self.tokenizer(sentences, return_tensors="pt", padding=True)
-        with self._torch.no_grad():
-            out = self.model.generate(
-                **batch,
-                forced_bos_token_id=self.tokenizer.convert_tokens_to_ids(CODES[lang]),
-                max_length=256,
-                num_beams=4,
-            )
-        return self.tokenizer.batch_decode(out, skip_special_tokens=True)
+    def translate(
+        self, sentences: list[str], lang: str, src: str = "eng_Latn", batch_size: int = 16, progress=None
+    ) -> list[str]:
+        """Translate `sentences` from `src` (an NLLB code, English by default) into `lang` (our code)."""
+        target = CODES.get(lang, lang)  # our short code ("wo") or an NLLB code ("wol_Latn")
+        self.tokenizer.src_lang = src
+        # Longest-first batches waste far less on padding; results go back in the caller's order.
+        order = sorted(range(len(sentences)), key=lambda i: -len(sentences[i]))
+        translated: dict[int, str] = {}
+        for start in range(0, len(order), batch_size):
+            idx = order[start : start + batch_size]
+            batch = self.tokenizer([sentences[i] for i in idx], return_tensors="pt", padding=True)
+            with self._torch.no_grad():
+                ids = self.model.generate(
+                    **batch,
+                    forced_bos_token_id=self.tokenizer.convert_tokens_to_ids(target),
+                    max_new_tokens=min(256, 2 * int(batch["input_ids"].shape[1]) + 10),  # stop runaway output
+                    num_beams=4,
+                )
+            for i, text in zip(idx, self.tokenizer.batch_decode(ids, skip_special_tokens=True), strict=True):
+                translated[i] = text
+            if progress:
+                progress(len(translated), len(sentences))
+        out = [translated[i] for i in range(len(sentences))]
+        self.tokenizer.src_lang = "eng_Latn"
+        return out
 
     def translate_protected(self, text: str, lang: str) -> str | None:
         """Translate one string that may hold {placeholders}; None if they cannot be kept."""

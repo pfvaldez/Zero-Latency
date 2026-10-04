@@ -25,6 +25,7 @@ import {
   THEME_IDS,
   toAddons,
   VISITOR_LANGS,
+  WolofEvidenceSchema,
 } from "../packages/core/src/index.ts";
 
 const DIR = join(dirname(fileURLToPath(import.meta.url)), "ondera-noor");
@@ -309,5 +310,42 @@ describe("index-passages.json", () => {
 
   it("holds no email addresses or phone numbers", () => {
     for (const p of flat) expect(redact(p.text), p.text).toBe(p.text);
+  });
+});
+
+describe("eval/wolof.json (Wolof evidence)", () => {
+  const evidence = WolofEvidenceSchema.parse(json("eval/wolof.json"));
+
+  it("records every sample size, so no number is reported without its n", () => {
+    expect(evidence.flores?.n).toBeGreaterThanOrEqual(300);
+    expect(evidence.fleurs?.n).toBe(100);
+    expect(evidence.roundtrip?.n).toBe(8);
+    for (const d of Object.values(evidence.flores?.directions ?? {}))
+      expect(d.n).toBe(evidence.flores?.n);
+  });
+
+  it("covers English to Wolof and English to German on the same sentences, and Wolof back to English", () => {
+    expect(Object.keys(evidence.flores?.directions ?? {}).sort()).toEqual([
+      "eng_Latn to deu_Latn",
+      "eng_Latn to wol_Latn",
+      "wol_Latn to eng_Latn",
+    ]);
+  });
+
+  it("round-trips all eight dubbed clips against Preet's own script", () => {
+    const clipsById = new Map(clips.clips.map((c) => [c.id, c.script.en]));
+    expect(evidence.roundtrip?.clips.map((c) => c.clip)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+    for (const c of evidence.roundtrip?.clips ?? []) expect(c.script).toBe(clipsById.get(c.clip));
+  });
+
+  it("names the models and revisions it used, with their non-commercial licenses", () => {
+    const v = evidence.versions as {
+      nllb: { revision: string; license: string };
+      mms: { revision: string; license: string };
+    };
+    expect(v.nllb.license).toBe("CC-BY-NC-4.0");
+    expect(v.mms.license).toBe("CC-BY-NC-4.0");
+    expect(v.nllb.revision).toMatch(/^[0-9a-f]{40}$/);
+    expect(v.mms.revision).toMatch(/^[0-9a-f]{40}$/);
   });
 });

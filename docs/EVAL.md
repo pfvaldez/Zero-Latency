@@ -81,6 +81,52 @@ Each row is a different set of passages for the same moments, evaluated the same
 - **What the audit cannot see:** it measures token overlap within one language, so a phrasing that is a paraphrase or a translation of a test question is not detected. Paraphrase leakage is not measured.
 - **Limits I cannot remove:** the team's assistant also wrote the test questions and has seen them in this project, and both come from the same model family, so the style of the phrasings and of the questions is correlated. That can make the gain look larger than real guests would give. They are unchecked machine text (a draft), shipped labeled; see `docs/RESPONSIBLE_AI.md`.
 
+## Wolof evidence
+
+How good are the machine translation and speech recognition the Wolof drafts and the dub evaluation depend on? Local runs, never in the product; **NLLB and MMS are CC-BY-NC-4.0 (non-commercial)**. chrF is 0 to 100 (higher is better). Sample sizes are in every row.
+
+### Machine translation: FLORES-200 devtest (NLLB-200 distilled 600M)
+
+300 sentences sampled from 1012 (seed 4), the same sentences in every direction.
+
+| Direction | chrF | Sentences |
+|---|---|---|
+| eng to wol | 23.86 | 300 |
+| eng to deu | 62.47 | 300 |
+| wol to eng | 38.29 | 300 |
+
+English to Wolof scores 23.86 and English to German 62.47: Wolof is **38.6 chrF points lower**.
+
+### Speech recognition: MMS-1b-all with the Wolof adapter on FLEURS Wolof
+
+100 utterances sampled from 371 (seed 4), 2427 reference words, 1762 s of audio. Same normalization on both sides (lowercase, no punctuation).
+
+| Metric | Value |
+|---|---|
+| Word error rate | 38.2% |
+| Character error rate | 12.0% |
+
+Wolof spelling varies, so the word error rate overstates the real errors; the character error rate is the fairer number.
+
+### Round trip on the AI-dubbed Wolof clips
+
+MMS Wolof transcript, then NLLB Wolof to English, then chrF against Preet's English script. **n = 8 clips**; pooled chrF **15.29**.
+
+| Clip | chrF | Back to English (machine) |
+|---|---|---|
+| 1 | 7.51 | dlljmt zmtl can lnur zmanjbt ygnñ lgttndw tig dnln wnsn cf dog ttortor bagt 5nks |
+| 2 | 11.83 | our cafe in cauhtun wilai big cirgi menat o hunc and north fish lanui dag ach lochoiji ben ben jeich whaijé mo tach cafe gine and sav sugar |
+| 3 | 9.86 | we're going to hell and we're not going to hell and we're not going to hell and we're going to hell and we're going to hell and we're going to hell and we're go… (699 characters) |
+| 4 | 18.76 | There's a bunch of benign animals that eat in our coffee shops when you combine a bunch of guinea pigs they teach my baby jigen to teach me how to cook |
+| 5 | 24.54 | in the coffee shop we are jin bokah they are cold cold samanjabut didundi telingen leke teysah have chilu joge fufu rek |
+| 6 | 24.26 | can call our coffee company to send you the ty de nano lako packaging base tack |
+| 7 | 17.58 | jon bijem chitulu the cafe is located at the top of the dafai jel wahtu solal dalw digar tayoblndoh sula ye which jafle wahko sagedanu jal rek chi safugi |
+| 8 | 19.48 | ama gunooy now wante lingeen kolaye barena letter mangishi think now he owns the sengiid you can say a few words here |
+
+**Where it breaks (an inference, not a measurement):** on clean FLORES text NLLB's Wolof to English scores 38.29, and on real FLEURS speech MMS makes 12.0% character errors; the dubs round-trip at 15.29, far below what either stage suggests. That points at the dubbed audio (or MMS on synthetic speech) more than at the translation step, but a Wolof speaker listening to the clips is the only real test.
+
+**Limits:** the round trip is 8 clips, so it is an anecdote, not a benchmark; FLEURS is read speech by volunteers and the dubs are synthetic speech, so neither number transfers to a farm tour; a low chrF here means the machine drafts need a Wolof speaker, which is exactly how they are treated (drafts, demo only). The round trip compounds two errors (recognition and translation) and cannot say which one is at fault.
+
 ## The overnight loop (clip 8 held back, then published)
 
 Same threshold, same questions. Before the answer is published the overnight questions have no answer and should be saved for Noor; after the next pack includes it they should match.
@@ -149,8 +195,8 @@ Best moment score per question, in 8 bins from 0.6 to 1.
 | Embedding matrix | 0.2 MB |
 | Prepared audio (local, if built) | 0.5 MB |
 | Estimated pack | 136.1 MB against the 150.0 MB P0 budget |
-| Model load (Node, build machine) | 532 ms |
-| Embedding the passages | 219 ms |
+| Model load (Node, build machine) | 463 ms |
+| Embedding the passages | 211 ms |
 | One question, median / p95 (116 questions) | 1.8 ms / 2.2 ms |
 
 **These timings are Node on the build machine, not a mid-range Android phone.** The phone numbers (model first load, question to outcome) come from the offline end-to-end run with the real worker.

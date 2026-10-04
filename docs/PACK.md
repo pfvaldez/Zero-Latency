@@ -42,6 +42,7 @@ demo site, in both pack modes; any deployment to real guests needs new consent.
 | Put the model next to the fixture for the offline tests | `bun run pack:model -- --into apps/web/public/packs/fixture` (gitignored) |
 | Evaluation (writes `docs/EVAL.md` and `threshold.json`) | `bun run eval` |
 | Model tests | `bun run test:model` (after `pack:model`) |
+| Wolof evidence (FLORES chrF, MMS word error rate, dub round trip; long, local, writes `content/ondera-noor/eval/wolof.json`) | `cd pipeline && uv sync --group translate && uv run --group translate python -m asknoor.evidence.run --flores-n 300` (needs the models and data in `.cache/`, about 8 GB) |
 | Translation drafts | `cd pipeline && uv sync --group translate && uv run python -m asknoor.build --farm ondera-noor --steps translate` |
 
 `pack:build` stops with the command to run if a translation is stale (the English text changed)
