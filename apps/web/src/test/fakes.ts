@@ -6,7 +6,7 @@ import { join } from "node:path";
 import type { MatchResult, OutboxItem } from "@asknoor/core";
 import { type FarmPackManifest, FarmPackManifestSchema } from "@asknoor/core";
 import { LocalPackRepository } from "@/services/pack-repository.ts";
-import type { Matcher, Outbox, Services } from "@/services/types.ts";
+import type { Matcher, Outbox, Scanner, Services } from "@/services/types.ts";
 
 export const FIXTURE_DIR = join(import.meta.dirname, "..", "..", "public", "packs", "fixture");
 export const fixtureManifest = (): FarmPackManifest =>
@@ -91,6 +91,23 @@ export class FakeMatcher implements Matcher {
   }
 }
 
+export class FakeScanner implements Scanner {
+  onCode: ((code: string) => void) | null = null;
+  started = 0;
+  stopped = 0;
+  /** Set to make start() fail like a refused camera. */
+  deny = false;
+  async start(_video: HTMLVideoElement, onCode: (code: string) => void) {
+    this.started++;
+    if (this.deny) throw new Error("NotAllowedError");
+    this.onCode = onCode;
+  }
+  stop() {
+    this.stopped++;
+    this.onCode = null;
+  }
+}
+
 export function testServices(
   over: Partial<Services> = {},
 ): Services & { storage: MemoryCacheStorage } {
@@ -104,6 +121,7 @@ export function testServices(
     }),
     matcher: new FakeMatcher(),
     outbox: new MemoryOutbox(),
+    scanner: new FakeScanner(),
     ...over,
   };
 }
