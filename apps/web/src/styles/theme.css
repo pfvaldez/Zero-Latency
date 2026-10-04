@@ -1,0 +1,125 @@
+/*
+ * Ask Noor theme tokens (TRD 6.5). World Bank-inspired: palette only, never the logo or any
+ * implied endorsement. Values are plain hex so theme.test.ts can read them.
+ *
+ * CONTRAST RULE. Ratios are WCAG 2.x relative luminance, recorded and enforced in
+ * theme.test.ts (it fails when a value drifts from its recorded ratio):
+ *   navy on white 16.00, navy on --surface 15.01, navy text on a cyan fill 5.31;
+ *   cyan on white 3.01 and cyan on --surface 2.83, which fails 4.5:1 for text and 3:1 for icons
+ *   and focus rings. So in light mode CYAN IS A FILL ONLY: text on it is navy, and it is never
+ *   text, an icon, a border or a focus ring.
+ *   --line on --surface is 1.25: decorative dividers only. The borders of interactive components
+ *   use --input (3:1 or better).
+ *   A focus ring is drawn at 50% opacity. Navy at 50% on --surface is 3.20, but cyan at 50% on
+ *   navy is only 2.35, so the dark-mode ring is --surface (4.69).
+ */
+:root {
+  --wb-navy: #002244;
+  --wb-cyan: #009fda;
+  --surface: #f5f8fb;
+  --line: #d6e1ea;
+
+  /* Status colours, for status text and icons. Each is 4.5:1 or better on --background and --card.
+     Source: World Bank Group Branding and Visual Identity Guidelines, Feb 2016, p.19.
+     --ok and --safety are official secondary colours: the muted dark green (PMS 336 C) and the
+     muted dark red (PMS 7622 C). The bright ones fail as text here: green 2.84, red 4.16.
+     --draft is DERIVED: no official amber or gold passes (amber PMS 7549 C is 1.65, dark gold
+     PMS 7556 C #b88c1d is 2.89), so it is that gold darkened until it passes. */
+  --ok: #006450;
+  --draft: #876400;
+  --safety: #98252b;
+
+  /* shadcn semantic tokens, as used by the Animate UI components */
+  --background: var(--surface);
+  --foreground: var(--wb-navy);
+  --card: #ffffff;
+  --card-foreground: var(--wb-navy);
+  --popover: #ffffff;
+  --popover-foreground: var(--wb-navy);
+  --primary: var(--wb-cyan);
+  --primary-foreground: var(--wb-navy);
+  --secondary: var(--line);
+  --secondary-foreground: var(--wb-navy);
+  --muted: var(--line);
+  --muted-foreground: #3f566f;
+  --accent: var(--line);
+  --accent-foreground: var(--wb-navy);
+  --destructive: #98252b; /* official PMS 7622 C; white text on it is 7.97 */
+  --border: var(--line);
+  --input: #6b7f94;
+  --ring: var(--wb-navy);
+  --radius: 0.625rem;
+}
+
+/* Dark mode: navy surfaces (TRD 6.5). Tokens and tests only in Phase 0; there is no toggle yet. */
+.dark {
+  /* --ok and --draft are the official bright green (PMS 7481 C) and amber (PMS 7549 C). The
+     official red (PMS 185 C, #eb1c2d: the guide prints its hex with a typo, so it is derived
+     from its printed RGB 235, 28, 45) is only 3.61 on navy, so --safety is that red lightened. */
+  --ok: #00ab51;
+  --draft: #fdb714;
+  --safety: #f56b74;
+
+  --background: var(--wb-navy);
+  --foreground: var(--surface);
+  --card: #092b50;
+  --card-foreground: var(--surface);
+  --popover: #092b50;
+  --popover-foreground: var(--surface);
+  --primary: var(--wb-cyan);
+  --primary-foreground: var(--wb-navy);
+  --secondary: #12395f;
+  --secondary-foreground: var(--surface);
+  --muted: #12395f;
+  --muted-foreground: #b4c6d8;
+  --accent: #12395f;
+  --accent-foreground: var(--surface);
+  --destructive: #e21b2b; /* PMS 185 C darkened a little: white text 4.75, border on navy 3.37 */
+  --border: #1b4469;
+  --input: #6f93b5;
+  --ring: var(--surface);
+}
+
+@theme inline {
+  --color-wb-navy: var(--wb-navy);
+  --color-wb-cyan: var(--wb-cyan);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-ok: var(--ok);
+  --color-draft: var(--draft);
+  --color-safety: var(--safety);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Self-hosted through Fontsource and bundled by Vite, so it works in airplane mode. The system
+     fonts after it are the fallback. Headings use an Arial-compatible stack (TRD 6.5). */
+  --font-sans:
+    "Atkinson Hyperlegible Next", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Noto Sans", Arial, sans-serif;
+  --font-heading: Arial, "Helvetica Neue", Helvetica, "Liberation Sans", sans-serif;
+}
