@@ -51,7 +51,7 @@ export const en = {
   "player.play": "Play",
   "player.pause": "Pause",
   "player.subtitles": "Subtitles",
-  "player.noorSays": "Noor's own recording",
+  "player.noorSays": "Noor's story",
   "player.sourceFallback": "Subtitles are shown in Noor's language for now.",
 
   "facts.title": "Did you know?",

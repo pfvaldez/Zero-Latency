@@ -49,7 +49,7 @@ export const nl: Strings = {
   "player.play": "Afspelen",
   "player.pause": "Pauzeren",
   "player.subtitles": "Ondertitels",
-  "player.noorSays": "Noors eigen opname",
+  "player.noorSays": "Noors verhaal",
   "player.sourceFallback": "De ondertitels staan voorlopig in de taal van Noor.",
 
   "facts.title": "Wist je dat?",
