@@ -261,13 +261,21 @@ export type OutboxItem =
   | { type: 'order'; id: string; farmId: string; items: { productId: string; qty: number }[]; total: number; currency: string; confirmedByNoor: true; createdAt: string };
 ```
 
+Types not spelled out above, as built in `packages/core/src/types.ts`:
+
+- `Thresholds` is `{ match: number; margin: number }` (the `thresholds` field of the manifest).
+- `Addon` is a union tagged by `kind` (`fact` with a `source`, `recipe`, `product` with `price` and `currency`, `farm-card`). Every add-on has `id`, `text` per visitor language and `checked`. Only checked add-ons may ship in a production pack.
+
+Zod schemas live in `src/schemas.ts`, pinned to these types with `satisfies`: `FarmPackManifestSchema` and `OutboxItemSchema` (strict objects, so an unknown field is rejected). A production manifest is also rejected if it has draft moment text, an unchecked add-on or a stand-in label. `bun run --cwd packages/core export:schema` writes the manifest's JSON Schema (draft 2020-12) to `packages/core/schema/manifest.schema.json` for the pipeline; a test fails when the committed file is out of date. Refinements (the production rules, `endMs > startMs`) are not part of the JSON Schema, so `pack.py` tests cover them.
+
 Required functions, each with unit tests:
 
 - `normalize(text)`: lowercase, `ß` to `ss`, strip diacritics, collapse non-alphanumerics to spaces, pad with spaces for whole-word matching.
-- `decideSafety(text): boolean`: whole-word match against the multilingual lexicon (English, German, Dutch, Swedish at minimum). Conservative by design: a false positive sends a guest to the guide, which is safe.
-- `decide(results, thresholds): AskOutcome`: pure; no side effects.
-- `themeOf(text): ThemeId`: device-side keyword hints for the fixed taxonomy (the cooperative cross-checks with Groq in P1).
-- `fillTemplate(template, counts, labels): string`: only known placeholders; throws on unknown placeholders or missing checked labels.
+- `decideSafety(text): boolean`: whole-word match against the multilingual lexicon (English, German, Dutch, Swedish at minimum). Conservative by design: a false positive sends a guest to the guide, which is safe. Words common in ordinary tour questions ("help", "fire", "burn", "faint", "bite") are left out on purpose. The lexicon is a draft for Bee and Preet to review.
+- `decide(results, thresholds): AskOutcome`: pure; no side effects. Takes the best score (input order does not matter); at or above `match` is `confirm`, otherwise `saved` (`below-threshold`). It never returns `safety`: the caller runs `decideSafety` first. `margin` is not used until the P1 "A or B" step.
+- `themeOf(text): ThemeId`: device-side keyword hints for the fixed taxonomy (the cooperative cross-checks with Groq in P1). A theme matches if any of its hints appears (whole word, any language); ties go to the earliest theme in taxonomy order; no match is `other`.
+- `fillTemplate(template, counts, labels): FilledTemplate`: only known placeholders (`guests`, `orders`, `items`, `askedCount` are counts; `loved`, `asked`, `wished` are `{ text, checked }` labels). Throws on an unknown placeholder, an unbalanced brace, a count that is not a non-negative integer, or a missing or unchecked label. Returns `{ body, encoding, length, segments, fitsOneSegment }`: bodies over one segment (160 GSM-7 characters, or 70 in UCS-2) are flagged, and more than two segments throws. Whether the template itself is checked (the "held" state) is decided by `monthly-summary`. Letters outside GSM-7, such as Wolof `ë`, switch the text to UCS-2, so one segment is then only 70 characters.
+- `t(lang, key, params)` and `STRINGS`: interface strings for `en`, `de`, `nl` and `sv`. English is the source; the other three are drafts that no native speaker has checked (`I18N_STATUS`).
 
 ### 6.2 `apps/web`: SOLID boundaries
 
