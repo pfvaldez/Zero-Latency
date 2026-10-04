@@ -3,7 +3,8 @@
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
     "lib": ["ES2023"],
-    "types": []
+    "types": [],
+    "resolveJsonModule": true
   },
   "include": ["src", "test", "vitest.config.ts"]
 }
