@@ -68,7 +68,7 @@ flowchart LR
 5. A person checks drafts and edits `checks.json`. Nothing is auto-approved.
 6. `embed` encodes each moment as `passage: <checked text>` in every available language and stores normalized vectors.
 7. `export_model` exports e5 to ONNX and quantizes to int8 (P1: vocabulary trimming).
-8. `pack` writes `manifest.json`, audio (Opus), WebVTT subtitles, embeddings and model files, with sizes and SHA-256 checksums. In `--mode production`, unchecked items are excluded. In `--mode demo`, they're included and flagged.
+8. `pack` writes `manifest.json`, audio (mono AAC `.m4a`, 48 kbps, -16 LUFS: AAC plays on iOS Safari where Opus in a web container is unreliable), WebVTT subtitles, embeddings and model files, with sizes and SHA-256 checksums. In `--mode production`, unchecked items are excluded. In `--mode demo`, they're included and flagged.
 9. `eval` calibrates the match threshold on the test set, writes it into the manifest, and writes `docs/EVAL.md`.
 
 ### 3.2 Ask a question (guest's phone, offline)
@@ -145,12 +145,17 @@ ask-noor/
 │   └── DEMO.md                  # video script
 ├── content/
 │   └── ondera-noor/
-│       ├── clips.json           # scripts, stop codes, topics
-│       ├── addons.json          # facts (with sources), recipe, products, farm card
-│       ├── checks.json          # who checked what, when
-│       ├── templates.json       # Noor-language text templates and theme labels
-│       ├── test-questions.csv   # question, lang, expected_moment or NOT_COVERED, synthetic flag
-│       └── recordings/          # raw audio (gitignored if large)
+│       ├── clips.json           # script (expected English text), stop codes, one moment per clip, topics in 4 languages
+│       ├── checks.json          # who checked what, when; no entry means draft
+│       ├── facts.json           # narrator fun facts (each needs a source until it has one)
+│       ├── recipe.json          # Noor's recipe; she confirms before guests see it
+│       ├── products.json        # products (each needs a price until Preet sets it)
+│       ├── farm-card.json       # the farm card (needs a phone number until there is a demo number)
+│       ├── sms-templates.json   # monthly text and order line (en; Wolof null until NLLB drafts it) and theme labels
+│       ├── eval/test-questions.csv  # id, lang, question, expected (clipNN, none, safety), variant, synthetic
+│       ├── transcripts/en/      # ElevenLabs speech-to-text with word times, and comparison.md for Preet
+│       └── recordings/          # recordings.json (provenance and labels) and audio-report.json are committed;
+│                                # en/ (Preet's English, stand-in voice) and wo/ (AI-dubbed Wolof) audio is gitignored
 ├── packages/
 │   └── core/
 │       ├── package.json

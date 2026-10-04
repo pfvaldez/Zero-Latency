@@ -1,0 +1,37 @@
+{
+  "note": "Who checked what, and when. Anything without an entry is a draft. Preet's English subtitle checks flip to checked only after the transcript comparison (transcripts/en/comparison.md) has been read, with the transcriptSha256 of the transcript she approved.",
+  "checks": [
+    {
+      "id": "clip-1/subtitles/en",
+      "checked": false
+    },
+    {
+      "id": "clip-2/subtitles/en",
+      "checked": false
+    },
+    {
+      "id": "clip-3/subtitles/en",
+      "checked": false
+    },
+    {
+      "id": "clip-4/subtitles/en",
+      "checked": false
+    },
+    {
+      "id": "clip-5/subtitles/en",
+      "checked": false
+    },
+    {
+      "id": "clip-6/subtitles/en",
+      "checked": false
+    },
+    {
+      "id": "clip-7/subtitles/en",
+      "checked": false
+    },
+    {
+      "id": "clip-8/subtitles/en",
+      "checked": false
+    }
+  ]
+}

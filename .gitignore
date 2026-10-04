@@ -242,3 +242,20 @@ pnpm-lock.yaml
 
 # The Python template above ignores every lib/ folder; apps/web/src/lib is source code
 !apps/web/src/lib/
+
+# Ask Noor: raw audio of people's voices (consent covers dubbing, not publishing; see
+# docs/CONSENT.md) and pipeline build output. The registry, transcripts and audio-report.json
+# in content/ are committed.
+content/**/recordings/en/
+content/**/recordings/wo/
+pipeline/build/
+pipeline/.venv/
+content/**/*.m4a
+content/**/*.flac
+content/**/*.wav
+content/**/*.mp3
+content/**/*.ogg
+pipeline/**/*.m4a
+pipeline/**/*.flac
+pipeline/**/*.wav
+pipeline/**/*.mp3

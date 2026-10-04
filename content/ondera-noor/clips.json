@@ -1,0 +1,173 @@
+{
+  "farmSlug": "ondera-noor",
+  "note": "Script text is the expected English text; subtitles are what Preet actually said (transcripts/). Topic labels in de, nl and sv are AI drafts, unchecked. Clip 8 (staying overnight) is the held-back answer, unpublished by default.",
+  "clips": [
+    {
+      "id": 1,
+      "kind": "stop",
+      "stopCode": "NOOR-STOP-1",
+      "published": true,
+      "momentId": "c1-m1",
+      "script": {
+        "en": "Welcome to my farm. I'm Noor. My family has worked on this hillside for years. Today I'll show you how our coffee goes from a flower to your cup."
+      },
+      "topic": {
+        "en": "her welcome and her family",
+        "de": "ihre Begrüßung und ihre Familie",
+        "nl": "haar welkomstwoord en haar familie",
+        "sv": "hennes välkomnande och hennes familj"
+      },
+      "draft": {
+        "de": true,
+        "nl": true,
+        "sv": true
+      }
+    },
+    {
+      "id": 2,
+      "kind": "stop",
+      "stopCode": "NOOR-STOP-2",
+      "published": true,
+      "momentId": "c2-m1",
+      "script": {
+        "en": "Our coffee grows on the upper slope, in the shade. We pick only the red, ripe cherries, by hand, one by one. It's slow, but that's why the coffee tastes sweet."
+      },
+      "topic": {
+        "en": "how the coffee is grown and picked",
+        "de": "wie der Kaffee angebaut und gepflückt wird",
+        "nl": "hoe de koffie wordt verbouwd en geplukt",
+        "sv": "hur kaffet odlas och plockas"
+      },
+      "draft": {
+        "de": true,
+        "nl": true,
+        "sv": true
+      }
+    },
+    {
+      "id": 3,
+      "kind": "stop",
+      "stopCode": "NOOR-STOP-3",
+      "published": true,
+      "momentId": "c3-m1",
+      "script": {
+        "en": "We roast in a pan over the fire, and we never stop stirring. Listen: when the beans crack, like popcorn, they're almost ready. Smell that? That's my favorite time of the day."
+      },
+      "topic": {
+        "en": "roasting the coffee",
+        "de": "das Rösten des Kaffees",
+        "nl": "het roosteren van de koffie",
+        "sv": "rostningen av kaffet"
+      },
+      "draft": {
+        "de": true,
+        "nl": true,
+        "sv": true
+      }
+    },
+    {
+      "id": 4,
+      "kind": "stop",
+      "stopCode": "NOOR-STOP-4",
+      "published": true,
+      "momentId": "c4-m1",
+      "script": {
+        "en": "I've been a member of the Ondera Coffee Cooperative for 11 years. Together we get better prices, and we teach each other. My daughter helps me on weekends; she's the one who set up this tour."
+      },
+      "topic": {
+        "en": "the cooperative and her daughter",
+        "de": "die Genossenschaft und ihre Tochter",
+        "nl": "de coöperatie en haar dochter",
+        "sv": "kooperativet och hennes dotter"
+      },
+      "draft": {
+        "de": true,
+        "nl": true,
+        "sv": true
+      }
+    },
+    {
+      "id": 5,
+      "kind": "stop",
+      "stopCode": "NOOR-STOP-5",
+      "published": true,
+      "momentId": "c5-m1",
+      "script": {
+        "en": "Below the coffee, we grow maize and beans. They feed my family through the year."
+      },
+      "topic": {
+        "en": "the maize and beans below the coffee",
+        "de": "den Mais und die Bohnen unterhalb des Kaffees",
+        "nl": "de maïs en bonen onder de koffie",
+        "sv": "majsen och bönorna nedanför kaffet"
+      },
+      "draft": {
+        "de": true,
+        "nl": true,
+        "sv": true
+      }
+    },
+    {
+      "id": 6,
+      "kind": "stop",
+      "stopCode": "NOOR-STOP-6",
+      "published": true,
+      "momentId": "c6-m1",
+      "script": {
+        "en": "Yes, you can take our coffee home! Ask your guide, and we'll pack it fresh for you."
+      },
+      "topic": {
+        "en": "buying coffee to take home",
+        "de": "Kaffee zum Mitnehmen kaufen",
+        "nl": "koffie kopen om mee naar huis te nemen",
+        "sv": "att köpa kaffe att ta med hem"
+      },
+      "draft": {
+        "de": true,
+        "nl": true,
+        "sv": true
+      }
+    },
+    {
+      "id": 7,
+      "kind": "stop",
+      "stopCode": "NOOR-STOP-7",
+      "published": true,
+      "momentId": "c7-m1",
+      "script": {
+        "en": "The path up to the coffee is steep and takes some time. Wear good shoes and bring water. If the climb is hard for you, tell your guide and we'll stay down here."
+      },
+      "topic": {
+        "en": "the steep path and what to bring",
+        "de": "den steilen Weg und was man mitbringen soll",
+        "nl": "het steile pad en wat je mee moet nemen",
+        "sv": "den branta stigen och vad man ska ta med"
+      },
+      "draft": {
+        "de": true,
+        "nl": true,
+        "sv": true
+      }
+    },
+    {
+      "id": 8,
+      "kind": "answer",
+      "published": false,
+      "momentId": "c8-m1",
+      "script": {
+        "en": "We don't have rooms yet, but so many of you have asked that I'm thinking about it. For now, your guide can suggest a place nearby."
+      },
+      "topic": {
+        "en": "staying overnight",
+        "de": "das Übernachten",
+        "nl": "overnachten",
+        "sv": "att övernatta"
+      },
+      "draft": {
+        "de": true,
+        "nl": true,
+        "sv": true
+      }
+    }
+  ]
+}

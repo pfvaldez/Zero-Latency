@@ -8,6 +8,7 @@
 import { z } from "zod";
 import {
   type Addon,
+  type AddonNeed,
   type Clip,
   type FarmPackManifest,
   type Moment,
@@ -109,17 +110,44 @@ const clipSchema = z.strictObject({
   momentIds: z.array(z.string().min(1)),
 }) satisfies z.ZodType<Clip>;
 
-const addonBase = { id: z.string().min(1), text: localizedText, checked: z.boolean() };
+const addonNeed = z.enum(["source", "price", "phone"]);
+const addonBase = {
+  id: z.string().min(1),
+  text: localizedText,
+  checked: z.boolean(),
+  needs: z.array(addonNeed).optional(),
+};
+
+// A missing value must be declared in `needs`, and a declared need must really be missing:
+// nothing is silently incomplete, and nothing claims a gap it does not have.
+const declares = (a: { needs?: string[] }, need: AddonNeed) => (a.needs ?? []).includes(need);
+
 const addonSchema = z.discriminatedUnion("kind", [
-  z.strictObject({ ...addonBase, kind: z.literal("fact"), source: z.string().min(1) }),
+  z
+    .strictObject({ ...addonBase, kind: z.literal("fact"), source: z.string().min(1).optional() })
+    .refine((a) => (a.source !== undefined) !== declares(a, "source"), {
+      error: "a fact needs a source, or must list needs: [source]",
+    }),
   z.strictObject({ ...addonBase, kind: z.literal("recipe") }),
-  z.strictObject({
-    ...addonBase,
-    kind: z.literal("product"),
-    price: z.number().nonnegative(),
-    currency,
-  }),
-  z.strictObject({ ...addonBase, kind: z.literal("farm-card") }),
+  z
+    .strictObject({
+      ...addonBase,
+      kind: z.literal("product"),
+      price: z.number().nonnegative().optional(),
+      currency,
+    })
+    .refine((a) => (a.price !== undefined) !== declares(a, "price"), {
+      error: "a product needs a price, or must list needs: [price]",
+    }),
+  z
+    .strictObject({
+      ...addonBase,
+      kind: z.literal("farm-card"),
+      phone: z.string().min(1).optional(),
+    })
+    .refine((a) => (a.phone !== undefined) !== declares(a, "phone"), {
+      error: "the farm card needs a phone number, or must list needs: [phone]",
+    }),
 ]) satisfies z.ZodType<Addon>;
 
 export const FarmPackManifestSchema = z
@@ -177,6 +205,15 @@ export const FarmPackManifestSchema = z
           code: "custom",
           message: `add-on ${addon.id} is unchecked in a production pack`,
           path: ["addons", i, "checked"],
+        });
+      }
+    });
+    pack.addons.forEach((addon, i) => {
+      if (addon.needs && addon.needs.length > 0) {
+        ctx.addIssue({
+          code: "custom",
+          message: `add-on ${addon.id} still needs ${addon.needs.join(", ")} in a production pack`,
+          path: ["addons", i, "needs"],
         });
       }
     });

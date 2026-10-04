@@ -1,0 +1,23 @@
+{
+  "note": "Inspired by Café Touba, the spiced coffee popular in Senegal and The Gambia. Noor confirms her own version before guests see it.",
+  "id": "recipe",
+  "title": {
+    "en": "Spiced farm coffee"
+  },
+  "steps": [
+    {
+      "en": "Grind 2 tablespoons of roasted beans for each cup."
+    },
+    {
+      "en": "Add a small pinch of djar (grains of Selim) or one clove."
+    },
+    {
+      "en": "Pour on water just off the boil and wait 4 minutes."
+    },
+    {
+      "en": "Strain through a cloth and sweeten if you like."
+    }
+  ],
+  "inspiredBy": "Café Touba, the spiced coffee popular in Senegal and The Gambia",
+  "noorConfirmsBeforeGuestsSee": true
+}

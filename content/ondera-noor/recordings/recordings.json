@@ -1,0 +1,158 @@
+{
+  "note": "Provenance and labels for every recording. Audio files are not committed (see .gitignore and docs/CONSENT.md). English audio is Preet Patel's labeled stand-in for Noor's voice. Wolof audio is AI-dubbed, draft until a Wolof speaker checks it, and reaches guests only in demo mode.",
+  "farmSlug": "ondera-noor",
+  "recordings": [
+    {
+      "clip": 1,
+      "lang": "en",
+      "file": "en/clip01.m4a",
+      "person": "Preet Patel",
+      "kind": "stand-in-voice",
+      "label": "Stand-in for Noor's voice (recorded by Preet Patel)"
+    },
+    {
+      "clip": 2,
+      "lang": "en",
+      "file": "en/clip02.m4a",
+      "person": "Preet Patel",
+      "kind": "stand-in-voice",
+      "label": "Stand-in for Noor's voice (recorded by Preet Patel)"
+    },
+    {
+      "clip": 3,
+      "lang": "en",
+      "file": "en/clip03.m4a",
+      "person": "Preet Patel",
+      "kind": "stand-in-voice",
+      "label": "Stand-in for Noor's voice (recorded by Preet Patel)"
+    },
+    {
+      "clip": 4,
+      "lang": "en",
+      "file": "en/clip04.m4a",
+      "person": "Preet Patel",
+      "kind": "stand-in-voice",
+      "label": "Stand-in for Noor's voice (recorded by Preet Patel)"
+    },
+    {
+      "clip": 5,
+      "lang": "en",
+      "file": "en/clip05.m4a",
+      "person": "Preet Patel",
+      "kind": "stand-in-voice",
+      "label": "Stand-in for Noor's voice (recorded by Preet Patel)"
+    },
+    {
+      "clip": 6,
+      "lang": "en",
+      "file": "en/clip06.m4a",
+      "person": "Preet Patel",
+      "kind": "stand-in-voice",
+      "label": "Stand-in for Noor's voice (recorded by Preet Patel)"
+    },
+    {
+      "clip": 7,
+      "lang": "en",
+      "file": "en/clip07.m4a",
+      "person": "Preet Patel",
+      "kind": "stand-in-voice",
+      "label": "Stand-in for Noor's voice (recorded by Preet Patel)"
+    },
+    {
+      "clip": 8,
+      "lang": "en",
+      "file": "en/clip08.m4a",
+      "person": "Preet Patel",
+      "kind": "stand-in-voice",
+      "label": "Stand-in for Noor's voice (recorded by Preet Patel)"
+    },
+    {
+      "clip": 1,
+      "lang": "wo",
+      "file": "wo/clip01_wo.flac",
+      "person": "Preet Patel",
+      "kind": "ai-dubbed",
+      "label": "AI-dubbed (ElevenLabs)",
+      "status": "draft",
+      "demoOnly": true,
+      "consentPerson": "Preet Patel"
+    },
+    {
+      "clip": 2,
+      "lang": "wo",
+      "file": "wo/clip02_wo.flac",
+      "person": "Preet Patel",
+      "kind": "ai-dubbed",
+      "label": "AI-dubbed (ElevenLabs)",
+      "status": "draft",
+      "demoOnly": true,
+      "consentPerson": "Preet Patel"
+    },
+    {
+      "clip": 3,
+      "lang": "wo",
+      "file": "wo/clip03_wo.flac",
+      "person": "Preet Patel",
+      "kind": "ai-dubbed",
+      "label": "AI-dubbed (ElevenLabs)",
+      "status": "draft",
+      "demoOnly": true,
+      "consentPerson": "Preet Patel"
+    },
+    {
+      "clip": 4,
+      "lang": "wo",
+      "file": "wo/clip04_wo.flac",
+      "person": "Preet Patel",
+      "kind": "ai-dubbed",
+      "label": "AI-dubbed (ElevenLabs)",
+      "status": "draft",
+      "demoOnly": true,
+      "consentPerson": "Preet Patel"
+    },
+    {
+      "clip": 5,
+      "lang": "wo",
+      "file": "wo/clip05_wo.flac",
+      "person": "Preet Patel",
+      "kind": "ai-dubbed",
+      "label": "AI-dubbed (ElevenLabs)",
+      "status": "draft",
+      "demoOnly": true,
+      "consentPerson": "Preet Patel"
+    },
+    {
+      "clip": 6,
+      "lang": "wo",
+      "file": "wo/clip06_wo.flac",
+      "person": "Preet Patel",
+      "kind": "ai-dubbed",
+      "label": "AI-dubbed (ElevenLabs)",
+      "status": "draft",
+      "demoOnly": true,
+      "consentPerson": "Preet Patel"
+    },
+    {
+      "clip": 7,
+      "lang": "wo",
+      "file": "wo/clip07_wo.flac",
+      "person": "Preet Patel",
+      "kind": "ai-dubbed",
+      "label": "AI-dubbed (ElevenLabs)",
+      "status": "draft",
+      "demoOnly": true,
+      "consentPerson": "Preet Patel"
+    },
+    {
+      "clip": 8,
+      "lang": "wo",
+      "file": "wo/clip08_wo.flac",
+      "person": "Preet Patel",
+      "kind": "ai-dubbed",
+      "label": "AI-dubbed (ElevenLabs)",
+      "status": "draft",
+      "demoOnly": true,
+      "consentPerson": "Preet Patel"
+    }
+  ]
+}

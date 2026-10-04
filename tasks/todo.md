@@ -27,12 +27,27 @@ Each slice ends working and tested, and no mocks ship: a stand-in used while a l
 - Done when: the offline Playwright test passes, `bun run test:coverage` and `bun run check` are green
 
 ### Slice 2: content, pack and the real matcher
-- [ ] Content files (`clips.json`, `addons.json`, `checks.json`, `templates.json`, `test-questions.csv`)
+- [x] Content files (`clips.json`, `checks.json`, `facts.json`, `recipe.json`, `products.json`, `farm-card.json`, `sms-templates.json`, `eval/test-questions.csv`) Proof: see Step 1 below
 - [ ] NLLB draft subtitles, all marked unchecked
 - [ ] Farm pack with moment embeddings built in TypeScript, using the same `Xenova/multilingual-e5-small` ONNX model that runs on the phone
 - [ ] The e5 worker is live in the app, behind the `Matcher` interface (the `FakeMatcher` stand-in is removed from the app)
 - [ ] Matching accuracy and the match threshold are measured and written to `docs/EVAL.md`
-- Done when: a production pack builds, the offline e2e runs with the real matcher and no request leaves the page, and `docs/EVAL.md` has real numbers
+- Done when: a demo pack builds (a production pack cannot, while Preet's English voice is a labeled stand-in), the offline e2e runs with the real matcher and no request leaves the page, and `docs/EVAL.md` has real numbers
+
+#### Step 1: recordings, audio prep, transcript step and content files (branch `feat/content-audio`)
+Plan approved 2026-10-04 with these defaults: audio is not committed (the repo is public and Preet's consent covers dubbing, not publishing); ffmpeg comes from the pinned `imageio-ffmpeg` wheel; Wolof template text stays null until the NLLB step drafts it; the stand-in English voice means every pack built now is a **demo** pack (the manifest schema refuses stand-ins in production).
+- [x] Recordings sorted: 8 English (`recordings/en/clip01.m4a` to `clip08.m4a`, copied from `~/Downloads/Archive-2/`; the "Create Recordings" commit held only a 1-line file) and 8 Wolof (`recordings/wo/clip01_wo.flac` to `clip08_wo.flac`); none missing Proof: durations English 10.07, 11.78, 13.57, 11.61, 8.19, 6.31, 12.80, 8.70 s; Wolof 12.01, 11.80, 13.59, 11.63, 12.01, 12.01, 12.82, 12.01 s (clips 1, 5, 6, 8 padded)
+- [x] Audio prep (`pipeline/asknoor/audio.py`): mono check, trim to 0.3 s, -16 LUFS / -1.5 dBTP, mono AAC 48 kbps, audit Proof: `uv run python -m asknoor.build --farm ondera-noor --mode demo --steps audio` prepares and audits all 16; LUFS -16.4 to -15.8, true peak at or under -1.4, silence at the ends at most 0.39 s; numbers in `recordings/audio-report.json`
+- [x] Mono check on the real files, against what was expected: all 8 English files lose 0.14 to 0.47 dB when averaged (kept as an average). **Only two Wolof dubs fail**: clip 1 loses 7.47 dB (left channel used) and clip 4 loses 10.17 dB (right channel used); the other six lose under 0.3 dB. "The Wolof dubs fail" is true for two of eight
+- [x] Consent gate (`consent.py`): dubbed audio is refused unless the person's row in `docs/CONSENT.md` is exactly `confirmed`, checked before any audio work, in every mode Proof: `test_consent.py` and `test_build.py` (pending, missing person, extra words in the status cell, production mode); the real file confirms Preet
+- [x] Transcript step (`transcribe.py`): ElevenLabs speech-to-text (`scribe_v2`, word timestamps), comparison with the script, `comparison.md` for Preet, check bound to the transcript hash Proof: `test_compare.py` and `test_transcribe.py` pass. **Not run live: there is no `ELEVENLABS_API_KEY`** (put it in `pipeline/.env`). The response fixture is hand-written from the docs ("shape per docs, not recorded") and must be replaced by a real recorded response on the first live run; `scribe_v2` is the docs' current batch model id and is unconfirmed against the live API
+- [x] Core schemas for every content file, `Addon.needs`, `toAddons`, the CSV parser; manifest JSON Schema regenerated Proof: `packages/core/test/content.test.ts` and `schemas.test.ts`; a production manifest with an add-on that still needs something is refused
+- [x] Content files: `clips.json` (script verbatim, clip 8 held back), `checks.json` (English subtitle entries, all unchecked), `facts.json`, `recipe.json`, `products.json`, `farm-card.json` (an extra file for the farm card), `sms-templates.json` (Wolof null), `eval/test-questions.csv` Proof: `content/ondera-noor.test.ts` validates all of them against the core schemas
+- [x] 116 synthetic test questions, 29 per language: 14 covered, 4 held-back overnight (clip 8), 7 never answered (28 in total) and 4 safety Proof: the real `decideSafety()` sends every safety question to the card and no other question, in en, de, nl and sv; `redact()` leaves all of them unchanged
+- [x] Controls: a pending consent row stops the build; an anti-phase file is not averaged; a quiet, a loud and a -20 LUFS file; 1 s of leading silence; deleting the lexicon word `schwindelig` fails the safety-question test; a fact with neither source nor needs fails the schema; a checked Wolof entry fails the content test
+- [ ] Live transcript run and Preet's check of the English subtitles. Blocked on two things only the captain can supply: Preet's **transcription** consent (a second row in `docs/CONSENT.md`, `pending`; sending her voice to ElevenLabs speech-to-text is not covered by her dubbing consent, and the step refuses to run until it is `confirmed`) and `ELEVENLABS_API_KEY` in `pipeline/.env`. Also: CLAUDE.md non-negotiable 10 mentions ElevenLabs only for narrator audio; if speech-to-text is allowed, record that there. Then Preet signs `checks.json`
+- [ ] Wolof (and de, nl, sv) template and subtitle drafts from NLLB (next Slice 2 step)
+- [ ] Pack builder (Phase 3 / next step), from the guardrail review: `toMoments` that drops or falls back to the English source for de, nl, sv topics and subtitles without a `checks.json` entry (a `draft: {de: false}` flag on unchecked text must not pass); a per-item `draft` marker on facts, recipe, products and farm card so demo mode can label each; an `audioLabel` on clips so the "AI-dubbed" and stand-in labels reach the guest UI from the pack; the Discord message link for Preet's dubbing consent filed in `docs/CONSENT.md`
 
 ### Slice 3: backend, sync, dashboard and a real text
 - [ ] Supabase tables and RLS on the hosted project
@@ -197,9 +212,9 @@ Open items for the captain and Preet (found while building):
 - [ ] Choose visitor languages from The Gambia's arrival data; note source and year
 - [ ] `content/ondera-noor/clips.json`: clips 1–8 with the three script fixes; clip 8 marked held back
 - [ ] Recordings 1–7 (and 8 for the demo loop) plus typed transcripts
-- [ ] `addons.json`: three fun facts with sources, Noor's recipe, three products with prices, farm card
+- [~] `facts.json`, `recipe.json`, `products.json`, `farm-card.json`: three fun facts with sources, Noor's recipe, three products with prices, farm card (written as drafts; sources, prices and a demo phone number are still needed)
 - [ ] `test-questions.csv`: about 40 covered (4–5 per clip) plus about 10 not covered, each labeled
-- [ ] `checks.json` and `templates.json` (monthly template and theme labels in Noor's language)
+- [~] `checks.json` and `sms-templates.json` (monthly template and theme labels: English written, Wolof null until drafted and checked)
 - [ ] Narrator voiceovers for add-ons (Preet's own voice, English)
 
 ## Phase 3: Pipeline (Bee, Colab, about 2.5 h)

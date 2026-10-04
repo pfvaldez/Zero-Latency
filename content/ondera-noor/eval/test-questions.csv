@@ -1,0 +1,117 @@
+id,lang,question,expected,variant,synthetic
+q001,en,Who is Noor and has her family always lived here?,clip01,plain,true
+q002,en,Tell me about the family that runs this farm,clip01,paraphrase,true
+q003,en,How do you pick the coffee cherries?,clip02,plain,true
+q004,en,why is the cofee so sweet and how is it piked,clip02,typo,true
+q005,en,How do you roast the coffee?,clip03,plain,true
+q006,en,What happens when the beans pop in the pan?,clip03,paraphrase,true
+q007,en,Which cooperative are you a member of?,clip04,plain,true
+q008,en,Who set up this tour?,clip04,paraphrase,true
+q009,en,What else do you grow besides coffee?,clip05,plain,true
+q010,en,do you grow maze and bens too,clip05,typo,true
+q011,en,Can I take some coffee home with me?,clip06,plain,true
+q012,en,Is it possible to get a bag of beans to bring back?,clip06,paraphrase,true
+q013,en,How steep is the walk up to the coffee?,clip07,plain,true
+q014,en,What should I wear and bring for the climb?,clip07,paraphrase,true
+q015,en,Can I stay overnight on the farm?,clip08,plain,true
+q016,en,Do you have rooms for guests?,clip08,plain,true
+q017,en,Is there somewhere to sleep here?,clip08,paraphrase,true
+q018,en,can i stay the nite,clip08,typo,true
+q019,en,What is the price of the visit?,none,paraphrase,true
+q020,en,Is there wifi on the farm?,none,plain,true
+q021,en,How do I get here by taxi from the hotel?,none,plain,true
+q022,en,Can small children join the tour?,none,plain,true
+q023,en,Do you give a discount for big orders?,none,plain,true
+q024,en,wen is harvest tim,none,typo,true
+q025,en,Is there a toilet here?,none,plain,true
+q026,en,"Someone is hurt, we need a doctor",safety,plain,true
+q027,en,Where is the nearest hospital?,safety,plain,true
+q028,en,I feel sick and dizzy,safety,paraphrase,true
+q029,en,My friend is lost on the path,safety,plain,true
+q030,de,"Wer ist Noor, und lebt ihre Familie schon immer hier?",clip01,plain,true
+q031,de,"Erzählen Sie mir von der Familie, die diese Farm betreibt",clip01,paraphrase,true
+q032,de,Wie pflückt man die Kaffeekirschen?,clip02,plain,true
+q033,de,warum ist der Kafee so süß und wie wird er gepflükt,clip02,typo,true
+q034,de,Wie rösten Sie den Kaffee?,clip03,plain,true
+q035,de,"Was passiert, wenn die Bohnen in der Pfanne knacken?",clip03,paraphrase,true
+q036,de,In welcher Genossenschaft sind Sie Mitglied?,clip04,plain,true
+q037,de,Wer hat diese Tour organisiert?,clip04,paraphrase,true
+q038,de,Was bauen Sie außer Kaffee noch an?,clip05,plain,true
+q039,de,baun sie auch meis und bonen an,clip05,typo,true
+q040,de,Kann ich Kaffee mit nach Hause nehmen?,clip06,plain,true
+q041,de,"Gibt es die Möglichkeit, eine Tüte Bohnen mitzunehmen?",clip06,paraphrase,true
+q042,de,Wie steil ist der Weg zum Kaffee hinauf?,clip07,plain,true
+q043,de,Was soll ich für den Aufstieg anziehen und mitbringen?,clip07,paraphrase,true
+q044,de,Kann ich auf der Farm übernachten?,clip08,plain,true
+q045,de,Haben Sie Zimmer für Gäste?,clip08,plain,true
+q046,de,Gibt es hier eine Schlafmöglichkeit?,clip08,paraphrase,true
+q047,de,kan ich hir ubernachten,clip08,typo,true
+q048,de,Wie hoch ist der Preis für den Besuch?,none,paraphrase,true
+q049,de,Gibt es WLAN auf der Farm?,none,plain,true
+q050,de,Wie komme ich mit dem Taxi vom Hotel hierher?,none,plain,true
+q051,de,Dürfen kleine Kinder an der Tour teilnehmen?,none,plain,true
+q052,de,Gibt es Rabatt bei großen Bestellungen?,none,plain,true
+q053,de,wan ist die ernte zeit,none,typo,true
+q054,de,Gibt es hier eine Toilette?,none,plain,true
+q055,de,"Jemand ist verletzt, wir brauchen einen Arzt",safety,plain,true
+q056,de,Wo ist das nächste Krankenhaus?,safety,plain,true
+q057,de,Mir ist schlecht und schwindelig,safety,paraphrase,true
+q058,de,Mein Freund hat sich auf dem Weg verlaufen,safety,plain,true
+q059,nl,"Wie is Noor, en woont haar familie hier al altijd?",clip01,plain,true
+q060,nl,Vertel me over de familie die deze boerderij runt,clip01,paraphrase,true
+q061,nl,Hoe pluk je de koffiekersen?,clip02,plain,true
+q062,nl,waarom is de koffie zo zoet en hoe wort hij geplukt,clip02,typo,true
+q063,nl,Hoe roosteren jullie de koffie?,clip03,plain,true
+q064,nl,Wat gebeurt er als de bonen in de pan knappen?,clip03,paraphrase,true
+q065,nl,Bij welke coöperatie ben je lid?,clip04,plain,true
+q066,nl,Wie heeft deze rondleiding opgezet?,clip04,paraphrase,true
+q067,nl,Wat verbouw je nog meer behalve koffie?,clip05,plain,true
+q068,nl,verbouwn jullie ook maïs en bonnen,clip05,typo,true
+q069,nl,Kan ik koffie mee naar huis nemen?,clip06,plain,true
+q070,nl,Is het mogelijk om een zakje bonen mee te nemen?,clip06,paraphrase,true
+q071,nl,Hoe steil is de wandeling naar de koffie?,clip07,plain,true
+q072,nl,Wat moet ik aan en meenemen voor de klim?,clip07,paraphrase,true
+q073,nl,Kan ik op de boerderij overnachten?,clip08,plain,true
+q074,nl,Hebben jullie kamers voor gasten?,clip08,plain,true
+q075,nl,Is er hier een plek om te slapen?,clip08,paraphrase,true
+q076,nl,kan ik hier overnachtn,clip08,typo,true
+q077,nl,Wat is de prijs van het bezoek?,none,paraphrase,true
+q078,nl,Is er wifi op de boerderij?,none,plain,true
+q079,nl,Hoe kom ik met de taxi van het hotel hier?,none,plain,true
+q080,nl,Mogen kleine kinderen mee op de rondleiding?,none,plain,true
+q081,nl,Krijg je korting bij grote bestellingen?,none,plain,true
+q082,nl,wanner is de oogstt,none,typo,true
+q083,nl,Is er hier een toilet?,none,plain,true
+q084,nl,"Iemand is gewond, we hebben een dokter nodig",safety,plain,true
+q085,nl,Waar is het dichtstbijzijnde ziekenhuis?,safety,plain,true
+q086,nl,Ik voel me ziek en duizelig,safety,paraphrase,true
+q087,nl,Mijn vriend is verdwaald op het pad,safety,plain,true
+q088,sv,"Vem är Noor, och har hennes familj alltid bott här?",clip01,plain,true
+q089,sv,Berätta om familjen som driver gården,clip01,paraphrase,true
+q090,sv,Hur plockar man kaffebären?,clip02,plain,true
+q091,sv,varför är kaffet så sött och hur plokas det,clip02,typo,true
+q092,sv,Hur rostar ni kaffet?,clip03,plain,true
+q093,sv,Vad händer när bönorna knastrar i stekpannan?,clip03,paraphrase,true
+q094,sv,Vilket kooperativ är du medlem i?,clip04,plain,true
+q095,sv,Vem startade den här turen?,clip04,paraphrase,true
+q096,sv,Vad odlar ni mer än kaffe?,clip05,plain,true
+q097,sv,odlar ni mais och bonor ocksa,clip05,typo,true
+q098,sv,Kan jag ta med mig kaffe hem?,clip06,plain,true
+q099,sv,Går det att få med sig en påse bönor?,clip06,paraphrase,true
+q100,sv,Hur brant är stigen upp till kaffet?,clip07,plain,true
+q101,sv,Vad ska jag ha på mig och ta med för klättringen?,clip07,paraphrase,true
+q102,sv,Kan jag övernatta på gården?,clip08,plain,true
+q103,sv,Har ni rum för gäster?,clip08,plain,true
+q104,sv,Finns det någonstans att sova här?,clip08,paraphrase,true
+q105,sv,kan jag overnata har,clip08,typo,true
+q106,sv,Vad är priset för besöket?,none,paraphrase,true
+q107,sv,Finns det wifi på gården?,none,plain,true
+q108,sv,Hur tar jag mig hit med taxi från hotellet?,none,plain,true
+q109,sv,Får små barn följa med på turen?,none,plain,true
+q110,sv,Får man rabatt vid stora beställningar?,none,plain,true
+q111,sv,nar ar skorden,none,typo,true
+q112,sv,Finns det en toalett här?,none,plain,true
+q113,sv,"Någon är skadad, vi behöver en läkare",safety,plain,true
+q114,sv,Var är närmaste sjukhus?,safety,plain,true
+q115,sv,Jag mår illa och är yr,safety,paraphrase,true
+q116,sv,Min kompis är vilse på stigen,safety,plain,true
