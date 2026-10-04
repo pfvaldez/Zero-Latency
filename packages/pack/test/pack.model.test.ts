@@ -110,6 +110,56 @@ describe("the pack builder", () => {
   });
 });
 
+describe("index-only passages in a built pack", () => {
+  it("become flagged matrix rows that the builder embeds and verifies, and are never in a subtitle file", async () => {
+    const out = await mkdtemp(join(tmpdir(), "index-"));
+    const input = await fixtureInput();
+    const phrases = [
+      "Where do the cherries come from",
+      "Wie werden die Kirschen gepflückt",
+      "Hoe worden de bessen geplukt",
+      "Hur plockas bären",
+    ];
+    input.indexPassages = {
+      writer: "an isolated assistant",
+      draft: true,
+      neverShown: true,
+      removedAsDuplicates: [],
+      clips: Object.fromEntries(
+        [1, 2, 3].map((n) => [
+          String(n),
+          {
+            en: [phrases[0] as string],
+            de: [phrases[1] as string],
+            nl: [phrases[2] as string],
+            sv: [phrases[3] as string],
+          },
+        ]),
+      ),
+    };
+    const built = await buildPack({
+      farm: "fixture",
+      mode: "demo",
+      input,
+      outDir: out,
+      audioDir: join(REPO_ROOT, "packages", "pack", "fixtures", "audio"),
+      now: new Date("2026-10-04T00:00:00Z"),
+      includeModel: false,
+      allowSyntheticTones: true,
+      thresholds: { match: 0.85, margin: 0.05 },
+    });
+    const rows = built.manifest.embeddings.rows;
+    expect(rows).toHaveLength(12 + 12);
+    expect(rows.filter((r) => r.indexOnly)).toHaveLength(12);
+    expect(rows.filter((r) => !r.indexOnly)).toHaveLength(12);
+    for (const f of Object.keys(built.manifest.checksums).filter((k) => k.endsWith(".vtt"))) {
+      expect(await readFile(join(out, f), "utf8")).not.toContain(phrases[0] as string);
+    }
+    const buf = await readFile(join(out, "embeddings.f32"));
+    expect(buf.byteLength).toBe(24 * 384 * 4);
+  });
+});
+
 describe("the evaluation (smoke test on the real content, nothing written)", () => {
   it("finds a threshold that meets the 5% limit and reports consistent numbers", async () => {
     const r = await runEval("ondera-noor", new Date("2026-10-04"), { write: false });
@@ -121,5 +171,7 @@ describe("the evaluation (smoke test on the real content, nothing written)", () 
     expect(r.unsafe.safetyRecall).toBe(1);
     expect(r.size.modelBytes + r.size.embeddingsBytes).toBeLessThan(150e6);
     expect(r.primary.answered + r.primary.neverAnswered).toBe(r.primary.questions);
+    expect(r.study.length).toBe(5); // English only, before, after, production today, strict
+    expect(r.leakage?.passages).toBeGreaterThan(80);
   });
 });

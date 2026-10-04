@@ -18,6 +18,19 @@ describe("docs/EVAL.md (rendered from the committed results)", () => {
     expect(md).toContain("Tuned on the full set (in sample, kept for comparison)");
   });
 
+  it("compares the passage sets before and after index-only phrasings, and says how independent they are", async () => {
+    const r = await results();
+    const md = renderEval(r);
+    expect(md).toContain("## Which passages: before and after index-only phrasings");
+    expect(md).toContain("Leakage audit against the");
+    expect(md).toContain("**Limits I cannot remove:**");
+    expect(r.study.map((x) => x.name)).toEqual(
+      expect.arrayContaining([expect.stringContaining("before"), expect.stringContaining("after")]),
+    );
+    expect(r.study.length).toBe(5);
+    expect(r.leakage?.removedAsDuplicates).toBeGreaterThanOrEqual(0);
+  });
+
   it("states the rule for the shipped threshold and says the threshold file matches", async () => {
     const r = await results();
     const md = renderEval(r);

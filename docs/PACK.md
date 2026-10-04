@@ -56,7 +56,7 @@ or the prepared audio is missing.
 3. **Plan** (`planPack` in `packages/core`, pure and tested): which clips, languages, add-ons and files go in each mode.
 4. **Subtitles**: WebVTT per language. Timing comes from the transcript's word timestamps once the transcript exists;
    until then it is estimated from the script and the file says so.
-5. **Embeddings**: `Xenova/multilingual-e5-small` (int8 ONNX) at the revision in `packages/pack/model.lock.json`,
+5. **Embeddings** (the clip's own text in each language, plus its **index-only** phrasings, flagged `indexOnly` and never displayed): `Xenova/multilingual-e5-small` (int8 ONNX) at the revision in `packages/pack/model.lock.json`,
    `passage: ` prefix, mean pooling, normalized, one row per moment and language (`embeddings.rows`).
    The builder embeds with the **copies of the model files that go into the pack**, so the phone runs the same bytes.
 6. **Manifest**: sizes and SHA-256 of every file, the model revision, the evaluated match threshold; validated by the core schema, then every file is re-checked.

@@ -157,6 +157,7 @@ export async function fixtureInput(): Promise<PackInput> {
     transcripts: new Map(),
     clipTranslations,
     addonTranslations: null,
+    indexPassages: null,
     consent: [],
     sha256: hash,
   };

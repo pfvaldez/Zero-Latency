@@ -192,7 +192,13 @@ export const FarmPackManifestSchema = z
       dim: z.literal(384),
       dtype: z.literal("float32"),
       passagePrefix: z.literal("passage: "),
-      rows: z.array(z.strictObject({ momentId: z.string().min(1), lang: visitorLang })),
+      rows: z.array(
+        z.strictObject({
+          momentId: z.string().min(1),
+          lang: visitorLang,
+          indexOnly: z.literal(true).optional(),
+        }),
+      ),
     }),
     thresholds: z.strictObject({ match: unitInterval, margin: unitInterval }),
     sizes: z.record(z.string(), nonNegInt),
@@ -222,7 +228,11 @@ export const FarmPackManifestSchema = z
     }
     const momentIds = new Set(pack.moments.map((m) => m.id));
     pack.embeddings.rows.forEach((row, i) => {
-      if (!momentIds.has(row.momentId) || !pack.visitorLangs.includes(row.lang)) {
+      // An index-only row may be in any language: it is never shown, only matched.
+      if (
+        !momentIds.has(row.momentId) ||
+        (!row.indexOnly && !pack.visitorLangs.includes(row.lang))
+      ) {
         ctx.addIssue({
           code: "custom",
           message: `embedding row ${i} names an unknown moment or language`,

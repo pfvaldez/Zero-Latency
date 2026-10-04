@@ -7,6 +7,7 @@ import {
   ClipsFileSchema,
   FactsFileSchema,
   FarmCardFileSchema,
+  IndexPassagesFileSchema,
   ProductsFileSchema,
   parseTestQuestions,
   RecipeFileSchema,
@@ -379,5 +380,55 @@ describe("parseTestQuestions", () => {
 
   it("returns no rows for a header only", () => {
     expect(parseTestQuestions(H)).toEqual([]);
+  });
+});
+
+describe("index-passages.json", () => {
+  const four = (n: string) => ({
+    en: [`en ${n}`, `en two ${n}`],
+    de: [`de ${n}`],
+    nl: [`nl ${n}`],
+    sv: [`sv ${n}`],
+  });
+  const file = (over: object = {}) => ({
+    writer: "an isolated assistant",
+    draft: true,
+    neverShown: true,
+    removedAsDuplicates: [],
+    clips: { "1": four("a"), "2": four("b") },
+    ...over,
+  });
+
+  it("accepts phrasings in all four languages that are marked draft and never shown", () => {
+    expect(ok(IndexPassagesFileSchema, file())).toBe(true);
+  });
+
+  it("must say draft and neverShown: they are unchecked text that is never displayed", () => {
+    expect(ok(IndexPassagesFileSchema, file({ draft: false }))).toBe(false);
+    expect(ok(IndexPassagesFileSchema, file({ neverShown: false }))).toBe(false);
+    const { draft: _d, ...noDraft } = file();
+    expect(ok(IndexPassagesFileSchema, noDraft)).toBe(false);
+  });
+
+  it("needs every language for every clip, and rejects empty lists, too-short text and unknown fields", () => {
+    expect(
+      ok(
+        IndexPassagesFileSchema,
+        file({ clips: { "1": { en: ["x one"], de: ["d one"], nl: ["n one"] } } }),
+      ),
+    ).toBe(false);
+    expect(ok(IndexPassagesFileSchema, file({ clips: { "1": { ...four("a"), de: [] } } }))).toBe(
+      false,
+    );
+    expect(ok(IndexPassagesFileSchema, file({ clips: { "1": { ...four("a"), de: ["x"] } } }))).toBe(
+      false,
+    );
+    expect(ok(IndexPassagesFileSchema, file({ extra: 1 }))).toBe(false);
+    expect(ok(IndexPassagesFileSchema, file({ clips: { clipOne: four("a") } }))).toBe(false);
+  });
+
+  it("records what was removed for repeating a test question", () => {
+    const removed = [{ clip: "5", lang: "en", text: "What else do you grow?", questionId: "q009" }];
+    expect(ok(IndexPassagesFileSchema, file({ removedAsDuplicates: removed }))).toBe(true);
   });
 });

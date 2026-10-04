@@ -6,6 +6,7 @@ import { PackError } from "@asknoor/core";
 import { buildPack } from "./build.ts";
 import { runEval } from "./eval-run.ts";
 import { buildFixture } from "./fixture.ts";
+import { importIndexPassages } from "./index-passages.ts";
 import { ensureModelCache, REPO_ROOT, stageModel } from "./model.ts";
 
 const [command, ...rest] = process.argv.slice(2);
@@ -33,6 +34,19 @@ async function main(): Promise<number> {
         `threshold ${r.threshold} (limit ${r.maxFalseConfirm * 100}% met: ${r.primary.falseConfirmRate <= r.maxFalseConfirm}); ` +
           `false confirm ${(p.falseConfirmRate * 100).toFixed(1)}%, coverage ${(p.coverage * 100).toFixed(1)}%, ` +
           `top-1 ${(p.top1Rate * 100).toFixed(1)}%, fail-safe ${(p.failSafeRate * 100).toFixed(1)}%. Wrote docs/EVAL.md`,
+      );
+      return 0;
+    }
+    case "index-import": {
+      const from = flag("--from");
+      if (!from) throw new Error("usage: index-import --from <raw.json>");
+      const { file, audit } = await importIndexPassages(flag("--farm") ?? "ondera-noor", from);
+      const count = Object.values(file.clips).reduce(
+        (n, c) => n + c.en.length + c.de.length + c.nl.length + c.sv.length,
+        0,
+      );
+      console.log(
+        `index passages: ${count} kept, ${file.removedAsDuplicates.length} removed as exact duplicates of a test question; max token overlap with any question ${audit.maxOverlap.toFixed(2)}`,
       );
       return 0;
     }
@@ -64,7 +78,7 @@ async function main(): Promise<number> {
     }
     default:
       console.error(
-        "usage: cli.ts model [--into dir] | eval [--farm slug] | build [--mode demo|production] [--publish clip08]",
+        "usage: cli.ts model [--into dir] | index-import --from raw.json | eval [--farm slug] | build [--mode demo|production] [--publish clip08]",
       );
       return 2;
   }

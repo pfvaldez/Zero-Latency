@@ -12,12 +12,16 @@ import {
   FactsFileSchema,
   FarmCardFileSchema,
   fillTemplate,
+  IndexPassagesFileSchema,
+  leakageAudit,
+  normalize,
   ProductsFileSchema,
   parseTestQuestions,
   RecipeFileSchema,
   RecordingsFileSchema,
   redact,
   SmsTemplatesFileSchema,
+  splitSentences,
   THEME_IDS,
   toAddons,
   VISITOR_LANGS,
@@ -37,6 +41,7 @@ const farmCard = FarmCardFileSchema.parse(json("farm-card.json"));
 const sms = SmsTemplatesFileSchema.parse(json("sms-templates.json"));
 const recordings = RecordingsFileSchema.parse(json("recordings/recordings.json"));
 const questions = parseTestQuestions(text("eval/test-questions.csv"));
+const indexFile = IndexPassagesFileSchema.parse(json("index-passages.json"));
 
 describe("clips.json", () => {
   it("has clips 1 to 8, stops 1 to 7 and the held-back answer", () => {
@@ -263,5 +268,46 @@ describe("eval/test-questions.csv", () => {
 
   it("holds no email addresses or phone numbers", () => {
     for (const q of questions) expect(redact(q.question), q.id).toBe(q.question);
+  });
+});
+
+describe("index-passages.json", () => {
+  const flat = Object.entries(indexFile.clips).flatMap(([clip, byLang]) =>
+    Object.entries(byLang).flatMap(([lang, texts]) => texts.map((t) => ({ clip, lang, text: t }))),
+  );
+
+  it("covers every clip in all four languages, with at least two phrasings each", () => {
+    expect(Object.keys(indexFile.clips).sort()).toEqual(
+      clips.clips.map((c) => String(c.id)).sort(),
+    );
+    for (const byLang of Object.values(indexFile.clips)) {
+      for (const lang of VISITOR_LANGS) expect(byLang[lang].length).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it("is a draft that is never shown, labeled as such", () => {
+    expect(indexFile.draft).toBe(true);
+    expect(indexFile.neverShown).toBe(true);
+    expect(indexFile.writer).toContain("isolated");
+  });
+
+  it("repeats no test question exactly (the audit removed those), and records what it removed", () => {
+    const qs = questions.map((q) => ({ id: q.id, lang: q.lang, question: q.question }));
+    expect(leakageAudit(flat, qs).exact).toEqual([]);
+    for (const r of indexFile.removedAsDuplicates) {
+      const q = questions.find((x) => x.id === r.questionId);
+      expect(q, r.questionId).toBeDefined();
+      expect(normalize(q?.question ?? "")).toBe(normalize(r.text)); // the record is true
+    }
+  });
+
+  it("copies no sentence of a clip's script", () => {
+    const script = new Set(clips.clips.flatMap((c) => splitSentences(c.script.en).map(normalize)));
+    for (const p of flat.filter((x) => x.lang === "en"))
+      expect(script.has(normalize(p.text)), p.text).toBe(false);
+  });
+
+  it("holds no email addresses or phone numbers", () => {
+    for (const p of flat) expect(redact(p.text), p.text).toBe(p.text);
   });
 });

@@ -21,6 +21,7 @@
 | 116 test questions | Written by the team (Claude Code, for Bee) in `content/ondera-noor/eval/test-questions.csv` | 2026-10-03 | Project content | 116 rows, 29 per language | Evaluating matching and the safety card | **Synthetic**: not asked by any guest; de, nl and sv were not checked by native speakers; written by the same assistant that built the matcher, so style is correlated |
 | Safety lexicon and theme hints | `packages/core/src/guardrails/safety.ts`, `themes/themes.ts` | first drafts | Project content | a few hundred entries | Routing health and emergency questions; tagging themes | Inflected forms are listed one by one, so gaps exist; typos in a safety question are not covered |
 | de, nl, sv interface strings and topic labels | `packages/core/src/i18n/`, `content/ondera-noor/clips.json` | drafts | Project content | about 80 strings per language | What guests read in the app | Written by an AI assistant, **not checked by a native speaker** |
+| Index-only passages (93) | Written 2026-10-04 by an isolated Claude subagent that was given only the clip scripts; `content/ondera-noor/index-passages.json` | 2026-10-04 | Project content (unchecked machine text) | 93 short phrasings (3 per clip and language, 3 exact repeats of a test question removed) | Finding the right moment for a guest's question; never displayed | Written by the same model family as the test questions, so style is correlated; not checked by anyone; not guest wording |
 | Generated test tones (fixture pack) | `pipeline/asknoor/fixture_audio.py` | generated | Project content | 3 clips, about 110 KB | Letting CI and the app's offline tests run without anyone's voice | Not speech |
 
 ## 2. Labels: what is synthetic, a stand-in, AI-dubbed or a machine draft
@@ -35,7 +36,7 @@
 | Fun facts without a source, products without a price, the farm card without a phone | `needs: ["source"]`, `["price"]`, `["phone"]` | the add-on files and `manifest.addons[].needs` | Demo packs only, labeled; refused in production |
 | Fixture pack | "Synthetic test tone, not a voice" | `manifest.labels.standIn` | No (demo pack for tests) |
 | The 116 test questions | `synthetic = true` on every row | the CSV column | Never shown |
-| Index-only passages (**planned, Slice 4 step 2, not built**) | will be marked `indexOnly` on their embedding rows and never displayed | will be in `manifest.embeddings.rows` | Would never be shown; they would influence which clip is offered, and the guest confirms |
+| Index-only passages | `indexOnly: true` on their embedding rows; never displayed | `manifest.embeddings.rows`; `content/ondera-noor/index-passages.json` | Never shown; they influence which clip is offered, and the guest confirms |
 
 ## 3. Gaps, in plain words
 

@@ -1,21 +1,63 @@
 {
-  "match": 0.855,
+  "match": 0.8675,
   "margin": 0.05,
-  "rule": "the strictest of the full-set pick and the two fold picks",
-  "fullSetPick": 0.8525,
+  "rule": "the strictest of the full-set pick and both fold picks, for the demo pack and the production pack",
+  "allPicks": [
+    {
+      "passages": "subtitle text, English only",
+      "fullSetPick": 0.83,
+      "foldPicks": [
+        0.835,
+        0.8075
+      ]
+    },
+    {
+      "passages": "before: subtitle text in all languages",
+      "fullSetPick": 0.8525,
+      "foldPicks": [
+        0.855,
+        0.8475
+      ]
+    },
+    {
+      "passages": "after: plus index-only passages (demo pack, shipped)",
+      "fullSetPick": 0.86,
+      "foldPicks": [
+        0.8675,
+        0.86
+      ]
+    },
+    {
+      "passages": "production pack once English is checked: English subtitle text plus index-only",
+      "fullSetPick": 0.86,
+      "foldPicks": [
+        0.8675,
+        0.86
+      ]
+    },
+    {
+      "passages": "after, without index phrasings that overlap a test question by 0.6 or more",
+      "fullSetPick": 0.8525,
+      "foldPicks": [
+        0.8525,
+        0.8575
+      ]
+    }
+  ],
+  "fullSetPick": 0.86,
   "foldPicks": [
-    0.855,
-    0.8475
+    0.8675,
+    0.86
   ],
   "heldOut": {
-    "falseConfirmRate": 0.05,
-    "coverage": 0.5178571428571429,
-    "top1": 0.8392857142857143
+    "falseConfirmRate": 0.03,
+    "coverage": 0.7321428571428571,
+    "top1": 0.9107142857142857
   },
   "limitMet": true,
   "maxFalseConfirm": 0.05,
   "falseConfirmRate": 0.02,
-  "coverage": 0.48214285714285715,
+  "coverage": 0.6785714285714286,
   "questions": 100,
   "inSample": true,
   "modelRepo": "Xenova/multilingual-e5-small",

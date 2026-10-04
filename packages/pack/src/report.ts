@@ -48,7 +48,27 @@ export interface EvalResults {
     falseConfirm: { low: number; high: number };
     coverage: { low: number; high: number };
   };
-  englishOnly: Metrics | null;
+  study: {
+    name: string;
+    fullSetPick: number | null;
+    foldPicks: (number | null)[];
+    pooled: PooledMetrics | null;
+    pooledCi: {
+      falseConfirm: { low: number; high: number };
+      coverage: { low: number; high: number };
+      top1: { low: number; high: number };
+    } | null;
+    atShipped: Metrics;
+  }[];
+  leakage: {
+    passages: number;
+    removedAsDuplicates: number;
+    maxOverlap: number;
+    worst: { text: string; lang: string; questionId: string } | null;
+    bestOverlapBins: number[];
+    strictCutoff: number;
+    excludedAtCutoff: number;
+  } | null;
   afterPublish: Metrics;
   byLang: LangRow[];
   byVariant: LangRow[];
@@ -124,6 +144,46 @@ function honestSection(r: EvalResults): string[] {
   return out;
 }
 
+function sensitivity(r: EvalResults): string {
+  const shipped = r.study.find((x) => x.name.startsWith("after:"));
+  const strict = r.study.find((x) => x.name.startsWith("after, without"));
+  if (!shipped?.pooled || !strict?.pooled) return "";
+  const a = shipped.pooled;
+  const b = strict.pooled;
+  return `Held-out coverage goes from ${pct(a.coverage)} to ${pct(b.coverage)}, so the gain does not come from near-copies; but false confirm goes from ${pct(a.falseConfirmRate)} to ${pct(b.falseConfirmRate)} and fail-safe from ${pct(a.failSafeRate)} to ${pct(b.failSafeRate)}, so removing them is not free either. With this few questions these differences are within the noise of the intervals.`;
+}
+
+function studySection(r: EvalResults): string[] {
+  const out: string[] = ["## Which passages: before and after index-only phrasings", ""];
+  out.push(
+    "Each row is a different set of passages for the same moments, evaluated the same honest way: the threshold is chosen on one half of the question slots and the numbers below are **pooled held-out** (every question reported once, with a threshold chosen without it).",
+    "",
+    "| Passages | Held-out false confirm | Held-out coverage | Held-out top-1 | Fail-safe | At the shipped threshold (in sample): false confirm / coverage / top-1 |",
+    "|---|---|---|---|---|---|",
+  );
+  for (const x of r.study) {
+    const p = x.pooled;
+    out.push(
+      `| ${x.name} | ${p ? `${pct(p.falseConfirmRate)} (${ci(x.pooledCi?.falseConfirm ?? { low: 0, high: 0 })})` : "no threshold"} | ${p ? `${pct(p.coverage)} (${ci(x.pooledCi?.coverage ?? { low: 0, high: 0 })})` : "-"} | ${p ? pct(p.top1Rate) : "-"} | ${p ? pct(p.failSafeRate) : "-"} | ${pct(x.atShipped.falseConfirmRate)} / ${pct(x.atShipped.coverage)} / ${pct(x.atShipped.top1Rate)} |`,
+    );
+  }
+  out.push("");
+  if (r.leakage) {
+    const l = r.leakage;
+    out.push(
+      "### Index-only phrasings: how they were made and how independent they are",
+      "",
+      `- ${l.passages} short question-style phrasings (3 per clip and language) were written by an isolated assistant that was given only the clip scripts and topics, and read no repository file. They are **never shown to a guest or to Noor**; they only add matrix rows for a moment, are marked \`indexOnly\` in the manifest, and the guest still confirms every match.`,
+      `- Leakage audit against the ${r.questions.total} test questions (same language, token overlap after normalization): ${l.removedAsDuplicates} phrasings that repeated a question exactly were **removed** (not rewritten); the closest remaining phrasing overlaps a question by ${l.maxOverlap.toFixed(2)}${l.worst ? ` ("${l.worst.text}" and ${l.worst.questionId})` : ""}. Best overlap per phrasing in fifths from 0 to 1: ${l.bestOverlapBins.join(", ")}.`,
+      `- **Sensitivity:** the last row of the table drops the ${l.excludedAtCutoff} phrasings that overlap a question by ${l.strictCutoff} or more. ${sensitivity(r)}`,
+      "- **What the audit cannot see:** it measures token overlap within one language, so a phrasing that is a paraphrase or a translation of a test question is not detected. Paraphrase leakage is not measured.",
+      "- **Limits I cannot remove:** the team's assistant also wrote the test questions and has seen them in this project, and both come from the same model family, so the style of the phrasings and of the questions is correlated. That can make the gain look larger than real guests would give. They are unchecked machine text (a draft), shipped labeled; see `docs/RESPONSIBLE_AI.md`.",
+      "",
+    );
+  }
+  return out;
+}
+
 export function renderEval(r: EvalResults): string {
   const p = r.primary;
   const lines: string[] = [];
@@ -145,7 +205,7 @@ export function renderEval(r: EvalResults): string {
   lines.push(...honestSection(r));
   lines.push("## Chosen threshold", "");
   lines.push(
-    `**match = ${r.threshold}**, the strictest of three picks: the full-set pick (${r.fullSetPick ?? "none"}) and the two fold picks (${r.foldPicks.map((x) => x ?? "none").join(" and ")}). It is never looser than any honest estimate, which fits "below the threshold, save for Noor". Written to \`content/ondera-noor/eval/threshold.json\` and into every pack manifest. \`margin\` = ${r.margin} is recorded but not used in P0 (the "is it A or B?" step is P1).`,
+    `**match = ${r.threshold}**, the strictest of the picks: for the shipped pack the full-set pick (${r.fullSetPick ?? "none"}) and the two fold picks (${r.foldPicks.map((x) => x ?? "none").join(" and ")}), and the same three for the production pack (see the table of passage sets below). It is never looser than any honest estimate, which fits "below the threshold, save for Noor". Written to \`content/ondera-noor/eval/threshold.json\` and into every pack manifest. \`margin\` = ${r.margin} is recorded but not used in P0 (the "is it A or B?" step is P1).`,
     "",
     r.fullSet
       ? `**Tuned on the full set (in sample, kept for comparison):** at ${r.fullSetPick} the same questions give false confirm ${pct(r.fullSet.falseConfirmRate)}, coverage ${pct(r.fullSet.coverage)}, top-1 ${pct(r.fullSet.top1Rate)}. These are optimistic: the threshold was chosen on these questions. The held-out numbers above are the honest estimate.`
@@ -174,22 +234,7 @@ export function renderEval(r: EvalResults): string {
   for (const x of r.byLang) lines.push(row(`language ${x.name}`, x.m));
   for (const x of r.byVariant) lines.push(row(`variant ${x.name}`, x.m));
   lines.push("");
-  if (r.englishOnly) {
-    lines.push("## English passages only vs all languages", "");
-    lines.push(
-      "| Passages | Questions | Top-1 | Coverage | False confirm | Fail-safe |",
-      "|---|---|---|---|---|---|",
-    );
-    lines.push(
-      row("demo pack: English plus draft translations", p),
-      row("production pack today: English only (translations are unchecked)", r.englishOnly),
-      "",
-    );
-    lines.push(
-      "The threshold was chosen on the demo pack. Today a production pack would carry English passages only, where the same threshold gives the second row. Once a language is checked it joins the production pack and this table should be rerun.",
-      "",
-    );
-  }
+  lines.push(...studySection(r));
   lines.push("## The overnight loop (clip 8 held back, then published)", "");
   lines.push(
     "Same threshold, same questions. Before the answer is published the overnight questions have no answer and should be saved for Noor; after the next pack includes it they should match.",

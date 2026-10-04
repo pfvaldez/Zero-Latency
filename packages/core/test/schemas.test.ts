@@ -418,3 +418,34 @@ describe("manifestJsonSchema", () => {
     expect(schema.additionalProperties).toBe(false);
   });
 });
+
+describe("embedding rows flagged indexOnly", () => {
+  const withRows = (rows: unknown[]) =>
+    FarmPackManifestSchema.safeParse({
+      ...manifest(),
+      embeddings: { ...manifest().embeddings, count: rows.length, rows },
+    }).success;
+  const base = { momentId: "c1-m1", lang: "en" };
+
+  it("accept indexOnly: true, in any language", () => {
+    expect(withRows([base, { ...base, lang: "de", indexOnly: true }])).toBe(true);
+  });
+  it("refuse a row in a language the pack does not carry unless it is indexOnly", () => {
+    const englishOnly = (rows: unknown[]) =>
+      FarmPackManifestSchema.safeParse({
+        ...manifest(),
+        visitorLangs: ["en"],
+        embeddings: { ...manifest().embeddings, count: rows.length, rows },
+      }).success;
+    expect(englishOnly([base, { ...base, lang: "de" }])).toBe(false);
+    expect(englishOnly([base, { ...base, lang: "de", indexOnly: true }])).toBe(true);
+  });
+  it("refuse indexOnly: false, a non-boolean and unknown fields", () => {
+    expect(withRows([{ ...base, indexOnly: false }])).toBe(false);
+    expect(withRows([{ ...base, indexOnly: "yes" }])).toBe(false);
+    expect(withRows([{ ...base, extra: 1 }])).toBe(false);
+  });
+  it("still refuse an indexOnly row for a moment that is not in the pack", () => {
+    expect(withRows([{ momentId: "c99-m1", lang: "en", indexOnly: true }])).toBe(false);
+  });
+});

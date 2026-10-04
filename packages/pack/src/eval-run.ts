@@ -11,9 +11,12 @@ import {
   decideSafety,
   evaluate,
   histogram,
+  IndexPassagesFileSchema,
+  leakageAudit,
   leaveOneLanguageOut,
   type Metrics,
   momentOfClip,
+  type PooledMetrics,
   pickThreshold,
   type ScoredQuestion,
   shippedThreshold,
@@ -43,6 +46,8 @@ export interface Passage {
   clip: number;
   lang: VisitorLang;
   text: string;
+  /** "subtitle": text a guest can read. "index": a question-style phrasing, never shown. */
+  kind: "subtitle" | "index";
 }
 
 interface TranslationsFile {
@@ -88,9 +93,29 @@ export async function buildPassages(
       clip: clip.id,
       lang: "en",
       text: t?.text ?? clip.script.en,
+      kind: "subtitle",
     });
     for (const [lang, text] of Object.entries(translations.get(clip.id) ?? {})) {
-      passages.push({ momentId: clip.momentId, clip: clip.id, lang: lang as VisitorLang, text });
+      passages.push({
+        momentId: clip.momentId,
+        clip: clip.id,
+        lang: lang as VisitorLang,
+        text,
+        kind: "subtitle",
+      });
+    }
+  }
+  // Index-only phrasings (never shown): extra rows per moment, when the file exists.
+  const idx = await readIndexFile(farm);
+  if (idx) {
+    for (const clip of clips.clips) {
+      const byLang = idx.clips[String(clip.id)];
+      if (!byLang) continue;
+      for (const lang of ["en", "de", "nl", "sv"] as const) {
+        for (const text of byLang[lang]) {
+          passages.push({ momentId: clip.momentId, clip: clip.id, lang, text, kind: "index" });
+        }
+      }
     }
   }
   const fromTranscript = transcripts.size;
@@ -113,6 +138,21 @@ async function dirBytes(dir: string): Promise<number | null> {
   } catch {
     return null;
   }
+}
+
+/** The index-passages file, or null if it does not exist. Any other problem (bad JSON, bad shape) throws. */
+async function readIndexFile(farm: string) {
+  try {
+    const raw = JSON.parse(await readFile(join(contentDir(farm), "index-passages.json"), "utf8"));
+    return IndexPassagesFileSchema.parse(raw);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+async function removedCount(farm: string): Promise<number> {
+  return (await readIndexFile(farm))?.removedAsDuplicates.length ?? 0;
 }
 
 export async function runEval(
@@ -153,13 +193,13 @@ export async function runEval(
   const publishedB = new Set(allMoments);
 
   const score = (
-    rowFilter: (p: Passage) => boolean,
+    rowFilter: (p: Passage, j: number) => boolean,
     moments: ReadonlySet<string>,
   ): ScoredQuestion[] =>
     questions.map((q, i) => {
       const best = new Map<string, number>();
       passages.forEach((p, j) => {
-        if (!moments.has(p.momentId) || !rowFilter(p)) return;
+        if (!moments.has(p.momentId) || !rowFilter(p, j)) return;
         const s = dot(queryVecs[i] as Float32Array, passageVecs[j] as Float32Array);
         if (s > (best.get(p.momentId) ?? Number.NEGATIVE_INFINITY)) best.set(p.momentId, s);
       });
@@ -173,35 +213,108 @@ export async function runEval(
       };
     });
 
-  const all = () => true;
-  const scoredA = score(all, publishedA);
-  const scoredB = score(all, publishedB);
   const grid = thresholdGrid(0.6, 0.99, 0.0025);
+  const gridMax = grid.at(-1) as number;
+  const hasIndex = passages.some((p) => p.kind === "index");
+
+  // How close each index phrasing comes to a test question (it was written without seeing them).
+  const indexPositions = passages
+    .map((p, j) => (p.kind === "index" ? j : -1))
+    .filter((j) => j >= 0);
+  const audit = hasIndex
+    ? leakageAudit(
+        indexPositions.map((j) => ({
+          clip: String(passages[j]?.clip),
+          lang: passages[j]?.lang as string,
+          text: passages[j]?.text as string,
+        })),
+        questions.map((q) => ({ id: q.id, lang: q.lang, question: q.question })),
+      )
+    : null;
+  const STRICT_CUTOFF = 0.6;
+  const tooClose = new Set(indexPositions.filter((_, k) => (audit?.best[k] ?? 0) >= STRICT_CUTOFF));
+
+  // The passage sets to compare. "after" is what ships when index phrasings exist.
+  const configs: { name: string; filter: (p: Passage, j: number) => boolean }[] = [
+    {
+      name: "subtitle text, English only",
+      filter: (p) => p.kind === "subtitle" && p.lang === "en",
+    },
+    {
+      name: hasIndex
+        ? "before: subtitle text in all languages"
+        : "subtitle text in all languages (shipped)",
+      filter: (p) => p.kind === "subtitle",
+    },
+    ...(hasIndex
+      ? [
+          { name: "after: plus index-only passages (demo pack, shipped)", filter: () => true },
+          {
+            name: "production pack once English is checked: English subtitle text plus index-only",
+            filter: (p: Passage) => p.kind === "index" || p.lang === "en",
+          },
+          {
+            name: `after, without index phrasings that overlap a test question by ${STRICT_CUTOFF} or more`,
+            filter: (p: Passage, j: number) => !(p.kind === "index" && tooClose.has(j)),
+          },
+        ]
+      : []),
+  ];
+  const study = configs.map((cfg) => {
+    const scored = score(cfg.filter, publishedA);
+    const picked = pickThreshold(
+      sweep(scored, grid, publishedA, MARGIN_PLACEHOLDER),
+      MAX_FALSE_CONFIRM,
+    );
+    const cv = crossValidate(scored, grid, publishedA, MAX_FALSE_CONFIRM, MARGIN_PLACEHOLDER);
+    return { cfg, scored, fullSetPick: picked?.threshold ?? null, cv };
+  });
+  const shippedIdx = hasIndex ? 2 : 1; // the pack that ships
+  const prodIdx = hasIndex ? 3 : -1; // the production pack today
+  const primaryStudy = study[shippedIdx] as (typeof study)[number];
+  const scoredA = primaryStudy.scored;
+  const scoredB = score(
+    configs[shippedIdx]?.filter as (p: Passage, j: number) => boolean,
+    publishedB,
+  );
   const rowsA = sweep(scoredA, grid, publishedA, MARGIN_PLACEHOLDER);
   const picked = pickThreshold(rowsA, MAX_FALSE_CONFIRM);
-  const gridMax = grid.at(-1) as number;
 
-  // The honest estimate: tune on one half of the question slots, report on the other, then swap.
-  const cv = crossValidate(scoredA, grid, publishedA, MAX_FALSE_CONFIRM, MARGIN_PLACEHOLDER);
-  const fullSetPick = picked?.threshold ?? null;
+  // The honest estimate for the shipped pack: tune on one half of the question slots, report on the other.
+  const cv = primaryStudy.cv;
+  const fullSetPick = primaryStudy.fullSetPick;
   const foldPicks = cv.folds.map((f) => f.threshold);
-  // The threshold that ships is the strictest of the three picks (never looser than an honest estimate).
-  const threshold = shippedThreshold(fullSetPick, foldPicks, gridMax);
+  // The threshold that ships is the strictest of every pick for the demo pack and the production pack,
+  // so it is never looser than any honest estimate of either.
+  const prod = prodIdx >= 0 ? (study[prodIdx] as (typeof study)[number]) : null;
+  const threshold = shippedThreshold(
+    fullSetPick,
+    [...foldPicks, ...(prod ? [prod.fullSetPick, ...prod.cv.folds.map((f) => f.threshold)] : [])],
+    gridMax,
+  );
   const primary = evaluate(scoredA, threshold, publishedA, MARGIN_PLACEHOLDER);
   const fullSet = picked
     ? evaluate(scoredA, picked.threshold, publishedA, MARGIN_PLACEHOLDER)
     : null;
 
+  const studyRows = study.map((row) => ({
+    name: row.cfg.name,
+    fullSetPick: row.fullSetPick,
+    foldPicks: row.cv.folds.map((f) => f.threshold),
+    pooled: row.cv.pooled as PooledMetrics | null,
+    pooledCi: row.cv.pooled
+      ? {
+          falseConfirm: wilson(
+            row.cv.pooled.wrongClipConfirm + row.cv.pooled.confirmOnNever,
+            row.cv.pooled.questions,
+          ),
+          coverage: wilson(row.cv.pooled.correctConfirm, row.cv.pooled.answered),
+          top1: wilson(row.cv.pooled.top1, row.cv.pooled.answered),
+        }
+      : null,
+    atShipped: evaluate(row.scored, threshold, publishedA, MARGIN_PLACEHOLDER),
+  }));
   const passageLangs = [...new Set(passages.map((p) => p.lang))];
-  const englishOnly =
-    passageLangs.length > 1
-      ? evaluate(
-          score((p) => p.lang === "en", publishedA),
-          threshold,
-          publishedA,
-          MARGIN_PLACEHOLDER,
-        )
-      : null;
 
   const metricsOf = (m: Record<string, Metrics>) =>
     Object.entries(m).map(([name, v]) => ({ name, m: v }));
@@ -294,7 +407,20 @@ export async function runEval(
       falseConfirm: wilson(primary.wrongClipConfirm + primary.confirmOnNever, primary.questions),
       coverage: wilson(primary.correctConfirm, primary.answered),
     },
-    englishOnly,
+    study: studyRows,
+    leakage: audit
+      ? {
+          passages: audit.passages,
+          removedAsDuplicates: await removedCount(farm),
+          maxOverlap: audit.maxOverlap,
+          worst: audit.worst
+            ? { text: audit.worst.text, lang: audit.worst.lang, questionId: audit.worst.questionId }
+            : null,
+          bestOverlapBins: audit.bestOverlapBins,
+          strictCutoff: STRICT_CUTOFF,
+          excludedAtCutoff: tooClose.size,
+        }
+      : null,
     afterPublish: evaluate(scoredB, threshold, publishedB, MARGIN_PLACEHOLDER),
     byLang: metricsOf(breakdown(scoredA, (q) => q.lang, threshold, publishedA, MARGIN_PLACEHOLDER)),
     byVariant: metricsOf(
@@ -340,7 +466,12 @@ export async function runEval(
       {
         match: threshold,
         margin: MARGIN_PLACEHOLDER,
-        rule: "the strictest of the full-set pick and the two fold picks",
+        rule: "the strictest of the full-set pick and both fold picks, for the demo pack and the production pack",
+        allPicks: studyRows.map((x) => ({
+          passages: x.name,
+          fullSetPick: x.fullSetPick,
+          foldPicks: x.foldPicks,
+        })),
         fullSetPick,
         foldPicks,
         heldOut: cv.pooled

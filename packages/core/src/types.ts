@@ -119,7 +119,9 @@ export interface FarmPackManifest {
     dtype: "float32";
     passagePrefix: "passage: ";
     // Row i of the matrix is the passage of this moment in this language.
-    rows: { momentId: string; lang: VisitorLang }[];
+    // `indexOnly` rows come from short question-style phrasings that are never shown to anyone:
+    // they only help find the moment, and the guest still confirms every match.
+    rows: { momentId: string; lang: VisitorLang; indexOnly?: true }[];
   };
   thresholds: Thresholds; // calibrated by pipeline/eval
   sizes: Record<string, number>;
