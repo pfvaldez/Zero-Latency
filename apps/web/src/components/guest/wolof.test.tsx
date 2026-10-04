@@ -106,7 +106,7 @@ describe("Hear this stop in Wolof (AI-dubbed)", () => {
     expect(screen.getByText(t("en", "player.dubNote"))).toBeInTheDocument();
     // Never framed as Noor speaking: a neutral heading, and the subtitles are said to be a machine translation.
     expect(screen.getByRole("heading", { name: "AI-dubbed Wolof version" })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Noor's own recording" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Noor's story" })).not.toBeInTheDocument();
     expect(screen.getByText(t("en", "player.dubSubtitlesNote"))).toBeInTheDocument();
     expect(screen.queryByText(/Hear Noor/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Hear the original recording" }));
@@ -116,17 +116,17 @@ describe("Hear this stop in Wolof (AI-dubbed)", () => {
 
   it("is hidden in a production pack, and for a confirmed moment (the dub's timing differs)", async () => {
     await mountPlayer({ ...withDub(), mode: "production" });
-    await screen.findByRole("heading", { name: "Noor's own recording" });
+    await screen.findByRole("heading", { name: "Noor's story" });
     expect(screen.queryByRole("button", { name: /Wolof/ })).not.toBeInTheDocument();
     cleanup();
     await mountPlayer(withDub(), "c2-m1");
-    await screen.findByRole("heading", { name: "Noor's own recording" });
+    await screen.findByRole("heading", { name: "Noor's story" });
     expect(screen.queryByRole("button", { name: /Wolof/ })).not.toBeInTheDocument();
   });
 
   it("is not offered for a clip with no dub", async () => {
     await mountPlayer(fixtureManifest());
-    await screen.findByRole("heading", { name: "Noor's own recording" });
+    await screen.findByRole("heading", { name: "Noor's story" });
     expect(screen.queryByRole("button", { name: /Wolof/ })).not.toBeInTheDocument();
   });
 });

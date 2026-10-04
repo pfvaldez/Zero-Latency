@@ -52,7 +52,7 @@ export const de: Strings = {
   "player.play": "Abspielen",
   "player.pause": "Pause",
   "player.subtitles": "Untertitel",
-  "player.noorSays": "Noors eigene Aufnahme",
+  "player.noorSays": "Noors Geschichte",
   "player.sourceFallback": "Die Untertitel werden vorerst in Noors Sprache angezeigt.",
 
   "facts.title": "Wussten Sie schon?",

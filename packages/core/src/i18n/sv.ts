@@ -47,7 +47,7 @@ export const sv: Strings = {
   "player.play": "Spela upp",
   "player.pause": "Pausa",
   "player.subtitles": "Undertexter",
-  "player.noorSays": "Noors egen inspelning",
+  "player.noorSays": "Noors berättelse",
   "player.sourceFallback": "Undertexterna visas tills vidare på Noors språk.",
 
   "facts.title": "Visste du att?",

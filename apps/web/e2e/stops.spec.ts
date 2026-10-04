@@ -35,7 +35,7 @@ test("offline: /stop/2 opens stop 2, and scanning the QR code for stop 3 opens s
   await context.setOffline(true);
   watch.goOffline();
   await page.goto("/stop/2");
-  await expect(page.getByRole("heading", { name: "Noor's own recording" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Noor's story" })).toBeVisible();
   await expect(page.getByText(/red coffee cherries/)).toBeVisible();
   expect(new URL(page.url()).pathname).toBe("/");
 
@@ -51,7 +51,7 @@ test("offline: /stop/2 opens stop 2, and scanning the QR code for stop 3 opens s
   page.on("console", (m) => consoleLines.push(`${m.type()}: ${m.text()}`));
   await page.getByRole("button", { name: "Scan a stop code" }).click();
   try {
-    await expect(page.getByRole("heading", { name: "Noor's own recording" })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Noor's story" })).toBeVisible({
       timeout: 30_000,
     });
   } catch (error) {

@@ -82,7 +82,7 @@ test("download, go offline, reload, play stop 1, ask a question, and a German sa
 
   // 3. Play stop 1: Noor's recording and its subtitles.
   await page.getByRole("button", { name: "Stop 1" }).click();
-  await expect(page.getByRole("heading", { name: "Noor's own recording" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Noor's story" })).toBeVisible();
   await expect(page.getByText(/Welcome to the fixture farm/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Play" })).toBeEnabled();
   await page.getByRole("button", { name: "Back" }).click();
@@ -97,7 +97,7 @@ test("download, go offline, reload, play stop 1, ask a question, and a German sa
     timeout: 30_000,
   });
   await page.getByRole("button", { name: "Yes, play it" }).click();
-  await expect(page.getByRole("heading", { name: "Noor's own recording" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Noor's story" })).toBeVisible();
   await expect(page.getByText(/red coffee cherries/)).toBeVisible();
   await page.getByRole("button", { name: "Back" }).click();
 

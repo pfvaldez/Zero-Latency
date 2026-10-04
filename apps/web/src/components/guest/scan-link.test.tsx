@@ -95,9 +95,7 @@ describe("stop links (/stop/n)", () => {
 
   it("opens that stop's player once the pack is saved, and returns the address bar to /", async () => {
     await openLink("/stop/2");
-    expect(
-      await screen.findByRole("heading", { name: "Noor's own recording" }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Noor's story" })).toBeInTheDocument();
     expect(await screen.findByText(/red coffee cherries/)).toBeInTheDocument();
     expect(window.location.pathname).toBe("/");
   });
