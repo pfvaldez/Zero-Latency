@@ -39,11 +39,6 @@ export function StopList({
   };
   return (
     <section aria-labelledby="stops-title" className="flex flex-col gap-4">
-      <img
-        src="/coffee-cherries.avif"
-        alt=""
-        className="h-32 w-full rounded-2xl object-cover shadow-[var(--shadow-soft)]"
-      />
       <h2 id="stops-title" className="text-2xl font-semibold">
         {t(lang, "stops.title")}
       </h2>
