@@ -65,6 +65,23 @@ test("offline: /stop/2 opens stop 2, and scanning the QR code for stop 3 opens s
         paused: v.paused,
         hasStream: !!v.srcObject,
         barcodeDetector: "BarcodeDetector" in window,
+        // A coarse picture of what the camera shows (# = dark), to tell "no code in view" from "not decoded".
+        ascii: (() => {
+          const c = document.createElement("canvas");
+          c.width = 48;
+          c.height = 24;
+          const ctx = c.getContext("2d");
+          if (!ctx) return "";
+          ctx.drawImage(v, 0, 0, 48, 24);
+          const d = ctx.getImageData(0, 0, 48, 24).data;
+          const rows: string[] = [];
+          for (let y = 0; y < 24; y++) {
+            let row = "";
+            for (let x = 0; x < 48; x++) row += (d[(y * 48 + x) * 4] ?? 0) < 128 ? "#" : ".";
+            rows.push(row);
+          }
+          return rows.join("|");
+        })(),
       }))
       .catch((e: unknown) => String(e));
     console.log(

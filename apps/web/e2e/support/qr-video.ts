@@ -7,12 +7,14 @@ import QRCode from "qrcode";
 
 const W = 640;
 const H = 480;
-const FRAMES = 15;
+const FRAMES = 150;
 
 export function writeQrVideo(path: string, text: string): void {
   const qr = QRCode.create(text, { errorCorrectionLevel: "M" });
   const n = qr.modules.size;
-  const scale = Math.floor(Math.min(W, H) / (n + 8)); // 4 modules of quiet zone on each side
+  // The scanner looks at the central square of 2/3 of the frame (320 px): keep the whole code, with its
+  // quiet zone, comfortably inside it.
+  const scale = Math.floor(240 / n);
   const size = n * scale;
   const x0 = Math.floor((W - size) / 2);
   const y0 = Math.floor((H - size) / 2);

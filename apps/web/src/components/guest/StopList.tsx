@@ -58,7 +58,14 @@ export function StopList({
       {scanning ? (
         <ScanStop lang={lang} onStop={openNumber} onClose={() => setScanning(false)} />
       ) : (
-        <Button onClick={() => setScanning(true)}>{t(lang, "stops.scan")}</Button>
+        <Button
+          onClick={() => {
+            setMissing(false);
+            setScanning(true);
+          }}
+        >
+          {t(lang, "stops.scan")}
+        </Button>
       )}
       {missing && <p role="alert">{t(lang, "stops.notFound")}</p>}
       <form onSubmit={submit} className="flex flex-col gap-2">
