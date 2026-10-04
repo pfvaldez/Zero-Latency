@@ -1,0 +1,6 @@
+# Vercel deploys apps/web/dist as static files (Hobby: 100 MB per CLI upload).
+# The local production pack (an empty pack with the 135 MB full model) is never deployed.
+packs/ondera-noor/
+# A hashed copy of the ONNX runtime wasm that the bundler emits but the app never loads
+# (the worker loads /ort/*), and the service worker does not precache.
+assets/ort-wasm-*.wasm
