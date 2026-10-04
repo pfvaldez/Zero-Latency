@@ -218,3 +218,27 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- Ask Noor: Bun, Vite, Node ---
+node_modules/
+coverage/
+.vitest/
+playwright-report/
+test-results/
+blob-report/
+*.tsbuildinfo
+dev-dist/
+.DS_Store
+.env.*
+!.env.example
+
+# Bun is the only package manager (bun.lock is tracked)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Per-user Claude Code settings: permission allow rules live here, never in .claude/settings.json
+.claude/settings.local.json
+
+# The Python template above ignores every lib/ folder; apps/web/src/lib is source code
+!apps/web/src/lib/

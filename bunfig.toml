@@ -1,0 +1,4 @@
+[install]
+# Each workspace package sees only the dependencies it declares. This is Bun 1.3's default for
+# new workspaces; it is pinned here so an older lockfile setting cannot switch it to hoisted.
+linker = "isolated"
