@@ -4,12 +4,14 @@ import { Button } from "@/components/animate-ui/components/buttons/button";
 import { LanguagePicker } from "@/components/guest/LanguagePicker.tsx";
 import { PackGate } from "@/components/guest/PackGate.tsx";
 import { usePack } from "@/hooks/use-pack.ts";
+import { useStopLink } from "@/hooks/use-stop-link.ts";
 import { useGuest } from "@/state/guest-store.ts";
 import { GuestTour } from "./GuestTour.tsx";
 
 export function App() {
   const { lang, setLang } = useGuest();
   const { state, download } = usePack();
+  const [linkedStop, clearLink] = useStopLink();
   return (
     // Animate UI's accessibility advice: honour the guest's reduced-motion setting everywhere.
     <MotionConfig reducedMotion="user">
@@ -25,7 +27,12 @@ export function App() {
         {!lang ? (
           <LanguagePicker current={null} onPick={setLang} />
         ) : state.status === "ready" ? (
-          <GuestTour lang={lang} manifest={state.manifest} />
+          <GuestTour
+            lang={lang}
+            manifest={state.manifest}
+            linkedStop={linkedStop}
+            onLinkHandled={clearLink}
+          />
         ) : (
           <PackGate lang={lang} state={state} onDownload={download} />
         )}

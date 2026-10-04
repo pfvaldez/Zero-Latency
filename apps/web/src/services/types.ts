@@ -29,8 +29,14 @@ export interface Outbox {
   count(): Promise<number>;
 }
 
+export interface Scanner {
+  start(video: HTMLVideoElement, onCode: (code: string) => void): Promise<void>;
+  stop(): void;
+}
+
 export interface Services {
   repo: PackRepository;
   matcher: Matcher;
   outbox: Outbox;
+  scanner: Scanner;
 }

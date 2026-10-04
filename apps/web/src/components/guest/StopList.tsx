@@ -1,20 +1,36 @@
 import { type Clip, t, type VisitorLang } from "@asknoor/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/animate-ui/components/buttons/button";
 import { findStop, stopNumber, stopsOf } from "@/lib/stops.ts";
+import { ScanStop } from "./ScanStop.tsx";
 
 /** The tour stops, plus the stop-number entry that works without a camera. */
 export function StopList({
   lang,
   clips,
   onOpen,
+  notFound = false,
 }: {
   lang: VisitorLang;
   clips: readonly Clip[];
   onOpen: (clip: Clip) => void;
+  /** A link or a scan named a stop this pack does not have. */
+  notFound?: boolean;
 }) {
   const [entry, setEntry] = useState("");
-  const [missing, setMissing] = useState(false);
+  const [missing, setMissing] = useState(notFound);
+  const [scanning, setScanning] = useState(false);
+  useEffect(() => {
+    if (notFound) setMissing(true);
+  }, [notFound]);
+  const openNumber = (n: number) => {
+    const clip = findStop(clips, String(n));
+    setMissing(!clip);
+    if (clip) {
+      setScanning(false);
+      onOpen(clip);
+    }
+  };
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const clip = findStop(clips, entry);
@@ -39,6 +55,19 @@ export function StopList({
           </li>
         ))}
       </ul>
+      {scanning ? (
+        <ScanStop lang={lang} onStop={openNumber} onClose={() => setScanning(false)} />
+      ) : (
+        <Button
+          onClick={() => {
+            setMissing(false);
+            setScanning(true);
+          }}
+        >
+          {t(lang, "stops.scan")}
+        </Button>
+      )}
+      {missing && <p role="alert">{t(lang, "stops.notFound")}</p>}
       <form onSubmit={submit} className="flex flex-col gap-2">
         <label htmlFor="stop-number" className="font-bold">
           {t(lang, "stops.number")}
@@ -54,7 +83,6 @@ export function StopList({
           />
           <Button type="submit">{t(lang, "stops.go")}</Button>
         </div>
-        {missing && <p role="alert">{t(lang, "stops.notFound")}</p>}
       </form>
     </section>
   );
