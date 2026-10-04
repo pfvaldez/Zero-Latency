@@ -10,6 +10,7 @@ import { buildFixture } from "./fixture.ts";
 import { importIndexPassages } from "./index-passages.ts";
 import {
   ensureModelCache,
+  ensureTrimmedModel,
   REPO_ROOT,
   stageModel,
   stageTrimmedModel,
@@ -30,6 +31,8 @@ async function main(): Promise<number> {
       if (rest.includes("--write-trimmed-lock")) {
         const lock = await writeTrimmedLock(flag("--from"));
         console.log(`wrote model-trimmed.lock.json (${lock.keepCount} rows kept)`);
+      } else if (rest.includes("--trimmed") && !into) {
+        console.log(`trimmed model downloaded and verified at ${await ensureTrimmedModel()}`);
       } else if (into) {
         const dir = rest.includes("--trimmed")
           ? await stageTrimmedModel(join(REPO_ROOT, into))

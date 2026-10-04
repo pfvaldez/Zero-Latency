@@ -1,0 +1,38 @@
+{
+  "what": "Share of text that the trimmed tokenizer splits into exactly the pieces of the full tokenizer (identical), and the share of pieces dropped.",
+  "keepCount": 52005,
+  "heldOut": "every 20th line of the Wikipedia and Tatoeba (and FLEURS wo train) corpus, first 300 per language; never used to choose the keep list. content = our own clip text, translations and interface strings (400 lines), which the keep list covers by construction.",
+  "tokenizerSha256": "98f64775f39ecafb41e897e45536ff9e597af5e16ca38bf2002a2510ae75f12a",
+  "byLanguage": {
+    "en": {
+      "sentences": 300,
+      "identical": 0.5167,
+      "pieces_dropped": 0.00995
+    },
+    "de": {
+      "sentences": 300,
+      "identical": 0.7,
+      "pieces_dropped": 0.01589
+    },
+    "nl": {
+      "sentences": 300,
+      "identical": 0.6067,
+      "pieces_dropped": 0.0094
+    },
+    "sv": {
+      "sentences": 300,
+      "identical": 0.6567,
+      "pieces_dropped": 0.00995
+    },
+    "wo": {
+      "sentences": 300,
+      "identical": 0.9233,
+      "pieces_dropped": 0.00133
+    },
+    "content": {
+      "sentences": 400,
+      "identical": 0.9875,
+      "pieces_dropped": 0.0017
+    }
+  }
+}

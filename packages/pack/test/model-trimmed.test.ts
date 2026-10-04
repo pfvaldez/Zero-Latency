@@ -5,9 +5,11 @@ import { describe, expect, it } from "vitest";
 import { PACK_BUDGET_BYTES, TOP1_TOLERANCE } from "../src/compare-models.ts";
 import { loadQuestions } from "../src/load-content.ts";
 import {
+  ensureTrimmedModel,
   KEEP_IDS_PATH,
   readLock,
   readTrimmedLock,
+  releaseAssetName,
   sha256,
   type TrimmedLock,
   verifyTrimmedDir,
@@ -56,6 +58,7 @@ describe("verifyTrimmedDir", () => {
       recipe: "r",
       keepIdsSha256: sha256(await readFile(keepPath)),
       keepCount: 4,
+      release: { repo: "o/r", tag: "t" },
       files: [{ path: "a.bin", size: 5, sha256: sha256(new TextEncoder().encode("hello")) }],
     };
     await writeFile(join(dir, "a.bin"), "hello");
@@ -120,5 +123,79 @@ describe("content/ondera-noor/eval/models.json", () => {
     const controls = m.rows.filter((r) => r.name.startsWith("control:"));
     expect(controls.length).toBeGreaterThanOrEqual(2);
     for (const c of controls) expect(c.withinTolerance).toBe(false);
+  });
+});
+
+describe("ensureTrimmedModel (release download)", () => {
+  const bytes = new TextEncoder().encode("model bytes");
+  const lock = (): TrimmedLock => ({
+    baseRepo: "x/y",
+    baseRevision: "r",
+    license: "MIT",
+    dtype: "q8",
+    recipe: "r",
+    keepIdsSha256: "0".repeat(64),
+    keepCount: 1,
+    release: { repo: "o/r", tag: "t1" },
+    files: [{ path: "onnx/m.onnx", size: bytes.length, sha256: sha256(bytes) }],
+  });
+
+  it("flattens folders in asset names and fetches each missing file from the release tag", async () => {
+    expect(releaseAssetName("onnx/model_quantized.onnx")).toBe("onnx__model_quantized.onnx");
+    const dir = await mkdtemp(join(tmpdir(), "trim-dl-"));
+    const urls: string[] = [];
+    const fetchFile = (async (url: string) => {
+      urls.push(url);
+      return new Response(bytes);
+    }) as unknown as typeof fetch;
+    await ensureTrimmedModel(dir, lock(), fetchFile, undefined);
+    expect(urls).toEqual(["https://github.com/o/r/releases/download/t1/onnx__m.onnx"]);
+    expect(new Uint8Array(await readFile(join(dir, "onnx", "m.onnx")))).toEqual(bytes);
+    await ensureTrimmedModel(dir, lock(), fetchFile, undefined); // already verified: no second download
+    expect(urls).toHaveLength(1);
+  });
+
+  it("rejects a download whose sha256 does not match the lock, and writes nothing", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "trim-dl-"));
+    const bad = (async () =>
+      new Response(new TextEncoder().encode("model bytez"))) as unknown as typeof fetch;
+    await expect(ensureTrimmedModel(dir, lock(), bad, undefined)).rejects.toThrow(/does not match/);
+    await expect(readFile(join(dir, "onnx", "m.onnx"))).rejects.toThrow();
+    const notFound = (async () => new Response("no", { status: 404 })) as unknown as typeof fetch;
+    await expect(ensureTrimmedModel(dir, lock(), notFound, undefined)).rejects.toThrow(/404/);
+  });
+
+  it("with a token, asks the API for the asset URL and sends the token (private repository)", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "trim-dl-"));
+    const calls: { url: string; auth: string | undefined; accept: string | undefined }[] = [];
+    const fetchFile = (async (url: string, init?: RequestInit) => {
+      const h = (init?.headers ?? {}) as Record<string, string>;
+      calls.push({ url, auth: h.Authorization, accept: h.Accept });
+      if (url.includes("/releases/tags/"))
+        return Response.json({
+          assets: [{ name: "onnx__m.onnx", url: "https://api.github.com/assets/7" }],
+        });
+      return new Response(bytes);
+    }) as unknown as typeof fetch;
+    await ensureTrimmedModel(dir, lock(), fetchFile, "tok");
+    expect(calls.map((c) => c.url)).toEqual([
+      "https://api.github.com/repos/o/r/releases/tags/t1",
+      "https://api.github.com/assets/7",
+    ]);
+    expect(calls.every((c) => c.auth === "Bearer tok")).toBe(true);
+    expect(calls[1]?.accept).toBe("application/octet-stream");
+    const missing = (async (url: string) =>
+      url.includes("/releases/tags/")
+        ? Response.json({ assets: [] })
+        : new Response(bytes)) as unknown as typeof fetch;
+    const dir2 = await mkdtemp(join(tmpdir(), "trim-dl-"));
+    await expect(ensureTrimmedModel(dir2, lock(), missing, "tok")).rejects.toThrow(/no asset/);
+  });
+
+  it("names the real release in the committed lock", async () => {
+    expect((await readTrimmedLock()).release).toEqual({
+      repo: "pfvaldez/Zero-Latency",
+      tag: "model-trimmed-v1",
+    });
   });
 });

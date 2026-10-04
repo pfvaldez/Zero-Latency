@@ -37,10 +37,16 @@ export interface TrimmedLock {
   /** sha256 of packages/pack/trim/keep-ids.json (the kept rows of the base vocabulary, in order). */
   keepIdsSha256: string;
   keepCount: number;
+  /** The GitHub Release that holds the files, one asset per file (see releaseAssetName). */
+  release: { repo: string; tag: string };
   files: ModelFile[];
 }
 
-/** Where `pipeline asknoor.trim.run apply` (or a release download) puts the trimmed folder. */
+export const TRIMMED_RELEASE = { repo: "pfvaldez/Zero-Latency", tag: "model-trimmed-v1" } as const;
+/** The asset name of a model file: folders are flattened, so onnx/model_quantized.onnx is onnx__model_quantized.onnx. */
+export const releaseAssetName = (path: string) => path.replaceAll("/", "__");
+
+/** Where `pipeline asknoor.trim.run apply` (or ensureTrimmedModel) puts the trimmed folder. */
 export const TRIMMED_CACHE = join(REPO_ROOT, ".cache", "trimmed", PACK_MODEL_ID);
 export const KEEP_IDS_PATH = join(HERE, "..", "trim", "keep-ids.json");
 export const TRIMMED_RECIPE =
@@ -125,6 +131,68 @@ export async function verifyTrimmedDir(
   return true;
 }
 
+/**
+ * Where to fetch each release asset. A public repository serves them from the plain download URL.
+ * A private one answers 404 there, so with GITHUB_TOKEN (or GH_TOKEN) set we ask the API for the
+ * asset URLs and send the token. The token is read from the environment and never stored.
+ */
+async function releaseSources(
+  lock: TrimmedLock,
+  token: string | undefined,
+  fetchFile: typeof fetch,
+): Promise<(path: string) => { url: string; init?: RequestInit }> {
+  const { repo, tag } = lock.release;
+  if (!token) {
+    return (path) => ({
+      url: `https://github.com/${repo}/releases/download/${tag}/${releaseAssetName(path)}`,
+    });
+  }
+  const headers = { Authorization: `Bearer ${token}`, "X-GitHub-Api-Version": "2022-11-28" };
+  const res = await fetchFile(`https://api.github.com/repos/${repo}/releases/tags/${tag}`, {
+    headers: { ...headers, Accept: "application/vnd.github+json" },
+  });
+  if (!res.ok) throw new Error(`release lookup failed (${res.status}): ${repo} ${tag}`);
+  const assets = ((await res.json()) as { assets: { name: string; url: string }[] }).assets;
+  return (path) => {
+    const asset = assets.find((a) => a.name === releaseAssetName(path));
+    if (!asset) throw new Error(`release ${tag} has no asset ${releaseAssetName(path)}`);
+    if (!asset.url.startsWith("https://api.github.com/"))
+      throw new Error(`refusing to send the token to ${asset.url}`);
+    return {
+      url: asset.url,
+      init: { headers: { ...headers, Accept: "application/octet-stream" } },
+    };
+  };
+}
+
+/** Download any missing or corrupted trimmed file from the GitHub Release and verify it against the lock. */
+export async function ensureTrimmedModel(
+  dir = TRIMMED_CACHE,
+  lock?: TrimmedLock,
+  fetchFile: typeof fetch = fetch,
+  token: string | undefined = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN,
+): Promise<string> {
+  const l = lock ?? (await readTrimmedLock());
+  let source: Awaited<ReturnType<typeof releaseSources>> | undefined;
+  for (const file of l.files) {
+    const path = join(dir, file.path);
+    if (await fileMatches(path, file)) continue;
+    source ??= await releaseSources(l, token, fetchFile);
+    const { url, init } = source(file.path);
+    const res = await fetchFile(url, init);
+    if (!res.ok) throw new Error(`download failed (${res.status}): ${url}`);
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    if (bytes.length !== file.size || sha256(bytes) !== file.sha256) {
+      throw new Error(
+        `${file.path}: the download does not match model-trimmed.lock.json (size or sha256)`,
+      );
+    }
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, bytes);
+  }
+  return dir;
+}
+
 /** Copy the verified trimmed model to `<root>/model/<PACK_MODEL_ID>/…`. It is never downloaded unverified. */
 export async function stageTrimmedModel(root: string, from = TRIMMED_CACHE): Promise<string> {
   const lock = await readTrimmedLock();
@@ -159,6 +227,7 @@ export async function writeTrimmedLock(dir = TRIMMED_CACHE): Promise<TrimmedLock
     recipe: TRIMMED_RECIPE,
     keepIdsSha256: sha256(await readFile(KEEP_IDS_PATH)),
     keepCount: keep.length,
+    release: TRIMMED_RELEASE,
     files,
   };
   await writeFile(

@@ -110,3 +110,18 @@ describe("docs/DATA_CARD.md", () => {
     }
   });
 });
+
+describe("trim fidelity figures", () => {
+  it("are the committed measurements, and docs/EVAL.md cites that file with the same numbers", () => {
+    const doc = JSON.parse(read("content/ondera-noor/eval/trim-fidelity.json")) as {
+      byLanguage: Record<string, { identical: number }>;
+    };
+    const eval_ = read("docs/EVAL.md");
+    expect(eval_).toContain("content/ondera-noor/eval/trim-fidelity.json");
+    for (const [lang, v] of Object.entries(doc.byLanguage)) {
+      if (lang === "content")
+        expect(eval_).toContain(`${(v.identical * 100).toFixed(2).replace(/0$/, "")}%`);
+      else expect(eval_).toContain(v.identical.toFixed(2));
+    }
+  });
+});

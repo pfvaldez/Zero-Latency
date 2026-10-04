@@ -11,6 +11,7 @@ so the trimmed model can be reproduced without the text corpora.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import sys
@@ -115,6 +116,28 @@ def apply(keep_path: Path, out: Path) -> dict:
     return write_model(keep, out / "multilingual-e5-small")
 
 
+def fidelity(keep_path: Path, trimmed_dir: Path, out: Path) -> dict:
+    """Measure how often the shipped trimmed tokenizer splits text exactly like the full one, and write it down."""
+    from tokenizers import Tokenizer
+
+    keep = json.loads(keep_path.read_text())
+    full = Tokenizer.from_file(str(BASE / "tokenizer.json"))
+    trimmed = Tokenizer.from_file(str(trimmed_dir / "multilingual-e5-small" / "tokenizer.json"))
+    held = {lang: [r for i, r in enumerate(rows) if i % HOLD == 0][:300] for lang, rows in corpus_groups().items()}
+    seed = _lines(VOCAB_DIR / "seed_content.txt")[:400]
+    result = {lang: tokenization_fidelity(full, trimmed, keep, rows) for lang, rows in held.items()}
+    result["content"] = tokenization_fidelity(full, trimmed, keep, seed)
+    doc = {
+        "what": "Share of text that the trimmed tokenizer splits into exactly the pieces of the full tokenizer (identical), and the share of pieces dropped.",
+        "keepCount": len(keep),
+        "heldOut": "every 20th line of the Wikipedia and Tatoeba (and FLEURS wo train) corpus, first 300 per language; never used to choose the keep list. content = our own clip text, translations and interface strings (400 lines), which the keep list covers by construction.",
+        "tokenizerSha256": hashlib.sha256((trimmed_dir / "multilingual-e5-small" / "tokenizer.json").read_bytes()).hexdigest(),
+        "byLanguage": result,
+    }
+    out.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
+    return doc
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="asknoor.trim.run")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -123,8 +146,14 @@ def main(argv: list[str] | None = None) -> int:
     a = sub.add_parser("apply")
     a.add_argument("--keep", type=Path, required=True)
     a.add_argument("--out", type=Path, required=True)
+    f = sub.add_parser("fidelity")
+    f.add_argument("--keep", type=Path, required=True)
+    f.add_argument("--trimmed", type=Path, required=True)
+    f.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
-    if args.command == "sweep":
+    if args.command == "fidelity":
+        print(json.dumps(fidelity(args.keep, args.trimmed, args.out)["byLanguage"]))
+    elif args.command == "sweep":
         sweep(args.scales)
     else:
         print(apply(args.keep, args.out))
