@@ -1,3 +1,4 @@
+import { t } from "@asknoor/core";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ServicesProvider } from "@/services/context.tsx";
@@ -36,6 +37,7 @@ describe("AskPanel", () => {
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Yes, play it" }));
     expect(onPlay).toHaveBeenCalledWith(expect.objectContaining({ id: "c2-m1", clipId: 2 }));
+    expect(matcher.queries).toEqual(["How are cherries picked?"]); // control: an ordinary question does reach the matcher
     expect(outbox.items).toEqual([]);
   });
 
@@ -83,5 +85,17 @@ describe("AskPanel", () => {
     await type("How are cherries picked?");
     await screen.findByText(/Noor talks about/);
     expect(screen.queryByText(/0\.9500/)).not.toBeInTheDocument();
+  });
+
+  it("shows the draft label on the confirm card for a draft language in a demo pack", async () => {
+    const matcher = new FakeMatcher([{ momentId: "c2-m1", score: 0.95 }]);
+    render(
+      <ServicesProvider services={testServices({ matcher })}>
+        <AskPanel lang="de" manifest={manifest} onPlay={() => {}} />
+      </ServicesProvider>,
+    );
+    await type("Wie werden die Kirschen gepflückt?", "Fragen");
+    await screen.findByText(/Noor spricht über|Noor/);
+    expect(screen.getAllByText(t("de", "labels.draftTranslation")).length).toBeGreaterThan(0);
   });
 });

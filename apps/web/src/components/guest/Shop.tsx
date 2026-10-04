@@ -1,5 +1,5 @@
 import { type FarmPackManifest, t, type VisitorLang } from "@asknoor/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/animate-ui/components/buttons/button";
 import {
   Sheet,
@@ -22,15 +22,44 @@ export function Shop({ lang, manifest }: { lang: VisitorLang; manifest: FarmPack
   const [qty, setQty] = useState<Record<string, number>>({});
   const [open, setOpen] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [code, setCode] = useState("");
+  const [problem, setProblem] = useState<"wrong" | "missing" | null>(null);
+  const [wrongTries, setWrongTries] = useState(0);
+  const [lockedUntil, setLockedUntil] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
+  const secondsLeft = Math.max(0, Math.ceil((lockedUntil - now) / 1000));
+  // While locked, tick once a second so the countdown (and the unlock) show.
+  useEffect(() => {
+    if (lockedUntil <= Date.now()) return;
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [lockedUntil]);
   const order = orderTotal(qty, products);
   const change = (id: string, by: number) =>
     setQty((q) => ({ ...q, [id]: Math.max(0, (q[id] ?? 0) + by) }));
 
-  const confirm = async () => {
-    if (await confirmOrder(outbox, manifest, qty)) {
+  const confirm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (secondsLeft > 0) return;
+    const result = await confirmOrder(outbox, manifest, qty, code);
+    setCode("");
+    if (result.ok) {
       setConfirmed(true);
       setQty({});
       setOpen(false);
+      setProblem(null);
+      setWrongTries(0);
+    } else if (result.reason === "no-code") {
+      setProblem("missing");
+    } else if (result.reason === "wrong-code") {
+      setProblem("wrong");
+      const tries = wrongTries + 1;
+      setWrongTries(tries);
+      if (tries % 3 === 0) {
+        setLockedUntil(Date.now() + 30_000);
+        setNow(Date.now());
+      }
     }
   };
 
@@ -100,11 +129,36 @@ export function Shop({ lang, manifest }: { lang: VisitorLang; manifest: FarmPack
               {t(lang, "shop.total", { total: order.total, currency: order.currency })}
             </p>
           )}
-          <div className="p-4">
-            <Button className="w-full" onClick={confirm}>
+          <form onSubmit={confirm} className="flex flex-col gap-2 p-4">
+            <label htmlFor="farm-code" className="font-bold">
+              {t(lang, "shop.codeLabel")}
+            </label>
+            <input
+              id="farm-code"
+              type="password"
+              inputMode="numeric"
+              autoComplete="off"
+              maxLength={4}
+              className="min-h-11 w-32 rounded-md border border-input bg-card px-3 text-lg"
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+            />
+            <p className="text-base font-bold">{t(lang, "labels.prototypeControl")}</p>
+            {problem === "wrong" && secondsLeft === 0 && (
+              <p role="alert">{t(lang, "shop.codeWrong")}</p>
+            )}
+            {problem === "missing" && <p role="alert">{t(lang, "shop.codeMissing")}</p>}
+            {secondsLeft > 0 && (
+              <p role="alert">{t(lang, "shop.codeLocked", { seconds: secondsLeft })}</p>
+            )}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={code.length !== 4 || secondsLeft > 0}
+            >
               {t(lang, "shop.noorConfirms")}
             </Button>
-          </div>
+          </form>
         </SheetContent>
       </Sheet>
     </section>

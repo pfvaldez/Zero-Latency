@@ -33,12 +33,12 @@ The test references are checked by `content/docs.test.ts`: every `` `file` :: `t
 
 ## 4. Human oversight
 
-What exists today: the `checks.json` mechanism and the pack gating. **By design, not built:** Noor's held report and reviewer approval. The guest's confirm card and the order sheet (`Noor confirms your payment in person.`) are built in the guest app; the order is stored only after that tap (`apps/web/src/components/guest/shop-feedback.test.tsx` :: `stores nothing when the guest orders; the order is stored only when Noor confirms payment`).
+What exists today: the `checks.json` mechanism and the pack gating. **By design, not built:** Noor's held report and reviewer approval. The guest's confirm card and the order sheet (`Noor confirms your payment in person.`) are built in the guest app; the order is stored only after that tap after Noor types her 4-digit farm code (`apps/web/src/components/guest/shop-feedback.test.tsx` :: `stores nothing when the guest orders; the order is stored only after Noor enters her farm code`; `apps/web/src/components/guest/shop-feedback.test.tsx` :: `a wrong code stores nothing and says so; three wrong codes lock the form for 30 seconds`; `packages/core/test/farm-code.test.ts` :: `accepts the right code and rejects every wrong one`). **The farm code is a prototype control**: the pack holds a salted PBKDF2 hash (never the code), but a 4-digit code has 10,000 values, so someone with the pack can find it offline; it stops a guest tapping the button, not an attacker. The real confirmation belongs on Noor's own device or the dashboard.
 
 - **Checks:** nothing is checked until a person signs an entry in `checks.json` (who, when). A subtitle check is bound to the exact text it approved: new or regenerated text makes it a draft again.
 - **The guest decides:** the phone shows a topic label and the guest confirms before anything plays; below the threshold the question is saved for Noor.
 - **Noor's text:** held until a Wolof speaker checks the template and a reviewer approves (to be built).
-- **Orders:** counted only after Noor confirms payment in person (schema enforced; the screen is to be built).
+- **Orders:** counted only after Noor confirms payment in person: the schema requires `confirmedByNoor`, and the guest app stores an order only after Noor enters her 4-digit farm code (a prototype control, see row 6).
 
 ## 5. Honest trade-offs
 

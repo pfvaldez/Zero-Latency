@@ -30,7 +30,7 @@ export function FeedbackForm({
       <h2 id="feedback-title" className="text-2xl font-bold">
         {t(lang, "feedback.title")}
       </h2>
-      <p className="text-sm">{t(lang, "feedback.privacy")}</p>
+      <p className="text-base">{t(lang, "feedback.privacy")}</p>
       <form onSubmit={submit} className="flex flex-col gap-3">
         <Field
           id="loved"

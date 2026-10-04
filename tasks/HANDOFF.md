@@ -22,7 +22,7 @@ Branch `feat/guest-app`, draft PR #16. **Do not merge it until the guardrail rev
 
 Status at the last run (local, on this branch): `bun run check` clean, `bun run typecheck` clean, `bun run test` 617 passed, `bun run test:model` 10 passed, `bun run e2e` 3 passed. **CI had not reported on PR #16 when I wrote this, and the e2e step in the CI `model` job has never run in CI**: if it fails there, fix or drop that step, do not skip the local e2e. The guardrail-reviewer returned **FAIL** (section 1b).
 
-## 1b. Guardrail review of PR #16: FAIL, fix these before anything else (blocks merging)
+## 1b. Guardrail review of PR #16: FAIL on the first read; items 1 to 5 were fixed on 2026-10-04 (autopilot), see the top of this file for the re-review result
 
 The reviewer read the diff only (it ran nothing). Everything else in the ten non-negotiables passed (offline wiring, safety before matcher and nothing stored, redaction, no secrets, no Groq or ElevenLabs, nothing plays before Yes).
 
@@ -96,3 +96,7 @@ VITE_PACK_BASE=/packs/ondera-noor/demo bun run dev
 5. **Our take.** A 44 MB offline model (the full one is 135 MB) with the same held-out top-1 (91.1%); safety questions 16 of 16 sent to the card and 0 ordinary questions wrongly sent (`docs/EVAL.md`); honest limits: 116 synthetic questions written by us, wide intervals on the held-out halves, Wolof quality is weak and drafted, de/nl/sv are unchecked drafts, the threshold was not checked on phone vectors, and no real guests yet.
 
 Label every stand-in on screen and in the narration: the voice is Preet standing in for Noor; the Wolof audio is AI-dubbed; the German, Dutch and Swedish text is a draft; the questions are synthetic.
+
+## Prototype farm code (demo)
+
+Orders are confirmed with Noor's 4-digit farm code. The pack carries only a salted PBKDF2 hash (`manifest.farmCode`, labeled `prototype`). **Demo and fixture code: `4827`** (a documented prototype value, not a real farm's code; `DEMO_FARM_CODE` in `packages/pack/src/fixture.ts`). A production pack is built with `ASKNOOR_FARM_CODE=<4 digits> bun run --cwd packages/pack build --mode production`; without it the pack has no code and the shop cannot confirm any order. Three wrong codes lock the form for 30 seconds. Limits: only 10,000 values, so someone holding the pack can find it offline; it is a speed bump, not security.

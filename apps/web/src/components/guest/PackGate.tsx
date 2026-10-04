@@ -46,7 +46,7 @@ export function PackGate({
           <Button onClick={onDownload}>{t(lang, "pack.retry")}</Button>
         </>
       )}
-      <p className="text-sm">{t(lang, "pack.storage")}</p>
+      <p className="text-base">{t(lang, "pack.storage")}</p>
     </section>
   );
 }

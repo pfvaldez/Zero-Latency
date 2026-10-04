@@ -80,7 +80,7 @@ Evidence still to collect (Preet, with source, year and country): tourism arriva
 | FR-06 | Store saved questions locally with a device-assigned theme | P0 | Item appears in outbox with a client UUID |
 | FR-07 | End-of-tour feedback (loved, change) | P0 | Stored in outbox with themes |
 | FR-08 | Fun facts, recipe card, farm card | P0 | Only checked add-ons in production; farm card says "call or text" |
-| FR-09 | Shop, order sheet, Noor confirms payment | P0 | Order stored only after Noor taps confirm; no payment processing |
+| FR-09 | Shop, order sheet, Noor confirms payment | P0 | Order stored only after Noor enters her 4-digit farm code (prototype control: salted hash in the pack); no payment processing |
 | FR-10 | Sync outbox when online; idempotent; retries | P0 | Duplicate uploads create no duplicate rows; pending count shown |
 | FR-11 | Cooperative sign-in and dashboard | P0 | Only signed-in cooperative members can read their farm's data |
 | FR-12 | Monthly report from checked template; "held" if template unchecked | P0 | Body contains only template text and counts |

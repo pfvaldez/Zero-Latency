@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { type FarmPackManifest, t } from "@asknoor/core";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -112,5 +114,52 @@ describe("Player", () => {
     await vi.waitFor(() => expect(button).toBeEnabled());
     fireEvent.click(button);
     expect(button).toBeInTheDocument();
+  });
+});
+
+describe("draft labels on every subtitle path in a demo pack", () => {
+  it("a stop opened from the stop list (no confirmed moment) shows the draft chip for a draft language, and none once the moments are checked", async () => {
+    await mountPlayer(fixtureManifest(), "de", 1);
+    await screen.findByText(/Willkommen auf der Fixture-Farm/);
+    expect(screen.getByText(t("de", "labels.draftTranslation"))).toBeInTheDocument();
+    cleanup();
+    // The fixture marks even its English as an unchecked draft; a checked clip shows no chip.
+    const checked = fixtureManifest();
+    for (const m of checked.moments) delete m.draft;
+    await mountPlayer(checked, "en", 1);
+    await screen.findByText(/Welcome to the fixture farm/);
+    expect(screen.queryByText(t("en", "labels.draftTranslation"))).not.toBeInTheDocument();
+  });
+
+  it("translates the AI-dubbed chip", async () => {
+    const m = fixtureManifest();
+    m.labels.aiDubbed = ["audio/clip01.m4a"];
+    await mountPlayer(m, "de", 1);
+    expect(await screen.findByText("KI-vertont")).toBeInTheDocument();
+    expect(screen.queryByText("AI-dubbed")).not.toBeInTheDocument();
+  });
+});
+
+describe("interface text is at least 16 px", () => {
+  const dir = join(import.meta.dirname);
+  const files = [
+    ...readdirSync(dir)
+      .filter((f) => f.endsWith(".tsx") && !f.includes(".test."))
+      .map((f) => join(dir, f)),
+    join(dir, "..", "animate-ui", "components", "buttons", "button.tsx"),
+    join(dir, "..", "animate-ui", "components", "radix", "sheet.tsx"),
+  ];
+  const small = /\btext-(xs|sm)\b|text-\[(\d|1[0-5])(\.\d+)?px\]/;
+
+  it("uses no text-xs, text-sm or sub-16px size in the guest components, the Button or the Sheet", () => {
+    expect(files.length).toBeGreaterThan(8);
+    for (const f of files) expect(small.test(readFileSync(f, "utf8")), f).toBe(false);
+  });
+
+  it("control: the pattern does catch small text", () => {
+    for (const bad of ["text-sm", "text-xs font-bold", "text-[12px]", "text-[15.5px]"])
+      expect(small.test(bad), bad).toBe(true);
+    for (const ok of ["text-base", "text-xl", "text-[16px]", "text-2xl"])
+      expect(small.test(ok), ok).toBe(false);
   });
 });

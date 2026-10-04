@@ -1,4 +1,4 @@
-import { type FarmPackManifest, t, type VisitorLang } from "@asknoor/core";
+import { type FarmPackManifest, I18N_STATUS, t, type VisitorLang } from "@asknoor/core";
 
 /** Every stand-in, draft and synthetic voice is labeled (non-negotiable 9). Demo packs only, except the disclosed stand-in voice. */
 export function VoiceLabels({
@@ -14,10 +14,10 @@ export function VoiceLabels({
   const synthetic = manifest.labels.syntheticVoice.includes(audio);
   const aiDubbed = manifest.labels.aiDubbed.includes(audio);
   return (
-    <ul className="flex flex-wrap gap-2 text-sm font-bold">
+    <ul className="flex flex-wrap gap-2 text-base font-bold">
       {standIn && <Chip>{t(lang, "labels.standInVoice", { person: standIn.person })}</Chip>}
       {synthetic && <Chip>{t(lang, "labels.aiVoice")}</Chip>}
-      {aiDubbed && <Chip>AI-dubbed</Chip>}
+      {aiDubbed && <Chip>{t(lang, "labels.aiDubbed")}</Chip>}
     </ul>
   );
 }
@@ -32,13 +32,15 @@ export function DemoNotes({
   drafts: boolean;
 }) {
   if (manifest.mode !== "demo") return null;
+  // The interface text itself (de, nl, sv) is an unchecked draft too.
+  const interfaceDraft = I18N_STATUS[lang] === "draft";
   return (
-    <ul className="flex flex-wrap gap-2 text-sm font-bold">
+    <ul className="flex flex-wrap gap-2 text-base font-bold">
       <Chip>{t(lang, "labels.demo")}</Chip>
       {manifest.labels.standIn.map((what) => (
         <Chip key={what}>{t(lang, "labels.standIn", { what })}</Chip>
       ))}
-      {drafts && <Chip>{t(lang, "labels.draftTranslation")}</Chip>}
+      {(drafts || interfaceDraft) && <Chip>{t(lang, "labels.draftTranslation")}</Chip>}
     </ul>
   );
 }

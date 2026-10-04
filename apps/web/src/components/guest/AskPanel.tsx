@@ -109,7 +109,10 @@ export function AskPanel({
             })}
           </p>
           {demo && (
-            <p className="text-sm font-bold">{`${t(lang, "labels.demo")}: ${view.score.toFixed(4)}`}</p>
+            <p className="text-base font-bold">{`${t(lang, "labels.demo")}: ${view.score.toFixed(4)}`}</p>
+          )}
+          {demo && view.moment.draft?.[lang] && (
+            <p className="text-base font-bold">{t(lang, "labels.draftTranslation")}</p>
           )}
           <div className="flex gap-2">
             <Button onClick={() => onPlay(view.moment)}>{t(lang, "ask.yes")}</Button>
@@ -127,7 +130,7 @@ export function AskPanel({
           <h3 className="text-xl font-bold">{t(lang, "ask.saved.title")}</h3>
           <p>{t(lang, "ask.saved.body")}</p>
           {demo && last && (
-            <p className="text-sm font-bold">{`${t(lang, "labels.demo")}: ${(last.top[0]?.score ?? 0).toFixed(4)}`}</p>
+            <p className="text-base font-bold">{`${t(lang, "labels.demo")}: ${(last.top[0]?.score ?? 0).toFixed(4)}`}</p>
           )}
         </div>
       )}

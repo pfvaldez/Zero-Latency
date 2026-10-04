@@ -1,4 +1,10 @@
-import type { Addon, FarmPackManifest, OutboxItem, VisitorLang } from "@asknoor/core";
+import {
+  type Addon,
+  type FarmPackManifest,
+  type OutboxItem,
+  type VisitorLang,
+  verifyFarmCode,
+} from "@asknoor/core";
 import type { Outbox } from "@/services/types.ts";
 
 export type Product = Extract<Addon, { kind: "product" }>;
@@ -27,14 +33,25 @@ export function orderTotal(
   return { total, complete, currency: products[0]?.currency ?? "", lines };
 }
 
-/** Stored only after Noor confirms payment (non-negotiable 6). */
+export type ConfirmResult =
+  | { ok: true; item: OutboxItem }
+  | { ok: false; reason: "empty" | "no-code" | "wrong-code" };
+
+/**
+ * Stored only after Noor confirms payment with her farm code (non-negotiable 6). The code is checked
+ * against the salted hash in the pack; a pack without one cannot confirm an order at all.
+ * PROTOTYPE CONTROL: see core/src/farm-code.ts for its limits.
+ */
 export async function confirmOrder(
   outbox: Outbox,
   manifest: FarmPackManifest,
   quantities: Record<string, number>,
-): Promise<OutboxItem | null> {
+  code: string,
+): Promise<ConfirmResult> {
   const { total, currency, lines } = orderTotal(quantities, productsOf(manifest));
-  if (lines.length === 0) return null;
+  if (lines.length === 0) return { ok: false, reason: "empty" };
+  if (!manifest.farmCode) return { ok: false, reason: "no-code" };
+  if (!(await verifyFarmCode(code, manifest.farmCode))) return { ok: false, reason: "wrong-code" };
   const item: OutboxItem = {
     type: "order",
     id: crypto.randomUUID(),
@@ -46,5 +63,5 @@ export async function confirmOrder(
     createdAt: new Date().toISOString(),
   };
   await outbox.add(item);
-  return item;
+  return { ok: true, item };
 }
