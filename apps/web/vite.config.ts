@@ -5,6 +5,7 @@ import { fileURLToPath, URL } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 
 // The ONNX runtime's WebAssembly files must come from our own origin: Transformers.js would
 // otherwise fetch them from a CDN, which the offline tour cannot do. They are copied from the
@@ -31,7 +32,34 @@ function copyOrt(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), copyOrt()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    copyOrt(),
+    VitePWA({
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.ts",
+      injectRegister: false, // main.tsx registers it, in production builds only
+      manifest: {
+        name: "Ask Noor",
+        short_name: "Ask Noor",
+        description: "An offline tour of the farm, in Noor's own voice.",
+        display: "standalone",
+        start_url: "/",
+        background_color: "#f3e5d0",
+        theme_color: "#3b2314",
+        icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }],
+      },
+      injectManifest: {
+        // The shell and the ONNX runtime. The farm pack is NOT precached: it is downloaded once into
+        // its own cache. The bundler also emits a hashed copy of the wasm that we never load.
+        globPatterns: ["**/*.{js,css,html,svg,woff,woff2,wasm,mjs,webmanifest}"],
+        globIgnores: ["packs/**", "assets/ort-wasm-*"],
+        maximumFileSizeToCacheInBytes: 40_000_000,
+      },
+    }),
+  ],
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },

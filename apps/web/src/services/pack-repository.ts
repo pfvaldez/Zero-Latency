@@ -100,7 +100,7 @@ export class LocalPackRepository implements PackRepository {
     const total = files.reduce((n, f) => n + f.size, 0) || 1;
     let done = 0;
     for (const { path, size } of files) {
-      const res = await this.fetchFile(this.url(path));
+      const res = await this.fetchFile(this.url(path), { cache: "reload" });
       if (!res.ok) throw new Error(`download failed (${res.status}): ${path}`);
       const bytes = await res.arrayBuffer();
       const expected = manifest.checksums[path];

@@ -12,6 +12,11 @@ const services = createServices();
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing #root element");
 
+// The offline tour needs the service worker, so it is registered in production builds only.
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js", { type: "module" }).catch(() => {});
+}
+
 createRoot(root).render(
   <StrictMode>
     <ServicesProvider services={services}>
