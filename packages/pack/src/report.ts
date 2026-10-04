@@ -1,6 +1,6 @@
 // docs/EVAL.md: generated text from the evaluation results. Pure string building.
 
-import type { Fold, Metrics, PooledMetrics } from "@asknoor/core";
+import type { Fold, Metrics, PooledMetrics, WolofEvidence } from "@asknoor/core";
 
 const pct = (x: number, digits = 1) => `${(x * 100).toFixed(digits)}%`;
 const ci = (c: { low: number; high: number }) => `${pct(c.low, 0)} to ${pct(c.high, 0)}`;
@@ -48,6 +48,7 @@ export interface EvalResults {
     falseConfirm: { low: number; high: number };
     coverage: { low: number; high: number };
   };
+  wolof: WolofEvidence | null;
   study: {
     name: string;
     fullSetPick: number | null;
@@ -184,6 +185,89 @@ function studySection(r: EvalResults): string[] {
   return out;
 }
 
+const chrfOf = (w: WolofEvidence, name: string) => w.flores?.directions[name];
+const shorten = (text: string, max = 160) =>
+  text.length > max ? `${text.slice(0, max)}… (${text.length} characters)` : text;
+
+function wolofSection(w: WolofEvidence | null): string[] {
+  const out: string[] = ["## Wolof evidence", ""];
+  if (!w || (!w.flores && !w.fleurs && !w.roundtrip)) {
+    out.push(
+      "Not run yet. (`uv run --group translate python -m asknoor.evidence.run`; see `docs/PACK.md`.)",
+      "",
+    );
+    return out;
+  }
+  out.push(
+    "How good are the machine translation and speech recognition the Wolof drafts and the dub evaluation depend on? Local runs, never in the product; **NLLB and MMS are CC-BY-NC-4.0 (non-commercial)**. chrF is 0 to 100 (higher is better). Sample sizes are in every row.",
+    "",
+  );
+  if (w.flores) {
+    const f = w.flores;
+    out.push(
+      `### Machine translation: FLORES-200 ${f.split} (NLLB-200 distilled 600M)`,
+      "",
+      `${f.n} sentences${f.sampled ? ` sampled from ${f.sentences_in_split} (seed ${f.seed})` : " (the whole split)"}, the same sentences in every direction.`,
+      "",
+      "| Direction | chrF | Sentences |",
+      "|---|---|---|",
+    );
+    for (const [name, d] of Object.entries(f.directions))
+      out.push(`| ${name.replaceAll("_Latn", "")} | ${d.chrf} | ${d.n} |`);
+    const wo = chrfOf(w, "eng_Latn to wol_Latn");
+    const de = chrfOf(w, "eng_Latn to deu_Latn");
+    if (wo && de) {
+      out.push(
+        "",
+        `English to Wolof scores ${wo.chrf} and English to German ${de.chrf}: Wolof is **${(de.chrf - wo.chrf).toFixed(1)} chrF points ${de.chrf >= wo.chrf ? "lower" : "higher"}**.`,
+      );
+    }
+    out.push("");
+  }
+  if (w.fleurs) {
+    const f = w.fleurs;
+    out.push(
+      "### Speech recognition: MMS-1b-all with the Wolof adapter on FLEURS Wolof",
+      "",
+      `${f.n} utterances sampled from ${f.utterances_in_split} (seed ${f.seed}), ${f.reference_words} reference words, ${f.audio_seconds} s of audio. Same normalization on both sides (lowercase, no punctuation).`,
+      "",
+      "| Metric | Value |",
+      "|---|---|",
+      `| Word error rate | ${(f.wer * 100).toFixed(1)}% |`,
+      `| Character error rate | ${(f.cer * 100).toFixed(1)}% |`,
+      "",
+      "Wolof spelling varies, so the word error rate likely overstates the real errors and the character error rate is probably the fairer number (this run did not measure that).",
+      "",
+    );
+  }
+  if (w.roundtrip) {
+    const r = w.roundtrip;
+    out.push(
+      "### Round trip on the AI-dubbed Wolof clips",
+      "",
+      `MMS Wolof transcript, then NLLB Wolof to English, then chrF against Preet's English script. **n = ${r.n} clips**; pooled chrF **${r.pooled_chrf}**.`,
+      "",
+      "| Clip | chrF | Back to English (machine) |",
+      "|---|---|---|",
+    );
+    for (const c of r.clips)
+      out.push(`| ${c.clip} | ${c.chrf} | ${shorten(c.back_to_english.replaceAll("|", "/"))} |`);
+    out.push("");
+  }
+  const back = chrfOf(w, "wol_Latn to eng_Latn");
+  if (w.roundtrip && w.fleurs && back) {
+    out.push(
+      `**Where it breaks (an inference, not a measurement):** on clean FLORES text NLLB's Wolof to English scores ${back.chrf}, and on real FLEURS speech MMS makes ${(w.fleurs.cer * 100).toFixed(1)}% character errors; the dubs round-trip at ${w.roundtrip.pooled_chrf}, far below what either stage suggests (the numbers are different metrics on different material, so they are not directly comparable). That points at the dubbed audio (or MMS on synthetic speech) more than at the translation step, but a Wolof speaker listening to the clips is the only real test.`,
+      "",
+    );
+  }
+  out.push(
+    `**Limits:** the round trip is ${w.roundtrip?.n ?? 0} clips, so it is an anecdote, not a benchmark; FLEURS is read speech by volunteers and the dubs are synthetic speech, so neither number transfers to a farm tour; a low chrF here means the machine drafts need a Wolof speaker, which is exactly how they are treated (drafts, demo only). The round trip compounds two errors (recognition and translation) and cannot say which one is at fault. These runs used a length-sorted batch order and an output-length cap that the committed translation drafts did not, so the two are slightly different generation settings.`,
+    "",
+  );
+  return out;
+}
+
 export function renderEval(r: EvalResults): string {
   const p = r.primary;
   const lines: string[] = [];
@@ -235,6 +319,7 @@ export function renderEval(r: EvalResults): string {
   for (const x of r.byVariant) lines.push(row(`variant ${x.name}`, x.m));
   lines.push("");
   lines.push(...studySection(r));
+  lines.push(...wolofSection(r.wolof));
   lines.push("## The overnight loop (clip 8 held back, then published)", "");
   lines.push(
     "Same threshold, same questions. Before the answer is published the overnight questions have no answer and should be saved for Noor; after the next pack includes it they should match.",

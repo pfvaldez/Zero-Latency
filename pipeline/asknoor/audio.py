@@ -79,10 +79,19 @@ def probe(path: Path) -> dict:
     return {"codec": codec, "sample_rate": rate, "channels": channels}
 
 
-def decode(path: Path, channels: int = 2) -> np.ndarray:
-    """Decode to float32 samples at 48 kHz, shape (frames, channels)."""
+def decode(path: Path, channels: int = 2, sample_rate: int = SAMPLE_RATE) -> np.ndarray:
+    """Decode to float32 samples (48 kHz unless asked otherwise), shape (frames, channels)."""
     raw = _run(
-        ["-v", "error", "-i", str(path), "-f", "f32le", "-ac", str(channels), "-ar", str(SAMPLE_RATE), "-"]
+        ["-v", "error", "-i", str(path), "-f", "f32le", "-ac", str(channels), "-ar", str(sample_rate), "-"]
+    ).stdout
+    return np.frombuffer(raw, dtype="<f4").reshape(-1, channels).astype(np.float32)
+
+
+def decode_bytes(data: bytes, channels: int = 1, sample_rate: int = SAMPLE_RATE) -> np.ndarray:
+    """Like decode, for audio held in memory (a parquet cell, for example)."""
+    raw = _run(
+        ["-v", "error", "-i", "pipe:0", "-f", "f32le", "-ac", str(channels), "-ar", str(sample_rate), "-"],
+        stdin=data,
     ).stdout
     return np.frombuffer(raw, dtype="<f4").reshape(-1, channels).astype(np.float32)
 

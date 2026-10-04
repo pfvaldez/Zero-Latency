@@ -1,0 +1,166 @@
+{
+  "fleurs": {
+    "split": "wo_sn test",
+    "utterances_in_split": 371,
+    "seed": 4,
+    "audio_seconds": 1762,
+    "decode_seconds": 968,
+    "examples": [
+      {
+        "id": 1874,
+        "reference": "am na nit ñu yaakaar ne waxoon na dëgg wante nit ñu bare yaakaaru ñu loolu; muy jànt bi dafay wë suuf ci; boole ci jant bi ak yeneen bideew yi",
+        "hypothesis": "amna nit ñu yaakaar ni waxoon na degg wante nit ñu bari yaakaaru ñu loolu muy jànt bi dafay wee suuf si boole ci jànt bi ak yeneen bi déew yi"
+      },
+      {
+        "id": 2004,
+        "reference": "ci mbenuum weer beneen fafalnaaw genn na yoonam ca mashhad te mëkk benn miir rey fukki nit ak juróom ñaar",
+        "hypothesis": "ci mennu weer bennen falfanaw gén na yoonam ca makshat te mëkk na benn mir rey fukki nit ak juróom ñaar"
+      },
+      {
+        "id": 1919,
+        "reference": "gox bi moo nekkoon itam fiñu daan sukkandiku ngir yeek ci wolkan bu nyiragongo ak yenn ci montaañi gorilla yu gëna yomb yuñuy topp afrik",
+        "hypothesis": "gox bi moo nekkoon itam fu ñu daan sukkandikoo ngir jekk ci volcaanu nirayongo ak yenn ci montañu gorea yu gëna yombo yuñu topp afrik"
+      },
+      {
+        "id": 1756,
+        "reference": "lu yeex ci gaaawu njiitu réewu amerig donald trump ci ab wax bu mu wax jaaree ko ci sekereteeru tasskatu xibaar bi yëgle na takk deru waa amerig yi dinanu genn syrie",
+        "hypothesis": "lu yeex ci gaawu njiiti réewwuy amerig donald trump ci ab wax bumu wax jaare ko ci sekreteeru taskatu xibaar bi yëglena takk der waa amerig yi dina ñu gën riñ gën syri"
+      },
+      {
+        "id": 1766,
+        "reference": "amna atom yoo xamni seeni noyóo duñu taxaw benn barab soo leen laalee tuuti wala nga bañ leen laal ñu tàqaloo",
+        "hypothesis": "amna atom yoo xam ni seeni noiyo duñu taxaw benn barab soo leen laalee tuuti wala nga bañ leen laal ñu tàkkaloo"
+      }
+    ],
+    "wer": 0.3824,
+    "cer": 0.1199,
+    "n": 100,
+    "reference_words": 2427
+  },
+  "versions": {
+    "date": "2026-10-04",
+    "python": "3.12.12",
+    "torch": "2.14.1",
+    "transformers": "5.18.0",
+    "sacrebleu": "2.6.0",
+    "device": "cpu",
+    "nllb": {
+      "model": "facebook/nllb-200-distilled-600M",
+      "revision": "f8d333a098d19b4fd9a8b18f94170487ad3f821d",
+      "license": "CC-BY-NC-4.0"
+    },
+    "mms": {
+      "model": "facebook/mms-1b-all",
+      "revision": "3d33597edbdaaba14a8e858e2c8caa76e3cec0cd",
+      "adapter": "wol",
+      "license": "CC-BY-NC-4.0"
+    },
+    "flores": {
+      "source": "dl.fbaipublicfiles.com/nllb/flores200_dataset.tar.gz",
+      "license": "CC-BY-SA-4.0"
+    },
+    "fleurs": {
+      "source": "google/fleurs wo_sn test",
+      "revision": "70bb2e84b976b7e960aa89f1c648e09c59f894dd",
+      "license": "CC-BY-4.0"
+    }
+  },
+  "roundtrip": {
+    "n": 8,
+    "pooled_chrf": 15.29,
+    "signature": "nrefs:1|case:mixed|eff:yes|nc:6|nw:0|space:no|version:2.6.0",
+    "clips": [
+      {
+        "clip": 1,
+        "wolof_transcript": "dlljmt zmtl man lnur zmanjbt ygnñ lgttndw tig dnln wnsn cf dog ttortor bagt 5nks",
+        "back_to_english": "dlljmt zmtl can lnur zmanjbt ygnñ lgttndw tig dnln wnsn cf dog ttortor bagt 5nks",
+        "script": "Welcome to my farm. I'm Noor. My family has worked on this hillside for years. Today I'll show you how our coffee goes from a flower to your cup.",
+        "chrf": 7.51,
+        "seconds_of_audio": 12.0
+      },
+      {
+        "clip": 2,
+        "wolof_transcript": "sunu café ci cauhtun wilai mag ti cirgi menat o hunc te nor rec lanui dag ach lochoiji ben ben dafa jeich whaijé mo tach café gine te sav sucar",
+        "back_to_english": "our cafe in cauhtun wilai big cirgi menat o hunc and north fish lanui dag ach lochoiji ben ben jeich whaijé mo tach cafe gine and sav sugar",
+        "script": "Our coffee grows on the upper slope, in the shade. We pick only the red, ripe cherries, by hand, one by one. It's slow, but that's why the coffee tastes sweet.",
+        "chrf": 11.83,
+        "seconds_of_audio": 11.8
+      },
+      {
+        "clip": 3,
+        "wolof_transcript": "cichiñ chi kaw safara gi lanu koyoale te duñu bayi muk di koxeb dëglul dum binimuy pachalo ni papkorn loolu daflay oon niñur anje gi ye gena lol ndx xlbb",
+        "back_to_english": "we're going to hell and we're not going to hell and we're not going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell and we're going to hell",
+        "script": "We roast in a pan over the fire, and we never stop stirring. Listen: when the beans crack, like popcorn, they're almost ready. Smell that? That's my favorite time of the day.",
+        "chrf": 9.86,
+        "seconds_of_audio": 13.6
+      },
+      {
+        "clip": 4,
+        "wolof_transcript": "amna fokkak benet lee gi mangi ci sunu sàmbu kafa bi boo ci boole dañam njeg yu gambaxta dañuy jàngalan sama doom ju jigen daf may jàmpale ci ay wikan mëm moodu farli ñuy wera bi",
+        "back_to_english": "There's a bunch of benign animals that eat in our coffee shops when you combine a bunch of guinea pigs they teach my baby jigen to teach me how to cook",
+        "script": "I've been a member of the Ondera Coffee Cooperative for 11 years. Together we get better prices, and we teach each other. My daughter helps me on weekends; she's the one who set up this tour.",
+        "chrf": 18.76,
+        "seconds_of_audio": 11.6
+      },
+      {
+        "clip": 5,
+        "wolof_transcript": "ci sufu kafe bi danu jin bokah ñebe lolula samanjabut didundi telingen leke teysah amna chilu joge fufu rek",
+        "back_to_english": "in the coffee shop we are jin bokah they are cold cold samanjabut didundi telingen leke teysah have chilu joge fufu rek",
+        "script": "Below the coffee, we grow maize and beans. They feed my family through the year.",
+        "chrf": 24.54,
+        "seconds_of_audio": 12.0
+      },
+      {
+        "clip": 6,
+        "wolof_transcript": "woo mana yubsunu café kurga lyal sa gi ty de nano lako embalbu base tack",
+        "back_to_english": "can call our coffee company to send you the ty de nano lako packaging base tack",
+        "script": "Yes, you can take our coffee home! Ask your guide, and we'll pack it fresh for you.",
+        "chrf": 24.26,
+        "seconds_of_audio": 12.0
+      },
+      {
+        "clip": 7,
+        "wolof_transcript": "jon bijem chitulu café bi dafa tei ta dafai jel wahtu solal dalw digar tayoblndoh sula ye gi jafle wahko saged dinanu jal rek chi safugi",
+        "back_to_english": "jon bijem chitulu the cafe is located at the top of the dafai jel wahtu solal dalw digar tayoblndoh sula ye which jafle wahko sagedanu jal rek chi safugi",
+        "script": "The path up to the coffee is steep and takes some time. Wear good shoes and bring water. If the climb is hard for you, tell your guide and we'll stay down here.",
+        "chrf": 17.58,
+        "seconds_of_audio": 12.8
+      },
+      {
+        "clip": 8,
+        "wolof_transcript": "ama gunooy neegi leegi wante lingeen kolaaye baarena batax mangishi xala leegi leegi moom sengiid bi manaleen wax berab bu yeeg fi",
+        "back_to_english": "ama gunooy now wante lingeen kolaye barena letter mangishi think now he owns the sengiid you can say a few words here",
+        "script": "We don't have rooms yet, but so many of you have asked that I'm thinking about it. For now, your guide can suggest a place nearby.",
+        "chrf": 19.48,
+        "seconds_of_audio": 12.0
+      }
+    ]
+  },
+  "flores": {
+    "split": "devtest",
+    "sentences_in_split": 1012,
+    "n": 300,
+    "seed": 4,
+    "sampled": true,
+    "directions": {
+      "eng_Latn to wol_Latn": {
+        "chrf": 23.86,
+        "n": 300,
+        "signature": "nrefs:1|case:mixed|eff:yes|nc:6|nw:0|space:no|version:2.6.0",
+        "seconds": 346
+      },
+      "eng_Latn to deu_Latn": {
+        "chrf": 62.47,
+        "n": 300,
+        "signature": "nrefs:1|case:mixed|eff:yes|nc:6|nw:0|space:no|version:2.6.0",
+        "seconds": 179
+      },
+      "wol_Latn to eng_Latn": {
+        "chrf": 38.29,
+        "n": 300,
+        "signature": "nrefs:1|case:mixed|eff:yes|nc:6|nw:0|space:no|version:2.6.0",
+        "seconds": 134
+      }
+    }
+  }
+}

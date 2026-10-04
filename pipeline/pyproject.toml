@@ -10,7 +10,14 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest==8.4.1"]
+# Light and needed by the evidence tests, so CI installs them.
+dev = [
+    "pytest==8.4.1",
+    "jiwer==4.0.0",
+    "pyarrow==25.0.1",
+    "sacrebleu==2.6.0",
+]
+# Heavy (several GB of models): the translation drafts and the Wolof evidence runs. Never in CI.
 translate = [
     "torch==2.14.1",
     "transformers==5.18.0",

@@ -83,17 +83,15 @@ describe("docs/DATA_CARD.md", () => {
     expect(md).toContain(nllb as string);
   });
 
-  it("marks everything that is not pinned or used yet as planned", () => {
-    for (const name of [
-      "Meta MMS-1b-all",
-      "FLORES-200",
-      "FLEURS",
-      "Wikipedia text",
-      "Tatoeba sentences",
-    ]) {
+  it("marks what is not used yet as planned and what has been run as run", () => {
+    for (const name of ["Wikipedia text", "Tatoeba sentences"]) {
       const row = md.split("\n").find((l) => l.startsWith(`| ${name}`));
       expect(row, name).toBeDefined();
       expect(row, name).toMatch(/[Pp]lanned/);
+    }
+    for (const name of ["Meta MMS-1b-all", "FLORES-200", "FLEURS"]) {
+      const row = md.split("\n").find((l) => l.startsWith(`| ${name}`));
+      expect(row, name).toMatch(/Status: run/);
     }
     // Index-only passages are built now: the doc may describe them as present only if the code has the flag.
     expect(read("packages/core/src/schemas.ts")).toContain("indexOnly");

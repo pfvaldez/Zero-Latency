@@ -49,6 +49,7 @@ export {
   thresholdGrid,
   wilson,
 } from "./eval.ts";
+export { type WolofEvidence, WolofEvidenceSchema } from "./evidence.ts";
 export { decide } from "./guardrails/decide.ts";
 export { decideSafety, SAFETY_LEXICON } from "./guardrails/safety.ts";
 export {

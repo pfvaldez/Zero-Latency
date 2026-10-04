@@ -24,6 +24,7 @@ import {
   thresholdGrid,
   VISITOR_LANGS,
   type VisitorLang,
+  WolofEvidenceSchema,
   wilson,
 } from "@asknoor/core";
 import { dot, loadEmbedder } from "./embed.ts";
@@ -145,6 +146,18 @@ async function readIndexFile(farm: string) {
   try {
     const raw = JSON.parse(await readFile(join(contentDir(farm), "index-passages.json"), "utf8"));
     return IndexPassagesFileSchema.parse(raw);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+/** The Wolof evidence file, or null if the runs have not been done. */
+async function readWolofEvidence(farm: string) {
+  try {
+    return WolofEvidenceSchema.parse(
+      JSON.parse(await readFile(join(contentDir(farm), "eval", "wolof.json"), "utf8")),
+    );
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
     throw error;
@@ -407,6 +420,7 @@ export async function runEval(
       falseConfirm: wilson(primary.wrongClipConfirm + primary.confirmOnNever, primary.questions),
       coverage: wilson(primary.correctConfirm, primary.answered),
     },
+    wolof: await readWolofEvidence(farm),
     study: studyRows,
     leakage: audit
       ? {
