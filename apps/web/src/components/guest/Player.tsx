@@ -35,24 +35,29 @@ export function Player({
   const [cues, setCues] = useState<Cue[]>([]);
   const [nowMs, setNowMs] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const fellBack = !clip.subtitles[lang] && !!clip.subtitles.en;
-  const vttPath = clip.subtitles[lang] ?? clip.subtitles.en;
+  const [dub, setDub] = useState(false);
+  // The AI-dubbed Wolof version of the clip: demo packs only, offered for a whole stop (not a moment).
+  const dubbed = manifest.mode === "demo" && !moment ? clip.dubbed : undefined;
+  const wolof = dub && !!dubbed;
+  const audioPath = wolof && dubbed ? dubbed.audio : clip.audio;
+  const fellBack = !wolof && !clip.subtitles[lang] && !!clip.subtitles.en;
+  const vttPath = wolof ? dubbed?.subtitles : (clip.subtitles[lang] ?? clip.subtitles.en);
   // A subtitle is a draft if the moment being played, or any moment of this clip, is a draft in this language.
   const draft = (
     moment ? [moment] : manifest.moments.filter((m) => clip.momentIds.includes(m.id))
   ).some((m) => !!m.draft?.[lang]);
   const from = moment?.startMs ?? 0;
-  const to = moment?.endMs ?? clip.durationMs;
+  const to = moment?.endMs ?? (wolof && dubbed ? dubbed.durationMs : clip.durationMs);
 
   useEffect(() => {
     let live = true;
-    repo.blobUrl(clip.audio).then((u) => live && setSrc(u));
+    repo.blobUrl(audioPath).then((u) => live && setSrc(u));
     setCues([]);
     if (vttPath) repo.text(vttPath).then((v) => live && setCues(v ? parseVtt(v) : []));
     return () => {
       live = false;
     };
-  }, [repo, clip.audio, vttPath]);
+  }, [repo, audioPath, vttPath]);
 
   // Start at the moment's start as soon as the audio is loaded, so a confirmed match plays at once.
   useEffect(() => {
@@ -75,7 +80,14 @@ export function Player({
       <h2 id="player-title" className="text-2xl font-bold">
         {t(lang, "player.noorSays")}
       </h2>
-      <VoiceLabels lang={lang} manifest={manifest} audio={clip.audio} />
+      <VoiceLabels lang={lang} manifest={manifest} audio={audioPath} />
+      {wolof && (
+        <div className="flex flex-col gap-1">
+          <p className="text-base font-bold">{t(lang, "labels.aiDubbed")}</p>
+          <p className="text-base font-bold">{t(lang, "labels.wolofDraft")}</p>
+          <p className="text-base">{t(lang, "player.dubNote")}</p>
+        </div>
+      )}
       <DemoNotes lang={lang} manifest={manifest} drafts={draft} />
       {/* biome-ignore lint/a11y/useMediaCaption: the subtitles are the visible cue list below, from the pack's checked WebVTT */}
       <audio
@@ -89,6 +101,11 @@ export function Player({
           if (moment && el.currentTime * 1000 >= to) el.pause();
         }}
       />
+      {dubbed && (
+        <Button variant="outline" onClick={() => setDub((d) => !d)} aria-pressed={dub}>
+          {dub ? t(lang, "player.hearOriginal") : t(lang, "player.hearWolof")}
+        </Button>
+      )}
       <Button onClick={toggle} disabled={!src}>
         {playing ? t(lang, "player.pause") : t(lang, "player.play")}
       </Button>
