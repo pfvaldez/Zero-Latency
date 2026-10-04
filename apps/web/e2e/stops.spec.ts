@@ -16,6 +16,12 @@ test("offline: /stop/2 opens stop 2, and scanning the QR code for stop 3 opens s
   const problems: string[] = [];
   page.on("pageerror", (e) => problems.push(`page error: ${e.message}`));
 
+  // Force the scanner's own decoder (a worker), the path iPhones and Linux browsers use: they have no
+  // native BarcodeDetector. Chromium on a Mac has one, which would hide a broken worker.
+  await page.addInitScript(() => {
+    Reflect.deleteProperty(window, "BarcodeDetector");
+  });
+
   // Online: language and download.
   await page.goto("/");
   await page.getByRole("button", { name: "English" }).click();
@@ -41,10 +47,36 @@ test("offline: /stop/2 opens stop 2, and scanning the QR code for stop 3 opens s
   ).toBeVisible();
 
   // Scan: the fake camera shows NOOR-STOP-3, the roasting stop.
+  const consoleLines: string[] = [];
+  page.on("console", (m) => consoleLines.push(`${m.type()}: ${m.text()}`));
   await page.getByRole("button", { name: "Scan a stop code" }).click();
-  await expect(page.getByRole("heading", { name: "Noor's own recording" })).toBeVisible({
-    timeout: 30_000,
-  });
+  try {
+    await expect(page.getByRole("heading", { name: "Noor's own recording" })).toBeVisible({
+      timeout: 30_000,
+    });
+  } catch (error) {
+    // Say what the camera view looked like, so a failure on another machine can be diagnosed from the log.
+    const video = await page
+      .locator("video")
+      .evaluate((v: HTMLVideoElement) => ({
+        readyState: v.readyState,
+        width: v.videoWidth,
+        height: v.videoHeight,
+        paused: v.paused,
+        hasStream: !!v.srcObject,
+        barcodeDetector: "BarcodeDetector" in window,
+      }))
+      .catch((e: unknown) => String(e));
+    console.log(
+      "scan diagnostics",
+      JSON.stringify({
+        video,
+        console: consoleLines,
+        text: await page.locator("main").innerText(),
+      }),
+    );
+    throw error;
+  }
   await expect(page.getByText(/roast the coffee beans/)).toBeVisible();
 
   expect(watch.foreign, "requests to other origins").toEqual([]);
