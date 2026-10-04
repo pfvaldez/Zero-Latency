@@ -67,5 +67,4 @@ or the prepared audio is missing.
 
 ## Size
 
-The model files are about 135 MB of the pack; audio adds 1 to 2 MB. The P0 budget is 150 MB.
-Trimming the vocabulary (P1) is the lever if it grows.
+With the pinned full model the pack is about 135 MB (model files) plus 1 to 2 MB of audio, against the P0 budget of 150 MB. With the trimmed-vocabulary model (`bun run --cwd packages/pack build -- --model trimmed`, after `pipeline/asknoor/trim/run.py apply` has produced the folder from `packages/pack/trim/keep-ids.json`) the model files are 44.3 MB and the pack is about 46 MB, under the 50 MB target. The builder verifies the folder against `model-trimmed.lock.json` (every file's sha256 and the kept-id list's hash) and refuses a mismatch; the manifest then says `model.vocab: "trimmed"` with a `trim` block. The trimmed folder is a local build product, not committed; hosting it as a GitHub Release asset is a decision for the captain (not done).

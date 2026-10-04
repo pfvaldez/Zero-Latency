@@ -195,11 +195,32 @@ Best moment score per question, in 8 bins from 0.6 to 1.
 | Embedding matrix | 0.2 MB |
 | Prepared audio (local, if built) | 0.5 MB |
 | Estimated pack | 136.1 MB against the 150.0 MB P0 budget |
-| Model load (Node, build machine) | 505 ms |
-| Embedding the passages | 214 ms |
-| One question, median / p95 (116 questions) | 1.7 ms / 2.2 ms |
+| Model load (Node, build machine) | 541 ms |
+| Embedding the passages | 224 ms |
+| One question, median / p95 (116 questions) | 1.8 ms / 2.4 ms |
 
 **These timings are Node on the build machine, not a mid-range Android phone.** The phone numbers (model first load, question to outcome) come from the offline end-to-end run with the real worker.
+
+## Model size: full against trimmed vocabulary
+
+Status: run on 2026-10-04 (`bun run --cwd packages/pack compare-models`). The e5 model is 118 MB, of which about 96 MB is a 250,002-token embedding table, most of it for languages and words Ask Noor never sees. The trimmed variants keep the rows for tokens that occur in large public text in en, de, nl, sv and Wolof (Wikipedia, Tatoeba, FLEURS Wolof transcripts) and in our own content (never the test questions), plus every single character and every special token, and cut the rest. The kept rows are sliced from the shipped int8 table, so each is **byte-identical** to the full model's row; nothing is re-quantized. Acceptance rule, set before the run: pooled held-out top-1 within 2 points of the full model, and a pack under 50 MB.
+
+| Model | Model files | Held-out top-1 | vs full | Coverage | False confirm | Mean cosine to full | Load | One question, median / p95 | Within rule |
+|---|---|---|---|---|---|---|---|---|---|
+| full (118 MB int8) | 135.4 MB | 91.1% | +0 points | 73.2% | 3.0% | 1 | 458 ms | 1.8 / 2.5 ms | yes |
+| trim 0.5 (41 MB) | 41.1 MB | 91.1% | +0 points | 69.6% | 3.0% | 0.9981 | 76 ms | 1.8 / 2.8 ms | yes |
+| trim 0.75 (43 MB) | 42.9 MB | 91.1% | +0 points | 71.4% | 3.0% | 0.9991 | 84 ms | 1.9 / 4.2 ms | yes |
+| trim 1.0 (44 MB) | 44.3 MB | 91.1% | +0 points | 71.4% | 3.0% | 0.9995 | 111 ms | 1.9 / 2.3 ms | yes |
+| trim 1.25 (46 MB) | 45.5 MB | 91.1% | +0 points | 71.4% | 3.0% | 0.9997 | 110 ms | 1.7 / 2.3 ms | yes |
+| control: untrimmed, re-quantized from fp32 | 127.9 MB | 85.7% | -5.4 points | 71.4% | 3.0% | 0.9994 | 321 ms | 1.9 / 2.4 ms | **no** |
+| control: trim 1.0, re-quantized from fp32 | 44.3 MB | 85.7% | -5.4 points | 69.6% | 3.0% | 0.9991 | 128 ms | 1.7 / 2.3 ms | **no** |
+
+**Shipped: trim 1.0 (44 MB).** it keeps 52,005 rows and tracks the full model's vectors closely (mean cosine 0.9995) with the best coverage of the near-smallest, 3 MB larger than the smallest; the pack is still under 50 MB. Every row gets the same shipped threshold (0.8675) when it is chosen again on that model's own scores, so the threshold does not change.
+
+- **The two control rows are the reason the trimmed model is not re-quantized.** Re-quantizing from the fp32 weights (the obvious route) cost 5.4 points of held-out top-1 with or without trimming, so the loss came from the new quantization, not from the smaller vocabulary. With 56 answered held-out questions, that is 3 questions, which is within noise, but it fails the rule as written, so the shipped model slices the original int8 rows instead.
+- Held-out top-1 is the same for every sliced row; coverage differs by one or two questions (one question is 1.8 points), so do not read the order of the trimmed rows as a ranking.
+- A trimmed vocabulary is a risk for words not in the corpus. Words that were cut are split into the characters that remain, or become the unknown token. Content words are all kept (the segmentation of our own text is identical to the full tokenizer's for 99% of lines), but a guest's rare word may be tokenized differently from the full model; the matcher then sees a slightly different vector (mean cosine to full above), and the guest still confirms every match.
+- Timings are Node on the build machine, not a phone. The size of the file is what changes for the guest: a smaller one-time farm-pack download.
 
 ## Honest limits
 

@@ -26,7 +26,16 @@ import {
 } from "@asknoor/core";
 import { DIM, loadEmbedder } from "./embed.ts";
 import { contentDir, loadChecks, loadClips, loadTranscripts } from "./load-content.ts";
-import { DEFAULT_CACHE, PACK_MODEL_ID, REPO_ROOT, readLock, sha256, stageModel } from "./model.ts";
+import {
+  DEFAULT_CACHE,
+  PACK_MODEL_ID,
+  REPO_ROOT,
+  readLock,
+  readTrimmedLock,
+  sha256,
+  stageModel,
+  stageTrimmedModel,
+} from "./model.ts";
 
 export interface BuildOptions {
   farm: string;
@@ -46,6 +55,8 @@ export interface BuildOptions {
   input?: PackInput;
   /** Copy the model into the pack. The committed fixture leaves it out (it is 135 MB). */
   includeModel?: boolean;
+  /** Which model files go in the pack: the pinned full model (default) or the trimmed-vocabulary one. */
+  model?: "full" | "trimmed";
   /** Only the fixture builder sets this: generated tones need no consent row. */
   allowSyntheticTones?: boolean;
   stageRoot?: string;
@@ -178,7 +189,9 @@ export async function buildPack(opts: BuildOptions): Promise<BuiltPack> {
   // The model files the phone will load, and the embeddings made from those exact files.
   const includeModel = opts.includeModel ?? true;
   const stage = includeModel ? outDir : (opts.stageRoot ?? join(REPO_ROOT, ".cache", "stage"));
-  await stageModel(stage, DEFAULT_CACHE);
+  const variant = opts.model ?? "full";
+  if (variant === "trimmed") await stageTrimmedModel(stage);
+  else await stageModel(stage, DEFAULT_CACHE);
   const embedder = await loadEmbedder(join(stage, "model"));
   const vectors = await embedder.embed(
     plan.passages.map((p) => p.text),
@@ -202,7 +215,8 @@ export async function buildPack(opts: BuildOptions): Promise<BuiltPack> {
   const changed = !previous || previousHash(previous) !== contentHash;
   const version = previous ? (changed ? previous.version + 1 : previous.version) : 1;
 
-  const modelBytes = lock.files.reduce((s, f) => s + f.size, 0);
+  const trimmedLock = variant === "trimmed" ? await readTrimmedLock() : null;
+  const modelBytes = (trimmedLock ?? lock).files.reduce((s, f) => s + f.size, 0);
   const manifest: FarmPackManifest = {
     packId: `${opts.farm}-${opts.mode}-${contentHash}`,
     farmId: opts.farmId ?? "00000000-0000-4000-8000-000000000001",
@@ -218,12 +232,21 @@ export async function buildPack(opts: BuildOptions): Promise<BuiltPack> {
     model: {
       id: PACK_MODEL_ID,
       dir: `model/${PACK_MODEL_ID}`,
-      source: lock.repo,
-      revision: lock.revision,
+      source: trimmedLock?.baseRepo ?? lock.repo,
+      revision: trimmedLock?.baseRevision ?? lock.revision,
       queryPrefix: "query: ",
       dim: 384,
       quantization: "int8",
-      vocab: "full",
+      vocab: trimmedLock ? "trimmed" : "full",
+      ...(trimmedLock
+        ? {
+            trim: {
+              keptRows: trimmedLock.keepCount,
+              keepIdsSha256: trimmedLock.keepIdsSha256,
+              recipe: trimmedLock.recipe,
+            },
+          }
+        : {}),
       sizeBytes: modelBytes,
     },
     embeddings: {

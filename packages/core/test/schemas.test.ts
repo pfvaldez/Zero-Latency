@@ -449,3 +449,40 @@ describe("embedding rows flagged indexOnly", () => {
     expect(withRows([{ momentId: "c99-m1", lang: "en", indexOnly: true }])).toBe(false);
   });
 });
+
+describe("a trimmed-vocabulary model", () => {
+  const trim = {
+    keptRows: 52_005,
+    keepIdsSha256: "a".repeat(64),
+    recipe: "slice the int8 embedding rows",
+  };
+  const withModel = (extra: Record<string, unknown>) => {
+    const base = manifest();
+    return { ...base, model: { ...base.model, ...extra } };
+  };
+
+  it("is accepted when the manifest says how it was trimmed", () => {
+    expect(FarmPackManifestSchema.safeParse(withModel({ vocab: "trimmed", trim })).success).toBe(
+      true,
+    );
+  });
+
+  it("is refused without the trim block, and the trim block is refused on the full vocabulary", () => {
+    expect(FarmPackManifestSchema.safeParse(withModel({ vocab: "trimmed" })).success).toBe(false);
+    expect(FarmPackManifestSchema.safeParse(withModel({ vocab: "full", trim })).success).toBe(
+      false,
+    );
+  });
+
+  it("refuses a malformed hash, zero rows and unknown fields in the trim block", () => {
+    for (const bad of [
+      { ...trim, keepIdsSha256: "abc" },
+      { ...trim, keptRows: 0 },
+      { ...trim, extra: 1 },
+    ]) {
+      expect(
+        FarmPackManifestSchema.safeParse(withModel({ vocab: "trimmed", trim: bad })).success,
+      ).toBe(false);
+    }
+  });
+});

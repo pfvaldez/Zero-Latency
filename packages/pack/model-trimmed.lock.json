@@ -1,0 +1,36 @@
+{
+  "baseRepo": "Xenova/multilingual-e5-small",
+  "baseRevision": "761b726dd34fb83930e26aab4e9ac3899aa1fa78",
+  "license": "MIT (intfloat/multilingual-e5-small)",
+  "dtype": "q8 (onnx/model_quantized.onnx)",
+  "recipe": "Slice the rows of the 8-bit word-embedding table of the base int8 model to the kept ids; renumber the tokenizer; change nothing else",
+  "keepIdsSha256": "2a140211c9a3c7350a461019deaffc2b116b06c2840cd0d377c1549e2da194eb",
+  "keepCount": 52005,
+  "files": [
+    {
+      "path": "config.json",
+      "size": 656,
+      "sha256": "239f13480c3d21e8205bb69dbc16cba22ce52b2cf320efdd1935613cada77cf1"
+    },
+    {
+      "path": "tokenizer.json",
+      "size": 2018188,
+      "sha256": "98f64775f39ecafb41e897e45536ff9e597af5e16ca38bf2002a2510ae75f12a"
+    },
+    {
+      "path": "tokenizer_config.json",
+      "size": 442,
+      "sha256": "9772f9a32d4c88bef334fe43945ea71ffb9550591ee351fff9ae121b98f4ef3b"
+    },
+    {
+      "path": "special_tokens_map.json",
+      "size": 167,
+      "sha256": "d05497f1da52c5e09554c0cd874037a083e1dc1b9cfd48034d1c717f1afc07a7"
+    },
+    {
+      "path": "onnx/model_quantized.onnx",
+      "size": 42263897,
+      "sha256": "20a19adc9c2a68e0e76d6c3910317a76e338f914118d6f3386849f5afca0ca3e"
+    }
+  ]
+}

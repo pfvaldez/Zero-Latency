@@ -35,8 +35,8 @@ import {
   loadQuestions,
   loadTranscripts,
 } from "./load-content.ts";
-import { DEFAULT_CACHE, REPO_ROOT, readLock, stageModel } from "./model.ts";
-import { type EvalResults, renderEval } from "./report.ts";
+import { DEFAULT_CACHE, PACK_MODEL_ID, REPO_ROOT, readLock, stageModel } from "./model.ts";
+import { type EvalResults, type ModelComparison, renderEval } from "./report.ts";
 
 export const MAX_FALSE_CONFIRM = 0.05;
 export const MARGIN_PLACEHOLDER = 0.05; // recorded, not used in P0
@@ -131,6 +131,16 @@ const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.len
 const p95 = (xs: number[]) =>
   [...xs].sort((a, b) => a - b)[Math.min(xs.length - 1, Math.floor(xs.length * 0.95))] ?? 0;
 
+/** Total size of every file under a folder, recursively. */
+async function folderBytes(dir: string): Promise<number> {
+  let total = 0;
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    total += entry.isDirectory() ? await folderBytes(full) : (await stat(full)).size;
+  }
+  return total;
+}
+
 async function dirBytes(dir: string): Promise<number | null> {
   try {
     let total = 0;
@@ -164,6 +174,17 @@ async function readWolofEvidence(farm: string) {
   }
 }
 
+async function readModels(farm: string): Promise<ModelComparison | null> {
+  try {
+    return JSON.parse(
+      await readFile(join(contentDir(farm), "eval", "models.json"), "utf8"),
+    ) as ModelComparison;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw error;
+  }
+}
+
 async function removedCount(farm: string): Promise<number> {
   return (await readIndexFile(farm))?.removedAsDuplicates.length ?? 0;
 }
@@ -171,17 +192,20 @@ async function removedCount(farm: string): Promise<number> {
 export async function runEval(
   farm: string,
   now = new Date(),
-  opts: { write?: boolean } = {},
+  opts: { write?: boolean; modelRoot?: string; modelLabel?: string } = {},
 ): Promise<EvalResults> {
   const clips = await loadClips(farm);
   const questions = await loadQuestions(farm);
   const lock = await readLock();
   const { passages, source } = await buildPassages(farm, clips);
 
+  // The model folder to evaluate: the pinned full model staged from the cache, or any folder that holds
+  // <PACK_MODEL_ID>/ (a trimmed model).
   const stage = join(REPO_ROOT, ".cache", "stage");
   const t0 = performance.now();
-  await stageModel(stage, DEFAULT_CACHE);
-  const embedder = await loadEmbedder(join(stage, "model"));
+  if (!opts.modelRoot) await stageModel(stage, DEFAULT_CACHE);
+  const modelsRoot = opts.modelRoot ?? join(stage, "model");
+  const embedder = await loadEmbedder(modelsRoot);
   const modelLoadMs = Math.round(performance.now() - t0);
 
   const t1 = performance.now();
@@ -357,7 +381,9 @@ export async function runEval(
   const bins = 8;
 
   const embeddingsBytes = passages.length * 384 * 4;
-  const modelBytes = lock.files.reduce((s, f) => s + f.size, 0);
+  const modelBytes = opts.modelRoot
+    ? await folderBytes(join(opts.modelRoot, PACK_MODEL_ID))
+    : lock.files.reduce((s, f) => s + f.size, 0);
   const audioBytes = await dirBytes(join(REPO_ROOT, "pipeline", "build", farm, "audio", "en"));
 
   const sweepSample = rowsA
@@ -379,7 +405,7 @@ export async function runEval(
   const answered = primary.answered;
   const results: EvalResults = {
     date: now.toISOString().slice(0, 10),
-    modelRepo: lock.repo,
+    modelRepo: opts.modelLabel ?? lock.repo,
     modelRevision: lock.revision,
     contentHash: hash.digest("hex").slice(0, 16),
     questions: {
@@ -421,6 +447,7 @@ export async function runEval(
       coverage: wilson(primary.correctConfirm, primary.answered),
     },
     wolof: await readWolofEvidence(farm),
+    models: await readModels(farm),
     study: studyRows,
     leakage: audit
       ? {

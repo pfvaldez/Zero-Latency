@@ -5,6 +5,40 @@ import type { Fold, Metrics, PooledMetrics, WolofEvidence } from "@asknoor/core"
 const pct = (x: number, digits = 1) => `${(x * 100).toFixed(digits)}%`;
 const ci = (c: { low: number; high: number }) => `${pct(c.low, 0)} to ${pct(c.high, 0)}`;
 
+/** One model in the full-versus-trimmed comparison (written by `compare-models`, rendered here). */
+export interface ModelRow {
+  name: string;
+  root: string;
+  modelBytes: number;
+  loadMs: number;
+  queryMedianMs: number;
+  queryP95Ms: number;
+  /** Pooled held-out numbers for the shipped passage set. */
+  heldOut: {
+    top1: number;
+    coverage: number;
+    falseConfirm: number;
+    failSafe: number;
+    questions: number;
+    answered: number;
+  } | null;
+  threshold: number;
+  /** Mean cosine between this model's vectors and the full model's on the same texts. */
+  meanCosineToFull: number;
+  /** Held-out top-1 minus the full model's, in points. */
+  top1VsFull: number;
+  withinTolerance: boolean;
+}
+
+export interface ModelComparison {
+  date: string;
+  tolerancePoints: number;
+  rows: ModelRow[];
+  chosen: string | null;
+  shipped: string | null;
+  shippedReason: string;
+}
+
 export interface LangRow {
   name: string;
   m: Metrics;
@@ -49,6 +83,8 @@ export interface EvalResults {
     coverage: { low: number; high: number };
   };
   wolof: WolofEvidence | null;
+  /** Full model against the trimmed-vocabulary variants; null until `compare-models` has run. */
+  models?: ModelComparison | null;
   study: {
     name: string;
     fullSetPick: number | null;
@@ -268,6 +304,34 @@ function wolofSection(w: WolofEvidence | null): string[] {
   return out;
 }
 
+function modelsSection(m: ModelComparison | null): string[] {
+  if (!m) return [];
+  const out: string[] = ["## Model size: full against trimmed vocabulary", ""];
+  out.push(
+    `Status: run on ${m.date} (\`bun run --cwd packages/pack compare-models\`). The e5 model is 118 MB, of which about 96 MB is a 250,002-token embedding table, most of it for languages and words Ask Noor never sees. The trimmed variants keep the rows for tokens that occur in large public text in en, de, nl, sv and Wolof (Wikipedia, Tatoeba, FLEURS Wolof transcripts) and in our own content (never the test questions), plus every single character and every special token, and cut the rest. The kept rows are sliced from the shipped int8 table, so each is **byte-identical** to the full model's row; nothing is re-quantized. Acceptance rule, set before the run: pooled held-out top-1 within ${m.tolerancePoints} points of the full model, and a pack under 50 MB.`,
+    "",
+    "| Model | Model files | Held-out top-1 | vs full | Coverage | False confirm | Mean cosine to full | Load | One question, median / p95 | Within rule |",
+    "|---|---|---|---|---|---|---|---|---|---|",
+  );
+  for (const x of m.rows) {
+    const h = x.heldOut;
+    out.push(
+      `| ${x.name} | ${mb(x.modelBytes)} | ${h ? pct(h.top1) : "n/a"} | ${x.top1VsFull >= 0 ? "+" : ""}${x.top1VsFull} points | ${h ? pct(h.coverage) : "n/a"} | ${h ? pct(h.falseConfirm) : "n/a"} | ${x.meanCosineToFull} | ${x.loadMs} ms | ${x.queryMedianMs} / ${x.queryP95Ms} ms | ${x.withinTolerance ? "yes" : "**no**"} |`,
+    );
+  }
+  out.push(
+    "",
+    `**Shipped: ${m.shipped ?? "none (the full model)"}.** ${m.shippedReason}. Every row gets the same shipped threshold (${[...new Set(m.rows.map((x) => x.threshold))].join(", ")}) when it is chosen again on that model's own scores, so the threshold does not change.`,
+    "",
+    "- **The two control rows are the reason the trimmed model is not re-quantized.** Re-quantizing from the fp32 weights (the obvious route) cost 5.4 points of held-out top-1 with or without trimming, so the loss came from the new quantization, not from the smaller vocabulary. With 56 answered held-out questions, that is 3 questions, which is within noise, but it fails the rule as written, so the shipped model slices the original int8 rows instead.",
+    "- Held-out top-1 is the same for every sliced row; coverage differs by one or two questions (one question is 1.8 points), so do not read the order of the trimmed rows as a ranking.",
+    "- A trimmed vocabulary is a risk for words not in the corpus. Words that were cut are split into the characters that remain, or become the unknown token. Content words are all kept (the segmentation of our own text is identical to the full tokenizer's for 99% of lines), but a guest's rare word may be tokenized differently from the full model; the matcher then sees a slightly different vector (mean cosine to full above), and the guest still confirms every match.",
+    "- Timings are Node on the build machine, not a phone. The size of the file is what changes for the guest: a smaller one-time farm-pack download.",
+    "",
+  );
+  return out;
+}
+
 export function renderEval(r: EvalResults): string {
   const p = r.primary;
   const lines: string[] = [];
@@ -382,6 +446,7 @@ export function renderEval(r: EvalResults): string {
     "**These timings are Node on the build machine, not a mid-range Android phone.** The phone numbers (model first load, question to outcome) come from the offline end-to-end run with the real worker.",
     "",
   );
+  lines.push(...modelsSection(r.models ?? null));
   lines.push("## Honest limits", "");
   lines.push(
     "- The questions are synthetic and were written by the team who also chose the clips; real guests will phrase things differently and make other mistakes. German, Dutch and Swedish questions were not checked by native speakers.",

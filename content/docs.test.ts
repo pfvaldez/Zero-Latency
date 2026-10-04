@@ -83,11 +83,11 @@ describe("docs/DATA_CARD.md", () => {
     expect(md).toContain(nllb as string);
   });
 
-  it("marks what is not used yet as planned and what has been run as run", () => {
+  it("marks what has been run as run (and nothing here is still only planned)", () => {
     for (const name of ["Wikipedia text", "Tatoeba sentences"]) {
       const row = md.split("\n").find((l) => l.startsWith(`| ${name}`));
       expect(row, name).toBeDefined();
-      expect(row, name).toMatch(/[Pp]lanned/);
+      expect(row, name).toMatch(/Status: run/);
     }
     for (const name of ["Meta MMS-1b-all", "FLORES-200", "FLEURS"]) {
       const row = md.split("\n").find((l) => l.startsWith(`| ${name}`));
