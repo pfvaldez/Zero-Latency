@@ -99,4 +99,10 @@ export const sv: Strings = {
   "labels.standInVoice": "Röst: {person}, som ersättare för Noor",
   "labels.aiVoice": "AI-berättarröst",
   "labels.synthetic": "Syntetiska exempeldata",
+  "shop.codeLabel": "Noor: skriv din fyrsiffriga gårdskod",
+  "shop.codeWrong": "Koden stämmer inte. Inget sparades.",
+  "shop.codeLocked": "För många försök. Vänta {seconds} sekunder.",
+  "shop.codeMissing": "Den här turen kan inte bekräfta beställningar än. Fråga Noor personligen.",
+  "labels.prototypeControl": "Prototypkontroll: en gårdskod är bara en broms, inget starkt skydd",
+  "labels.aiDubbed": "AI-dubbad",
 };

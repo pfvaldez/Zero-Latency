@@ -20,6 +20,8 @@ import { type BuiltPack, buildPack, sha256 } from "./build.ts";
 import { REPO_ROOT } from "./model.ts";
 
 export const FIXTURE_SLUG = "fixture";
+/** PROTOTYPE demo code for the synthetic fixture and the demo pack. Documented in tasks/HANDOFF.md; never a real farm's code. */
+export const DEMO_FARM_CODE = "4827";
 export const FIXTURE_FARM_ID = "00000000-0000-4000-8000-0000000000f1";
 export const FIXTURE_DIR = join(REPO_ROOT, "apps", "web", "public", "packs", FIXTURE_SLUG);
 const AUDIO = join(REPO_ROOT, "packages", "pack", "fixtures", "audio");
@@ -185,5 +187,6 @@ export async function buildFixture(): Promise<BuiltPack> {
     includeModel: false,
     allowSyntheticTones: true,
     thresholds: await realThreshold(),
+    farmCode: DEMO_FARM_CODE,
   });
 }

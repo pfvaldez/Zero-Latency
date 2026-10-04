@@ -103,4 +103,11 @@ export const en = {
   "labels.standInVoice": "Voice: {person}, standing in for Noor",
   "labels.aiVoice": "AI narrator voice",
   "labels.synthetic": "Synthetic example data",
+  "shop.codeLabel": "Noor: enter your 4-digit farm code",
+  "shop.codeWrong": "That code is not right. Nothing was saved.",
+  "shop.codeLocked": "Too many tries. Wait {seconds} seconds.",
+  "shop.codeMissing": "This tour cannot confirm orders yet. Ask Noor in person.",
+  "labels.prototypeControl":
+    "Prototype control: a farm code is only a speed bump, not strong security",
+  "labels.aiDubbed": "AI-dubbed",
 } as const;

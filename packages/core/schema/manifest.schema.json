@@ -629,6 +629,40 @@
       ],
       "additionalProperties": false
     },
+    "farmCode": {
+      "type": "object",
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "const": "pbkdf2-sha256"
+        },
+        "iterations": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 9007199254740991
+        },
+        "salt": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{32}$"
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "prototype": {
+          "type": "boolean",
+          "const": true
+        }
+      },
+      "required": [
+        "algorithm",
+        "iterations",
+        "salt",
+        "hash",
+        "prototype"
+      ],
+      "additionalProperties": false
+    },
     "sizes": {
       "type": "object",
       "propertyNames": {

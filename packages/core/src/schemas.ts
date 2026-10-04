@@ -213,6 +213,16 @@ export const FarmPackManifestSchema = z
       ),
     }),
     thresholds: z.strictObject({ match: unitInterval, margin: unitInterval }),
+    // Prototype control: the salted hash of Noor's 4-digit farm code (never the code itself).
+    farmCode: z
+      .strictObject({
+        algorithm: z.literal("pbkdf2-sha256"),
+        iterations: z.number().int().min(1000),
+        salt: z.string().regex(/^[0-9a-f]{32}$/),
+        hash: z.string().regex(/^[0-9a-f]{64}$/),
+        prototype: z.literal(true),
+      })
+      .optional(),
     sizes: z.record(z.string(), nonNegInt),
     checksums: z.record(z.string(), z.string().min(1)),
     labels: z.strictObject({

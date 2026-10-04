@@ -101,4 +101,11 @@ export const nl: Strings = {
   "labels.standInVoice": "Stem: {person}, ter vervanging van Noor",
   "labels.aiVoice": "AI-verteller",
   "labels.synthetic": "Synthetische voorbeeldgegevens",
+  "shop.codeLabel": "Noor: voer je viercijferige boerderijcode in",
+  "shop.codeWrong": "Die code klopt niet. Er is niets opgeslagen.",
+  "shop.codeLocked": "Te veel pogingen. Wacht {seconds} seconden.",
+  "shop.codeMissing": "Deze tour kan bestellingen nog niet bevestigen. Vraag het Noor persoonlijk.",
+  "labels.prototypeControl":
+    "Prototypecontrole: een boerderijcode is slechts een drempel, geen sterke beveiliging",
+  "labels.aiDubbed": "AI-gedubd",
 };

@@ -105,4 +105,12 @@ export const de: Strings = {
   "labels.standInVoice": "Stimme: {person}, in Vertretung für Noor",
   "labels.aiVoice": "KI-Sprecherstimme",
   "labels.synthetic": "Synthetische Beispieldaten",
+  "shop.codeLabel": "Noor: Gib deinen vierstelligen Farmcode ein",
+  "shop.codeWrong": "Der Code stimmt nicht. Es wurde nichts gespeichert.",
+  "shop.codeLocked": "Zu viele Versuche. Bitte {seconds} Sekunden warten.",
+  "shop.codeMissing":
+    "Diese Tour kann Bestellungen noch nicht bestätigen. Bitte frag Noor persönlich.",
+  "labels.prototypeControl":
+    "Prototyp-Kontrolle: Ein Farmcode ist nur eine Bremse, kein starker Schutz",
+  "labels.aiDubbed": "KI-vertont",
 };

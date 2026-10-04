@@ -1,6 +1,8 @@
 // Shared contracts (TRD 6.1). Types and constant lists only: the Zod schemas live in schemas.ts
 // and are pinned to these types with `satisfies`, so a drift fails `tsc -b`.
 
+import type { FarmCode } from "./farm-code.ts";
+
 export const VISITOR_LANGS = ["en", "de", "nl", "sv"] as const;
 export type VisitorLang = (typeof VISITOR_LANGS)[number];
 
@@ -126,6 +128,8 @@ export interface FarmPackManifest {
     rows: { momentId: string; lang: VisitorLang; indexOnly?: true }[];
   };
   thresholds: Thresholds; // calibrated by pipeline/eval
+  /** Prototype control: Noor's farm code as a salted hash. Absent: the shop cannot confirm an order. */
+  farmCode?: FarmCode;
   sizes: Record<string, number>;
   checksums: Record<string, string>;
   labels: {

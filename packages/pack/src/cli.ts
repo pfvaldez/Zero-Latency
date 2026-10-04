@@ -6,7 +6,7 @@ import { PackError } from "@asknoor/core";
 import { buildPack } from "./build.ts";
 import { compareModels, writeComparison } from "./compare-models.ts";
 import { runEval } from "./eval-run.ts";
-import { buildFixture } from "./fixture.ts";
+import { buildFixture, DEMO_FARM_CODE } from "./fixture.ts";
 import { importIndexPassages } from "./index-passages.ts";
 import {
   ensureModelCache,
@@ -115,6 +115,10 @@ async function main(): Promise<number> {
         mode,
         publish,
         model: flag("--model") === "trimmed" ? "trimmed" : "full",
+        // Noor's farm code comes from the environment (never printed). Demo packs fall back to the documented prototype demo code.
+        ...(process.env.ASKNOOR_FARM_CODE || mode === "demo"
+          ? { farmCode: process.env.ASKNOOR_FARM_CODE ?? DEMO_FARM_CODE }
+          : {}),
       });
       const m = built.manifest;
       console.log(
