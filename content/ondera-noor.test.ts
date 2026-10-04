@@ -93,7 +93,7 @@ describe("recordings", () => {
     }
   });
 
-  it("keeps the audio out of git (consent covers dubbing, not publishing)", () => {
+  it("keeps the audio out of git (publishing consent covers the demo site, not the repository)", () => {
     const gitignore = readFileSync(join(DIR, "..", "..", ".gitignore"), "utf8");
     expect(gitignore).toContain("content/**/recordings/en/");
     expect(gitignore).toContain("content/**/recordings/wo/");

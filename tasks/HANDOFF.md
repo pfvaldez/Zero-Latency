@@ -4,7 +4,7 @@ Everything below this block was written earlier for Pablo and is kept for refere
 
 ## Deploy (Vercel, static)
 
-Live demo: https://ask-noor.vercel.app (Vercel project `ask-noor`). Since 2026-10-04 it serves the **real demo pack**: 7 stops in Preet's voice (labeled "Voice: Preet, standing in for Noor"), the 7 AI-dubbed Wolof clips, the Wolof drafts and the 44 MB trimmed model; clip 8 is held back. Preet confirmed publishing and transcription in writing on 2026-10-04 (team Discord; the message link is not filed yet). It is a static deploy of the built app, uploaded from this machine:
+Live demo: https://ask-noor.vercel.app (Vercel project `ask-noor`). Since 2026-10-04 it serves the **real demo pack**: 7 stops in Preet's voice (labeled "Voice: Preet, standing in for Noor"), the 7 AI-dubbed Wolof clips (labeled "AI-dubbed"), the Wolof drafts (labeled "Draft, not yet checked by a Wolof speaker") and the 44 MB trimmed model; clip 8 is held back. Preet confirmed publishing and transcription in writing on 2026-10-04 (team Discord; the message link is not filed yet). It is a static deploy of the built app, uploaded from this machine:
 
 ```sh
 bun run --cwd packages/pack build --mode demo --model trimmed        # needs the recordings in content/ondera-noor/recordings/
@@ -122,7 +122,7 @@ bun run --cwd packages/pack build --mode demo --model trimmed   # writes apps/we
 VITE_PACK_BASE=/packs/ondera-noor/demo bun run dev
 ```
 
-**Earlier this refused** ("consent for Preet Patel (publishing) is 'pending'"); since 2026-10-04 the row is confirmed and the build works. The audio is also not in git: `content/ondera-noor/recordings/en/clip01.m4a` to `clip08.m4a` (and `wo/clip01_wo.flac` to `clip08_wo.flac`) are gitignored. They are on Bee's machine (copied from `~/Downloads/Archive-2/`); ask Bee for the folder, check it with `content/ondera-noor/recordings/audio.sha256`, and put it at `content/ondera-noor/recordings/`. I did not build the real demo pack (the build was stopped before it ran).
+**Earlier this refused** ("consent for Preet Patel (publishing) is 'pending'"); since 2026-10-04 the row is confirmed and the build works. The audio is also not in git: `content/ondera-noor/recordings/en/clip01.m4a` to `clip08.m4a` (and `wo/clip01_wo.flac` to `clip08_wo.flac`) are gitignored. They are on Bee's machine (copied from `~/Downloads/Archive-2/`); ask Bee for the folder, check it with `content/ondera-noor/recordings/audio.sha256`, and put it at `content/ondera-noor/recordings/`.
 
 ## 4. Open decisions and blockers
 
