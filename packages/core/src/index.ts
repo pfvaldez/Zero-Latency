@@ -76,8 +76,10 @@ export {
   type FilledTemplate,
   fillTemplate,
   MAX_SEGMENTS,
+  MONTHLY_PRIORITY,
   type TemplateCounts,
   type TemplateLabels,
+  templateParts,
 } from "./sms/template.ts";
 export { normalize } from "./text/normalize.ts";
 export { REDACTED_EMAIL, REDACTED_PHONE, redact } from "./text/redact.ts";

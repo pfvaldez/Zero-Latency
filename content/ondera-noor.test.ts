@@ -173,22 +173,30 @@ describe("sms-templates.json", () => {
     expect(ph(sms.orderLine.wo.text ?? "")).toEqual(ph(sms.orderLine.en));
   });
 
-  it("reports the Wolof draft's SMS size: over two segments it cannot be sent, so the report is held", () => {
-    // FINDING (2026-10-04): the NLLB draft is UCS-2 and needs 3 segments, so fillTemplate refuses
-    // it. A Wolof speaker has to shorten it; until then monthly-summary holds Noor's text.
+  it("fits the Wolof draft into two SMS segments by dropping the lowest-priority parts, and lists what it dropped", () => {
+    // Before this step the NLLB draft needed 3 UCS-2 segments and was refused. It is still an
+    // unchecked draft, so Noor's report stays held until a Wolof speaker checks it.
     const wo = sms.monthly.wo.text ?? "";
     const label = { text: sms.themeLabels.stay.wo.text ?? "", checked: true };
     const counts = { guests: 12, orders: 3, items: 5, askedCount: 4 };
-    let outcome: string;
-    try {
-      const r = fillTemplate(wo, counts, { loved: label, asked: label, wished: label });
-      outcome = `fits in ${r.segments} segment(s)`;
-      expect(r.body).not.toMatch(/[{}]/);
-    } catch (error) {
-      outcome = (error as Error).message;
-      expect(outcome).toMatch(/SMS segments/); // the only acceptable failure
-    }
-    expect(outcome).toBeTruthy();
+    const r = fillTemplate(wo, counts, { loved: label, asked: label, wished: label });
+    expect(r.segments).toBeLessThanOrEqual(2);
+    expect(r.body).not.toMatch(/[{}]/);
+    expect(r.body).toContain(String(counts.askedCount)); // the most important part is kept
+    expect(sms.monthly.wo.status).toBe("draft");
+  });
+
+  it("fits the English monthly text, even with the longest labels, by dropping parts if it must", () => {
+    const longest =
+      THEME_IDS.map((id) => sms.themeLabels[id].en).sort((a, b) => b.length - a.length)[0] ?? "";
+    const label = { text: longest, checked: true };
+    const r = fillTemplate(
+      sms.monthly.en,
+      { guests: 999, orders: 999, items: 999, askedCount: 999 },
+      { loved: label, asked: label, wished: label },
+    );
+    expect(r.segments).toBeLessThanOrEqual(2);
+    expect(r.body).toContain("Most asked");
   });
 });
 

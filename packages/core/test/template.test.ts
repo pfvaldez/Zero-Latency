@@ -184,3 +184,120 @@ describe("smsSize", () => {
     expect(smsSize("😀").length).toBe(2);
   });
 });
+
+// ---- dropping low-priority parts so the text fits two segments --------------------------------
+import { MONTHLY_PRIORITY, templateParts } from "../src/sms/template.ts";
+
+describe("templateParts", () => {
+  it("splits a template at sentence ends and keeps placeholders whole", () => {
+    expect(templateParts(TRD_TEMPLATE)).toEqual([
+      "This month: {guests} guests shared feedback.",
+      "{orders} orders ({items} items).",
+      "Loved: {loved}.",
+      "Most asked: {asked} ({askedCount}).",
+      "Most wished for: {wished}.",
+    ]);
+    expect(templateParts("  one  ")).toEqual(["one"]);
+    expect(templateParts("")).toEqual([]);
+  });
+
+  it("ranks the questions and wishes above the counts", () => {
+    expect([...MONTHLY_PRIORITY]).toEqual([
+      "asked",
+      "askedCount",
+      "wished",
+      "loved",
+      "orders",
+      "items",
+      "guests",
+    ]);
+  });
+});
+
+describe("fillTemplate drops the lowest-priority parts until it fits two segments", () => {
+  const long = (c: string) => c.repeat(100);
+  const big = (loved = long("l"), asked = long("a"), wished = long("w")): TemplateLabels => ({
+    loved: ok(loved),
+    asked: ok(asked),
+    wished: ok(wished),
+  });
+
+  it("leaves a text that fits untouched", () => {
+    const r = fillTemplate(TRD_TEMPLATE, COUNTS, LABELS);
+    expect(r.dropped).toEqual([]);
+    expect(r.body).toContain("This month: 7 guests");
+  });
+
+  it("drops guests, then orders, then loved, in that order, and stops as soon as it fits", () => {
+    const r = fillTemplate(TRD_TEMPLATE, COUNTS, big());
+    expect(r.dropped).toEqual([
+      "This month: 7 guests shared feedback.",
+      "3 orders (5 items).",
+      `Loved: ${long("l")}.`,
+    ]);
+    expect(r.segments).toBeLessThanOrEqual(2);
+    expect(r.body).toBe(`Most asked: ${long("a")} (4). Most wished for: ${long("w")}.`); // original order kept
+  });
+
+  it("drops more when the labels are longer: wished goes before asked", () => {
+    const r = fillTemplate(TRD_TEMPLATE, COUNTS, big(long("l"), "a".repeat(200), "w".repeat(150)));
+    expect(r.dropped.at(-1)).toContain("Most wished for");
+    expect(r.body).toContain("Most asked");
+    expect(r.body).not.toContain("Most wished for");
+  });
+
+  it("drops a part with no placeholder first", () => {
+    const template =
+      "A friendly note about the farm that carries no numbers at all. Most asked: {asked} ({askedCount}). Loved: {loved}.";
+    const r = fillTemplate(template, COUNTS, big("l".repeat(150), "a".repeat(120), "w"));
+    expect(r.dropped[0]).toBe("A friendly note about the farm that carries no numbers at all.");
+  });
+
+  it("drops the later part first when two parts rank the same", () => {
+    const r = fillTemplate("Loved: {loved}. Also loved: {loved}.", COUNTS, big("l".repeat(200)));
+    expect(r.dropped).toEqual([`Also loved: ${"l".repeat(200)}.`]);
+  });
+
+  it("honours a custom priority", () => {
+    const reversed = [...MONTHLY_PRIORITY].reverse();
+    const r = fillTemplate(TRD_TEMPLATE, COUNTS, big(), { priority: reversed });
+    expect(r.dropped[0]).toContain("Most asked"); // now the least important
+  });
+
+  it("never drops the last part: a single over-long part still throws", () => {
+    expect(() => fillTemplate("Loved: {loved}.", COUNTS, big("l".repeat(400)))).toThrow(
+      /SMS segments/,
+    );
+    expect(() => fillTemplate("a".repeat(307), COUNTS, LABELS)).toThrow(/3 SMS segments/);
+  });
+
+  it("still throws on an unchecked label or an unknown placeholder inside a part that would be dropped", () => {
+    const unchecked = { ...big(), loved: { text: "l".repeat(100), checked: false } };
+    expect(() => fillTemplate(TRD_TEMPLATE, COUNTS, unchecked)).toThrow(/\{loved\}.*not checked/);
+    expect(() => fillTemplate(`${TRD_TEMPLATE} Extra: {name}.`, COUNTS, big())).toThrow(
+      /Unknown placeholder/,
+    );
+    expect(() => fillTemplate(TRD_TEMPLATE, { ...COUNTS, guests: -1 }, big())).toThrow(/integer/);
+  });
+
+  it("uses the UCS-2 limit (2 x 67) for a text with letters outside GSM-7", () => {
+    const wolof =
+      "Ci weer bii: {guests} ay doxandéem ë. {orders} ay yëf. Love: {loved} ë. Ñoo laaj: {asked} ë.";
+    const r = fillTemplate(wolof, COUNTS, big("l".repeat(60), "a".repeat(60), "w"));
+    expect(r.encoding).toBe("ucs2");
+    expect(r.segments).toBeLessThanOrEqual(2);
+    expect(r.length).toBeLessThanOrEqual(134);
+    expect(r.dropped.length).toBeGreaterThan(0);
+  });
+
+  it("counts of zero are filled like any other number", () => {
+    const r = fillTemplate(TRD_TEMPLATE, { guests: 0, orders: 0, items: 0, askedCount: 0 }, LABELS);
+    expect(r.body).toContain("0 guests");
+    expect(r.dropped).toEqual([]);
+  });
+
+  it("reports how many segments the shortened text needs", () => {
+    const r = fillTemplate(TRD_TEMPLATE, COUNTS, big());
+    expect(r).toMatchObject({ encoding: "gsm7", fitsOneSegment: false });
+  });
+});
