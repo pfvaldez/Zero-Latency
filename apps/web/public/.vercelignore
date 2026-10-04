@@ -1,6 +1,10 @@
 # Vercel deploys apps/web/dist as static files (Hobby: 100 MB per CLI upload).
 # The local production pack (an empty pack with the 135 MB full model) is never deployed.
-packs/ondera-noor/
+packs/ondera-noor/production/
+# The synthetic fixture pack (CI and the offline tests use it; with its staged model it is 44 MB).
+# The deployed app loads the real demo pack instead (VITE_PACK_BASE=/packs/ondera-noor/demo),
+# and without this line the upload is over the 100 MB Hobby limit.
+packs/fixture/
 # A hashed copy of the ONNX runtime wasm that the bundler emits but the app never loads
 # (the worker loads /ort/*), and the service worker does not precache.
 assets/ort-wasm-*.wasm
