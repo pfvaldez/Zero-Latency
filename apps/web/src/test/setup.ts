@@ -17,3 +17,13 @@ window.scrollTo = () => {};
 afterEach(() => {
   cleanup();
 });
+
+// jsdom's media elements do not play. Tests that need playback spy on these.
+Object.defineProperty(HTMLMediaElement.prototype, "play", {
+  configurable: true,
+  value() {
+    return Promise.resolve();
+  },
+});
+Object.defineProperty(HTMLMediaElement.prototype, "pause", { configurable: true, value() {} });
+URL.createObjectURL ??= () => "blob:test";

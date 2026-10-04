@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ServicesProvider } from "@/services/context.tsx";
 import { useGuest } from "@/state/guest-store.ts";
@@ -47,9 +47,7 @@ describe("App: language and pack", () => {
     mount();
     expect(await screen.findByText(/Download size: \d+\.\d MB/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Download" }));
-    await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent("Ready. The tour now works offline."),
-    );
+    expect(await screen.findByRole("heading", { name: "Tour stops" })).toBeInTheDocument();
   });
 
   it("starts straight on the tour when the pack is already saved", async () => {
@@ -57,7 +55,7 @@ describe("App: language and pack", () => {
     const services = testServices();
     await services.repo.download(() => {});
     mount(services);
-    expect(await screen.findByRole("status")).toHaveTextContent("Ready.");
+    expect(await screen.findByRole("heading", { name: "Tour stops" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Download" })).not.toBeInTheDocument();
   });
 
@@ -75,6 +73,6 @@ describe("App: language and pack", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("The download did not finish");
     fail = false;
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
-    expect(await screen.findByText("Ready. The tour now works offline.")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Tour stops" })).toBeInTheDocument();
   });
 });
