@@ -113,7 +113,7 @@ type SheetDescriptionProps = SheetDescriptionPrimitiveProps;
 function SheetDescription({ className, ...props }: SheetDescriptionProps) {
   return (
     <SheetDescriptionPrimitive
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-muted-foreground text-base", className)}
       {...props}
     />
   );

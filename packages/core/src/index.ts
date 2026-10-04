@@ -50,6 +50,13 @@ export {
   wilson,
 } from "./eval.ts";
 export { type WolofEvidence, WolofEvidenceSchema } from "./evidence.ts";
+export {
+  FARM_CODE_ITERATIONS,
+  FARM_CODE_PATTERN,
+  type FarmCode,
+  makeFarmCode,
+  verifyFarmCode,
+} from "./farm-code.ts";
 export { decide } from "./guardrails/decide.ts";
 export { decideSafety, SAFETY_LEXICON } from "./guardrails/safety.ts";
 export {

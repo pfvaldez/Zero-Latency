@@ -255,6 +255,13 @@
     "match": 0.8675,
     "margin": 0.05
   },
+  "farmCode": {
+    "algorithm": "pbkdf2-sha256",
+    "iterations": 100000,
+    "salt": "84c996459b50a107ac51bc48d3aafcbd",
+    "hash": "356308ce92ca907339b15d0d2031b2355e9f42dbabfc5b73604ef28df517888b",
+    "prototype": true
+  },
   "sizes": {
     "audio/clip01.m4a": 33090,
     "audio/clip02.m4a": 39351,

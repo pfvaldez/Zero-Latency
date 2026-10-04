@@ -13,6 +13,7 @@ import {
   type FarmPackManifest,
   FarmPackManifestSchema,
   IndexPassagesFileSchema,
+  makeFarmCode,
   PackError,
   type PackInput,
   type PackMode,
@@ -59,6 +60,8 @@ export interface BuildOptions {
   model?: "full" | "trimmed";
   /** Only the fixture builder sets this: generated tones need no consent row. */
   allowSyntheticTones?: boolean;
+  /** Noor's 4-digit farm code. Only its salted hash goes in the manifest. Without it the shop cannot confirm an order. */
+  farmCode?: string;
   stageRoot?: string;
 }
 
@@ -262,6 +265,7 @@ export async function buildPack(opts: BuildOptions): Promise<BuiltPack> {
       })),
     },
     thresholds: opts.thresholds ?? (await readThreshold(opts.farm)),
+    ...(opts.farmCode ? { farmCode: await makeFarmCode(opts.farmCode, opts.farm) } : {}),
     sizes,
     checksums,
     labels: plan.labels,

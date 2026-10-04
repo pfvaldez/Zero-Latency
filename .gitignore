@@ -266,3 +266,4 @@ pipeline/**/*.mp3
 apps/web/public/packs/*
 !apps/web/public/packs/fixture
 apps/web/public/packs/*/model/
+apps/web/public/ort/

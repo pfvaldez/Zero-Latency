@@ -42,7 +42,7 @@ describe("docs/RESPONSIBLE_AI.md", () => {
   it("says plainly what is not built, so it cannot be read as more than it is", () => {
     expect(md).toContain("DRAFT for Preet");
     expect(md).toContain("do not exist in the repository yet");
-    expect(md).toContain("The airplane-mode end-to-end test does not exist");
+    expect(md).toContain("apps/web/e2e/offline.spec.ts");
   });
 });
 
