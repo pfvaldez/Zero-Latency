@@ -133,7 +133,9 @@ Evidence still to collect (Preet, with source, year and country): tourism arriva
 ## 11. Content requirements
 
 - Noor's clips 1–7 from Preet's script, with three fixes: clip 4 names the Ondera Coffee Cooperative; clip 5 doesn't imply a meal is served; clip 7 says "we'll stay down here" rather than skipping the roasting. Clip 8 (staying overnight) is held back for the demo loop.
-- Noor's language: Wolof, with a Wolof speaker from Discord recording and checking. If none is found, a clearly labeled stand-in, and Wolof is evaluated on benchmarks.
+- Guest audio: guests hear Preet's English recordings of Noor's script as **Noor's labeled stand-in voice** (labeled in the app, the data card and the video). Noor speaks the national language with tourists, as the brief says; the stand-in stays until Noor records her own.
+- Noor's language is Wolof. AI-dubbed Wolof versions of the clips (ElevenLabs, made with Preet's consent) are **labeled synthetic data**: they feed the pipeline and the Wolof evaluation, and reach guests only in demo mode until a Wolof speaker checks them. Noor's monthly text and her order line are in Wolof, checked by a Wolof speaker before they are used.
+- Open conflict: the non-goal "no cloning of anyone's voice" (section 4) and non-negotiable 10 in CLAUDE.md rule out an AI dub of a teammate's voice. Preet has consented, but the captain must amend that wording before the dubbing step runs.
 - Visitor languages: three or four, chosen from The Gambia's tourist-arrival data. Draft: English, Dutch, Swedish, German.
 - Add-ons voiced by Preet as the narrator, never as Noor: three fun facts with sources, one recipe confirmed as Noor's, three products with Noor-set prices, one farm card.
 - Test set: about 40 questions (4–5 phrasings per clip) plus about 10 Noor hasn't covered, labeled with the correct moment or "not covered."
@@ -142,7 +144,7 @@ Evidence still to collect (Preet, with source, year and country): tourism arriva
 
 | Risk | Mitigation |
 |---|---|
-| No Wolof speaker found | Labeled stand-in recordings; Wolof evaluated on FLEURS and FLORES-200 |
+| No Wolof speaker found | Preet's English recordings stay as the labeled stand-in voice; Wolof text stays demo-only; Wolof evaluated on FLEURS and FLORES-200 and the AI-dubbed round trip |
 | Model too large for a weak connection | Int8 now; vocabulary trimming as P1; side-load path documented |
 | Time runs out | Cut list in `tasks/todo.md`, applied in order |
 | Wrong match given confidently | Guest confirmation; threshold calibrated on the test set; disambiguation as P1 |

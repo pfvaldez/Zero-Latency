@@ -2,7 +2,7 @@
 
 Status: `[ ]` to do, `[~]` in progress, `[x]` done (add a one-line proof), `[!]` blocked (say why).
 Deadline: submit by 8:00 AM ET, October 4 (hard deadline 9:00 AM ET). Feature freeze at 4:30 AM ET.
-Plan status: **Phase 0 approved and built on branch `phase-0-tooling` (PR #1 awaiting the captain's merge). Phase 1 built on branch `phase-1-core`, awaiting approval. Phases 2–7 are not started.**
+Plan status: **Phase 0 (PR #1) and Phase 1 (PR #2) are merged to `main`. Phases 2–7 are not started. Delivery order follows the slices below.**
 
 ## Checkpoints
 
@@ -16,6 +16,38 @@ Plan status: **Phase 0 approved and built on branch `phase-0-tooling` (PR #1 awa
 | 8:00 AM | Submitted on HackOS | Confirmation screenshot |
 
 Slices 1 to 4 replace the old 8:00 PM, 10:00 PM, midnight and 4:00 AM checkpoints; the captain moved the times on 2026-10-03. The repo has no other definition of the slices, so each keeps the content of the row it replaces (an assumption). The feature freeze moved from 4:00 AM to 4:30 AM, and CLAUDE.md says so too.
+
+## Delivery in vertical slices
+
+Each slice ends working and tested, and no mocks ship: a stand-in used while a later slice is built is labeled in demo mode and is replaced by the slice that owns the real thing. Labels for unchecked content are honesty, not mocks. The phases below stay the task inventory; the slices are the delivery order and the checkpoint times in the table above.
+
+### Slice 1: guest app offline, real guardrails
+- [ ] The guest app plays a clip offline after one pack download (the airplane-mode e2e passes)
+- [ ] Questions go through the real guardrails in `packages/core` (`decideSafety`, `decide`, `themeOf`, `redact`); until Slice 2 the matcher is the labeled `FakeMatcher` stand-in, shown in demo mode only
+- Done when: the offline Playwright test passes, `bun run test:coverage` and `bun run check` are green
+
+### Slice 2: content, pack and the real matcher
+- [ ] Content files (`clips.json`, `addons.json`, `checks.json`, `templates.json`, `test-questions.csv`)
+- [ ] NLLB draft subtitles, all marked unchecked
+- [ ] Farm pack with moment embeddings built in TypeScript, using the same `Xenova/multilingual-e5-small` ONNX model that runs on the phone
+- [ ] The e5 worker is live in the app, behind the `Matcher` interface (the `FakeMatcher` stand-in is removed from the app)
+- [ ] Matching accuracy and the match threshold are measured and written to `docs/EVAL.md`
+- Done when: a production pack builds, the offline e2e runs with the real matcher and no request leaves the page, and `docs/EVAL.md` has real numbers
+
+### Slice 3: backend, sync, dashboard and a real text
+- [ ] Supabase tables and RLS on the hosted project
+- [ ] `ingest` Edge Function using `redact()` from core, idempotent upsert
+- [ ] Sync from the guest app to the real `ingest` (the mock endpoint is removed)
+- [ ] `monthly-summary` with `pg_cron`, held or ready from a checked template
+- [ ] `/coop` dashboard with review and approval
+- [ ] An approved monthly text is sent as a real SMS through Twilio's trial to a verified demo phone
+- Done when: a question asked offline syncs, shows in `/coop`, and an approved monthly text arrives on the demo phone
+
+### Slice 4: Wolof evidence, Groq and narrator audio
+- [ ] Wolof evidence: FLORES-200 chrF with NLLB, FLEURS word error rate with MMS, and a round trip on the AI-dubbed Wolof clips
+- [ ] Groq theme cross-check on the cooperative side (strict schema, Zod, review queue)
+- [ ] ElevenLabs narrator audio from checked text, labeled as an AI voice
+- Done when: the numbers are in `docs/EVAL.md` with their limits, and every AI-voice file is listed in `labels.syntheticVoice`
 
 ## Phase 0: Repo and tooling (Bee, about 45 min; estimate with pinning and verification: 75–90 min)
 
@@ -102,7 +134,7 @@ Rules for this phase: Bun only (no npm, yarn or pnpm); Node 24 runs the Node-bas
 - [x] Guards: `bun.lock` is tracked and no foreign lockfiles exist; no secret names in `apps/` or `packages/` (`git grep`); no `baseUrl` anywhere; `git diff --stat` shows `.githooks/`, `.github/copilot-instructions.md` and `.claude/settings.json` unchanged, and `CLAUDE.md`, `docs/TRD.md` and `docs/PROJECT_MEMORY.md` changed only as the captain's changes require Proof: all clean on 2026-10-03
 - [x] `test-verifier` and `guardrail-reviewer` both report clean. The project agents load only after a session restart; until then run the same briefs through general-purpose agents Proof: both briefs were run through general-purpose agents because the project agent types load only at session start. test-verifier: every step passed. guardrail-reviewer: no rule violations and six suggestions; four fixed (a stale 8 PM mention in the TRD, the origin check in the smoke test, core's `test/` folder, wording in this file), and two left open: CI runs `bun run test` rather than `test:coverage` (the gate is trivial until Phase 1) and the `shadcn` package sits in `dependencies`
 - [x] Git (D12): branch `phase-0-tooling`, commits grouped by area with explicit paths, push the branch, open a PR, CI green; the captain merges. Each item above ticked with a one-line proof; Review section filled in for Phase 0 Proof: six commits on `phase-0-tooling`, PR #1 open, CI green; awaiting the captain's merge
-- [ ] Docs follow-ups for the captain (not edited here): Animate UI files live in `components/animate-ui/`, not `components/ui/` (TRD section 5); CLAUDE.md's commands table and `.github/copilot-instructions.md` still list `bunx supabase start`, which needs Docker and is no longer planned (D11)
+- [x] Docs follow-ups for the captain: Animate UI files live in `components/animate-ui/`, not `components/ui/` (TRD section 5); CLAUDE.md's commands table and `.github/copilot-instructions.md` listed `bunx supabase start`, which needs Docker and is no longer planned (D11) Proof: fixed in the `docs/catch-up` PR (TRD section 5, CLAUDE.md, copilot-instructions)
 
 <details>
 <summary>Research notes, 2026-10-03: what changed since the stack was chosen</summary>

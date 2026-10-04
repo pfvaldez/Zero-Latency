@@ -25,6 +25,7 @@ Read at the start of every session. After any correction or bug, add an entry: w
 19. When a new approach replaces an old one, say which steps to stop using and give one path at a time.
 20. Tell research subagents to write only to the scratchpad, run `git status` after every research batch, and choose the local scope when approving "always allow".
 21. Start every shell command with `cd <repo root> &&`, or use `--cwd`: a `cd` in one call stays in effect for the next.
+22. Never cut real functionality to save time without the captain's sign-off; sequence it into vertical slices instead. Labels for unchecked content are honesty, not mocks.
 
 ## Entries
 
@@ -112,6 +113,11 @@ Read at the start of every session. After any correction or bug, add an entry: w
 - **What happened:** A `cd apps/web` in one shell call stayed in effect, so the next commands ran in the wrong folder.
 - **Rule:** Start every shell command with `cd <repo root> &&`, and run package-manager commands with `--cwd` instead of `cd`.
 - **Check:** Every command begins with the `cd` to the repo root, or uses `--cwd`.
+
+### L-018: Re-plan cut real functionality without asking
+- **What happened:** A re-plan to save time dropped the Python pipeline, Groq and the live SMS without asking the captain.
+- **Rule:** Never cut real functionality to save time without the captain's sign-off; sequence it into vertical slices instead. Labels for unchecked content are honesty, not mocks.
+- **Check:** A scope change names what is kept and what moves later, and gets the captain's yes first.
 
 ## Bug log
 

@@ -25,7 +25,9 @@ Offline tour companion for a small coffee-farm tourism operator (Noor). World Ba
 - Label stand-ins and synthetic data in demo mode.
 
 ## Commands
-`bun install` · `bun run dev` · `bun run test` · `bun run e2e` · `bun run check` · `bun run typecheck` · `bunx supabase start`
+`bun install` · `bun run dev` · `bun run test` · `bun run e2e` · `bun run check` · `bun run typecheck`
+
+Supabase is a hosted project (no Docker, no local `supabase start`).
 
 ## Style
 TypeScript strict, Biome formatting, small functions, descriptive names, no `any`, no default exports except React route components.
