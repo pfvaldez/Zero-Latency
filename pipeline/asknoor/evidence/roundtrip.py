@@ -8,11 +8,12 @@ import json
 from pathlib import Path
 
 from .. import audio
+from ..consent import require_confirmed
 from .mms import MMS_RATE, Recognizer
 from .text import chrf, sentence_chrf
 
 
-def run_roundtrip(recognizer: Recognizer, translator, content: Path, log=print) -> dict:
+def run_roundtrip(recognizer: Recognizer, translator, content: Path, consent_md: Path, log=print) -> dict:
     clips = json.loads((content / "clips.json").read_text(encoding="utf-8"))["clips"]
     registry = json.loads((content / "recordings" / "recordings.json").read_text(encoding="utf-8"))["recordings"]
     rows = []
@@ -20,6 +21,8 @@ def run_roundtrip(recognizer: Recognizer, translator, content: Path, log=print) 
         rec = next((r for r in registry if r["clip"] == clip["id"] and r["lang"] == "wo"), None)
         if rec is None:
             continue
+        # Dubbed audio needs a confirmed dubbing row, even for a local evaluation run.
+        require_confirmed(consent_md, rec["consentPerson"], scope="dubbing")
         path = content / "recordings" / rec["file"]
         samples = audio.decode(path, channels=1, sample_rate=MMS_RATE)[:, 0]
         wolof = recognizer.transcribe(samples)

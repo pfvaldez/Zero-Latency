@@ -1,6 +1,6 @@
 """Run the Wolof evidence and write content/<farm>/eval/wolof.json.
 
-    uv run --group translate --group evidence python -m asknoor.evidence.run --parts flores,fleurs,roundtrip
+    uv run --group translate python -m asknoor.evidence.run --parts flores,fleurs,roundtrip
 
 Parts are independent and merged into the file as they finish. Local, long (NLLB and MMS on CPU),
 never in CI.
@@ -92,7 +92,9 @@ def main(argv: list[str] | None = None) -> int:
     if "roundtrip" in parts:
         from .roundtrip import run_roundtrip
 
-        doc["roundtrip"] = run_roundtrip(recognizer, translator, content)
+        from ..build import CONSENT_MD
+
+        doc["roundtrip"] = run_roundtrip(recognizer, translator, content, CONSENT_MD)
         print(f"roundtrip: pooled chrF {doc['roundtrip']['pooled_chrf']} (n={doc['roundtrip']['n']})")
         save()
     print(f"wrote {out_path.relative_to(REPO)}")

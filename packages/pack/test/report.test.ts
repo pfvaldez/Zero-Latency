@@ -113,7 +113,7 @@ describe("the Wolof evidence section", () => {
   it("states the limits and the non-commercial licenses of the models", async () => {
     const md = renderEval({ ...(await results()), wolof: evidence });
     expect(md).toContain("CC-BY-NC-4.0 (non-commercial)");
-    expect(md).toContain("the round trip is 8 clips, so it is an anecdote, not a benchmark");
+    expect(md).toContain("the round trip is 2 clips, so it is an anecdote, not a benchmark");
   });
 });
 

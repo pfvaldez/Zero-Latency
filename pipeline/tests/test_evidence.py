@@ -147,16 +147,39 @@ class Backtranslator:
         return [s.replace("benn", "one") for s in sentences]
 
 
+CONSENT = (
+    "| Person | What they consented to | Where | Date | Status |\n|---|---|---|---|---|\n"
+    "| Preet Patel | AI dubbing of her English recordings | Discord | 2026-10-03 | {status} |\n"
+)
+
+
 def test_roundtrip_transcribes_the_dubs_translates_back_and_scores_against_the_script(tmp_path):
     content = tmp_path / "farm"
     (content / "recordings" / "wo").mkdir(parents=True)
     (content / "clips.json").write_text(json.dumps({"clips": [{"id": 1, "script": {"en": "one two"}}]}))
     (content / "recordings" / "recordings.json").write_text(
-        json.dumps({"recordings": [{"clip": 1, "lang": "wo", "file": "wo/clip01_wo.flac"}]})
+        json.dumps({"recordings": [{"clip": 1, "lang": "wo", "file": "wo/clip01_wo.flac", "consentPerson": "Preet Patel"}]})
     )
     wav = tmp_path / "in.wav"
     wav.write_bytes(wav_bytes())
     audio._run(["-i", str(wav), "-y", str(content / "recordings" / "wo" / "clip01_wo.flac")])
-    result = run_roundtrip(EchoRecognizer(["benn two"]), Backtranslator(), content, log=lambda *_: None)
+    consent = tmp_path / "CONSENT.md"
+    consent.write_text(CONSENT.format(status="confirmed"))
+    result = run_roundtrip(EchoRecognizer(["benn two"]), Backtranslator(), content, consent, log=lambda *_: None)
     assert result["n"] == 1 and result["pooled_chrf"] == 100.0
     assert result["clips"][0]["wolof_transcript"] == "benn two" and result["clips"][0]["back_to_english"] == "one two"
+
+
+def test_roundtrip_refuses_dubbed_audio_without_a_confirmed_dubbing_row(tmp_path):
+    from asknoor.consent import ConsentError
+
+    content = tmp_path / "farm"
+    (content / "recordings" / "wo").mkdir(parents=True)
+    (content / "clips.json").write_text(json.dumps({"clips": [{"id": 1, "script": {"en": "one two"}}]}))
+    (content / "recordings" / "recordings.json").write_text(
+        json.dumps({"recordings": [{"clip": 1, "lang": "wo", "file": "wo/clip01_wo.flac", "consentPerson": "Preet Patel"}]})
+    )
+    consent = tmp_path / "CONSENT.md"
+    consent.write_text(CONSENT.format(status="pending"))
+    with pytest.raises(ConsentError, match="pending"):
+        run_roundtrip(EchoRecognizer([]), Backtranslator(), content, consent, log=lambda *_: None)

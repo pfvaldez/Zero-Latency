@@ -1117,9 +1117,9 @@
     ]
   },
   "timings": {
-    "modelLoadMs": 463,
-    "passagesMs": 211,
-    "queryMedianMs": 1.8,
+    "modelLoadMs": 505,
+    "passagesMs": 214,
+    "queryMedianMs": 1.7,
     "queryP95Ms": 2.2,
     "queries": 116
   },

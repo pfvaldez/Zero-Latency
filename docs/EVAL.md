@@ -106,7 +106,7 @@ English to Wolof scores 23.86 and English to German 62.47: Wolof is **38.6 chrF 
 | Word error rate | 38.2% |
 | Character error rate | 12.0% |
 
-Wolof spelling varies, so the word error rate overstates the real errors; the character error rate is the fairer number.
+Wolof spelling varies, so the word error rate likely overstates the real errors and the character error rate is probably the fairer number (this run did not measure that).
 
 ### Round trip on the AI-dubbed Wolof clips
 
@@ -123,9 +123,9 @@ MMS Wolof transcript, then NLLB Wolof to English, then chrF against Preet's Engl
 | 7 | 17.58 | jon bijem chitulu the cafe is located at the top of the dafai jel wahtu solal dalw digar tayoblndoh sula ye which jafle wahko sagedanu jal rek chi safugi |
 | 8 | 19.48 | ama gunooy now wante lingeen kolaye barena letter mangishi think now he owns the sengiid you can say a few words here |
 
-**Where it breaks (an inference, not a measurement):** on clean FLORES text NLLB's Wolof to English scores 38.29, and on real FLEURS speech MMS makes 12.0% character errors; the dubs round-trip at 15.29, far below what either stage suggests. That points at the dubbed audio (or MMS on synthetic speech) more than at the translation step, but a Wolof speaker listening to the clips is the only real test.
+**Where it breaks (an inference, not a measurement):** on clean FLORES text NLLB's Wolof to English scores 38.29, and on real FLEURS speech MMS makes 12.0% character errors; the dubs round-trip at 15.29, far below what either stage suggests (the numbers are different metrics on different material, so they are not directly comparable). That points at the dubbed audio (or MMS on synthetic speech) more than at the translation step, but a Wolof speaker listening to the clips is the only real test.
 
-**Limits:** the round trip is 8 clips, so it is an anecdote, not a benchmark; FLEURS is read speech by volunteers and the dubs are synthetic speech, so neither number transfers to a farm tour; a low chrF here means the machine drafts need a Wolof speaker, which is exactly how they are treated (drafts, demo only). The round trip compounds two errors (recognition and translation) and cannot say which one is at fault.
+**Limits:** the round trip is 8 clips, so it is an anecdote, not a benchmark; FLEURS is read speech by volunteers and the dubs are synthetic speech, so neither number transfers to a farm tour; a low chrF here means the machine drafts need a Wolof speaker, which is exactly how they are treated (drafts, demo only). The round trip compounds two errors (recognition and translation) and cannot say which one is at fault. These runs used a length-sorted batch order and an output-length cap that the committed translation drafts did not, so the two are slightly different generation settings.
 
 ## The overnight loop (clip 8 held back, then published)
 
@@ -195,9 +195,9 @@ Best moment score per question, in 8 bins from 0.6 to 1.
 | Embedding matrix | 0.2 MB |
 | Prepared audio (local, if built) | 0.5 MB |
 | Estimated pack | 136.1 MB against the 150.0 MB P0 budget |
-| Model load (Node, build machine) | 463 ms |
-| Embedding the passages | 211 ms |
-| One question, median / p95 (116 questions) | 1.8 ms / 2.2 ms |
+| Model load (Node, build machine) | 505 ms |
+| Embedding the passages | 214 ms |
+| One question, median / p95 (116 questions) | 1.7 ms / 2.2 ms |
 
 **These timings are Node on the build machine, not a mid-range Android phone.** The phone numbers (model first load, question to outcome) come from the offline end-to-end run with the real worker.
 

@@ -236,7 +236,7 @@ function wolofSection(w: WolofEvidence | null): string[] {
       `| Word error rate | ${(f.wer * 100).toFixed(1)}% |`,
       `| Character error rate | ${(f.cer * 100).toFixed(1)}% |`,
       "",
-      "Wolof spelling varies, so the word error rate overstates the real errors; the character error rate is the fairer number.",
+      "Wolof spelling varies, so the word error rate likely overstates the real errors and the character error rate is probably the fairer number (this run did not measure that).",
       "",
     );
   }
@@ -257,12 +257,12 @@ function wolofSection(w: WolofEvidence | null): string[] {
   const back = chrfOf(w, "wol_Latn to eng_Latn");
   if (w.roundtrip && w.fleurs && back) {
     out.push(
-      `**Where it breaks (an inference, not a measurement):** on clean FLORES text NLLB's Wolof to English scores ${back.chrf}, and on real FLEURS speech MMS makes ${(w.fleurs.cer * 100).toFixed(1)}% character errors; the dubs round-trip at ${w.roundtrip.pooled_chrf}, far below what either stage suggests. That points at the dubbed audio (or MMS on synthetic speech) more than at the translation step, but a Wolof speaker listening to the clips is the only real test.`,
+      `**Where it breaks (an inference, not a measurement):** on clean FLORES text NLLB's Wolof to English scores ${back.chrf}, and on real FLEURS speech MMS makes ${(w.fleurs.cer * 100).toFixed(1)}% character errors; the dubs round-trip at ${w.roundtrip.pooled_chrf}, far below what either stage suggests (the numbers are different metrics on different material, so they are not directly comparable). That points at the dubbed audio (or MMS on synthetic speech) more than at the translation step, but a Wolof speaker listening to the clips is the only real test.`,
       "",
     );
   }
   out.push(
-    "**Limits:** the round trip is 8 clips, so it is an anecdote, not a benchmark; FLEURS is read speech by volunteers and the dubs are synthetic speech, so neither number transfers to a farm tour; a low chrF here means the machine drafts need a Wolof speaker, which is exactly how they are treated (drafts, demo only). The round trip compounds two errors (recognition and translation) and cannot say which one is at fault.",
+    `**Limits:** the round trip is ${w.roundtrip?.n ?? 0} clips, so it is an anecdote, not a benchmark; FLEURS is read speech by volunteers and the dubs are synthetic speech, so neither number transfers to a farm tour; a low chrF here means the machine drafts need a Wolof speaker, which is exactly how they are treated (drafts, demo only). The round trip compounds two errors (recognition and translation) and cannot say which one is at fault. These runs used a length-sorted batch order and an output-length cap that the committed translation drafts did not, so the two are slightly different generation settings.`,
     "",
   );
   return out;
