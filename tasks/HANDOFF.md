@@ -1,3 +1,39 @@
+# Status after the overnight autopilot (written 2026-10-04, about 03:35 ET)
+
+Everything below this block was written earlier for Pablo and is kept for reference; where it says the guest app is on a draft PR, this block is newer: **it is merged**.
+
+## What merged (all with CI green, including the Playwright airplane-mode test, and a guardrail-reviewer PASS)
+| PR | What |
+|---|---|
+| #14, #15 | The 44 MB trimmed model, hosted as a private GitHub Release asset (`pack:model --trimmed` downloads and verifies it; needs `GITHUB_TOKEN` while the repo is private), MIT notice, committed fidelity figures |
+| #16 | The guest app demo path: pack download, language picker, stops, player with labels, ask flow (safety first, e5 worker, confirm), feedback, shop, offline PWA, airplane-mode e2e. Review fixes: orders need Noor's 4-digit farm code (salted hash in the pack, prototype control), draft labels on every subtitle path, 16 px minimum text, translated AI-dubbed chip, the missing tests |
+| #17 | Stop links (`/stop/1` to `/stop/n`, offline) and the in-app QR scanner (`NOOR-STOP-n` or a stop link; anything else ignored), with a fake-camera Playwright test. The first CI run caught a real bug in my test feed (the QR was cropped by the scanner's scan region); fixed |
+| #18 | `docs/DATA_CARD.md`, `docs/RESPONSIBLE_AI.md` (every guardrail with the test that proves it), README Evaluation and Status tables from `docs/EVAL.md` |
+
+Test status on main: 643 unit tests, 10 model tests, 97 pytest, 4 Playwright tests (smoke, offline tour, request-watcher control, stop links and scanner). `bun run check` and `bun run typecheck` clean.
+
+## What is still open (guest app, in order)
+1. The real-audio demo pack (blocked: Preet's publishing consent, see below).
+2. Sync (`SyncService`: post the outbox when online, backoff, pending count; the Supabase ingest does not exist, so use a labeled mock).
+3. Fun fact, Recipe and Farm cards from `manifest.addons`, and the GSAP progress timeline (reduced motion respected).
+4. Pack update flow (swap on the next stop change, never mid-clip) and storage-persistence messaging for iOS.
+5. Polish: keyboard and screen-reader pass, Lighthouse PWA and accessibility 95+, error boundary, a measured first-load time on a real phone.
+6. `/coop` dashboard, Supabase, Groq theme check, monthly text and reviewer approval: **not started; `supabase/` is Pablo's and I did not touch it**. Step 7 (Groq) was skipped by decision.
+7. The video (story in the earlier handoff below).
+
+Small known items from the reviews: the farm-code lockout lives in page memory (a reload clears it); the e2e has no control for a foreign QR code (unit tests cover it); `waitForTimeout(3000)` in the e2e waits for the precache, so poll for it if it flakes; `/stop/n` links on a real host need a single-page-app fallback to `index.html` for the first online visit (the service worker and `vite preview` already do this); the older-Safari wasm build is precached but never exercised.
+
+## Waiting for Bee
+- **Preet's consent rows** (`docs/CONSENT.md`): set publishing to `confirmed` (needed for any pack with her voice) and decide on transcription; file the Discord link for the dubbing yes. I did not change any row.
+- **The audio folder for Pablo**: the 8 English and 8 Wolof recordings are gitignored and only on your machine (`~/Downloads/Archive-2/`); verify with `content/ondera-noor/recordings/audio.sha256`.
+- **Farm code**: pick the real production code (`ASKNOOR_FARM_CODE`, 4 digits, never committed) or decide that order confirmation moves to Noor's own device or the dashboard (a 4-digit code is brute-forceable offline from the pack). The demo code is `4827`.
+- **Hosting and its file limits**: the largest files are the 42.3 MB model, the 26.9 MB runtime wasm and the 14.3 MB older-Safari wasm; the app also precaches about 41 MB before the pack download. Choose a host that allows them, and decide whether to drop the older-Safari wasm.
+- **Private repo and the model download**: while the repo is private, `pack:model --trimmed` needs a token. If the repo goes public the plain URL works. The MIT notice is a release asset and in the repo, not inside each pack.
+- **Native-speaker checks** (de, nl, sv interface text and subtitle drafts; Wolof drafts and dubs) are Preet's; until they are done, production packs must not ship those languages.
+- **A real-phone run** (first load time, the matcher on a phone, iOS Safari) and a threshold check with phone-made vectors: not done.
+- **Index-only passages in production**: your decision on record is that they may ship; the responsible-AI doc flags the tension with rule 5.
+- **`.claude/settings.local.json`** has the autopilot permissions and is gitignored; I never committed it. `git push origin *` is allowed there, so narrow it if you want.
+
 # Handoff to Pablo (written 2026-10-04, about 03:00 ET, by Bee's Claude Code session)
 
 Branch `feat/guest-app`, draft PR #16. **Do not merge it until the guardrail review is back and CI is green.** Read CLAUDE.md, `tasks/lessons.md` and this file first. Bun is exactly 1.3.10. Feature freeze is 4:30 AM ET, submit by 8:00 AM ET.
