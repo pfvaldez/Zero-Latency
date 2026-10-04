@@ -2,7 +2,10 @@
 // scripts, for example `bun run --cwd packages/pack eval`. Never runs at guest runtime.
 
 import { join } from "node:path";
+import { PackError } from "@asknoor/core";
+import { buildPack } from "./build.ts";
 import { runEval } from "./eval-run.ts";
+import { buildFixture } from "./fixture.ts";
 import { ensureModelCache, REPO_ROOT, stageModel } from "./model.ts";
 
 const [command, ...rest] = process.argv.slice(2);
@@ -33,8 +36,36 @@ async function main(): Promise<number> {
       );
       return 0;
     }
+    case "fixture": {
+      const built = await buildFixture();
+      console.log(
+        `fixture pack ${built.manifest.packId} v${built.manifest.version} at ${built.dir}: ${built.manifest.clips.length} clips, ${built.manifest.embeddings.count} embeddings`,
+      );
+      return 0;
+    }
+    case "build": {
+      const mode = flag("--mode") === "production" ? "production" : "demo";
+      const publish = (flag("--publish") ?? "")
+        .split(",")
+        .filter(Boolean)
+        .map((c) => Number(c.replace(/^clip0*/, "")));
+      const built = await buildPack({ farm: flag("--farm") ?? "ondera-noor", mode, publish });
+      const m = built.manifest;
+      console.log(
+        `${m.mode} pack ${m.packId} v${m.version} (${built.changed ? "changed" : "unchanged"}) at ${built.dir}: ` +
+          `${m.clips.length} clips, ${m.embeddings.count} embeddings, ${(Object.values(m.sizes).reduce((a, b) => a + b, 0) / 1e6).toFixed(1)} MB`,
+      );
+      if (m.clips.length === 0)
+        console.log(
+          "  WARNING: this pack has no clips (nothing is checked yet for production, or every clip was excluded)",
+        );
+      for (const e of built.plan.excluded) console.log(`  excluded ${e.what}: ${e.why}`);
+      return 0;
+    }
     default:
-      console.error("usage: cli.ts model [--into dir] | eval [--farm slug]");
+      console.error(
+        "usage: cli.ts model [--into dir] | eval [--farm slug] | build [--mode demo|production] [--publish clip08]",
+      );
       return 2;
   }
 }
@@ -42,7 +73,13 @@ async function main(): Promise<number> {
 main().then(
   (code) => process.exit(code),
   (error) => {
-    console.error(error instanceof Error ? error.message : error);
+    console.error(
+      error instanceof PackError
+        ? `pack build refused: ${error.message}`
+        : error instanceof Error
+          ? error.message
+          : error,
+    );
     process.exit(1);
   },
 );

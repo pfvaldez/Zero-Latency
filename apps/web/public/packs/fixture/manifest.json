@@ -1,0 +1,302 @@
+{
+  "packId": "fixture-demo-4182f217eac9",
+  "farmId": "00000000-0000-4000-8000-0000000000f1",
+  "farmSlug": "fixture",
+  "version": 1,
+  "mode": "demo",
+  "createdAt": "2026-10-04T00:00:00.000Z",
+  "noorLang": "wo",
+  "visitorLangs": [
+    "en",
+    "de",
+    "nl",
+    "sv"
+  ],
+  "clips": [
+    {
+      "id": 1,
+      "kind": "stop",
+      "stopCode": "NOOR-STOP-1",
+      "audio": "audio/clip01.m4a",
+      "durationMs": 5611,
+      "momentIds": [
+        "c1-m1"
+      ],
+      "subtitles": {
+        "en": "subtitles/clip01.en.vtt",
+        "de": "subtitles/clip01.de.vtt",
+        "nl": "subtitles/clip01.nl.vtt",
+        "sv": "subtitles/clip01.sv.vtt"
+      }
+    },
+    {
+      "id": 2,
+      "kind": "stop",
+      "stopCode": "NOOR-STOP-2",
+      "audio": "audio/clip02.m4a",
+      "durationMs": 6613,
+      "momentIds": [
+        "c2-m1"
+      ],
+      "subtitles": {
+        "en": "subtitles/clip02.en.vtt",
+        "de": "subtitles/clip02.de.vtt",
+        "nl": "subtitles/clip02.nl.vtt",
+        "sv": "subtitles/clip02.sv.vtt"
+      }
+    },
+    {
+      "id": 3,
+      "kind": "stop",
+      "stopCode": "NOOR-STOP-3",
+      "audio": "audio/clip03.m4a",
+      "durationMs": 6101,
+      "momentIds": [
+        "c3-m1"
+      ],
+      "subtitles": {
+        "en": "subtitles/clip03.en.vtt",
+        "de": "subtitles/clip03.de.vtt",
+        "nl": "subtitles/clip03.nl.vtt",
+        "sv": "subtitles/clip03.sv.vtt"
+      }
+    }
+  ],
+  "moments": [
+    {
+      "id": "c1-m1",
+      "clipId": 1,
+      "startMs": 0,
+      "endMs": 5611,
+      "subtitles": {
+        "en": "Welcome to the fixture farm. This is synthetic test audio, not a person.",
+        "de": "Willkommen auf der Fixture-Farm. Das ist synthetisches Testaudio, keine Person.",
+        "nl": "Welkom op de fixture-boerderij. Dit is synthetische testaudio, geen persoon.",
+        "sv": "Välkommen till fixture-gården. Det här är syntetiskt testljud, ingen person."
+      },
+      "topic": {
+        "en": "the welcome",
+        "de": "the welcome",
+        "nl": "the welcome",
+        "sv": "the welcome"
+      },
+      "draft": {
+        "en": true,
+        "de": true,
+        "nl": true,
+        "sv": true
+      },
+      "timing": "estimated"
+    },
+    {
+      "id": "c2-m1",
+      "clipId": 2,
+      "startMs": 0,
+      "endMs": 6613,
+      "subtitles": {
+        "en": "We pick the red coffee cherries by hand. This is synthetic test audio, not a person.",
+        "de": "Wir pflücken die roten Kaffeekirschen von Hand. Das ist synthetisches Testaudio, keine Person.",
+        "nl": "We plukken de rode koffiekersen met de hand. Dit is synthetische testaudio, geen persoon.",
+        "sv": "Vi plockar de röda kaffebären för hand. Det här är syntetiskt testljud, ingen person."
+      },
+      "topic": {
+        "en": "picking the coffee cherries",
+        "de": "picking the coffee cherries",
+        "nl": "picking the coffee cherries",
+        "sv": "picking the coffee cherries"
+      },
+      "draft": {
+        "en": true,
+        "de": true,
+        "nl": true,
+        "sv": true
+      },
+      "timing": "estimated"
+    },
+    {
+      "id": "c3-m1",
+      "clipId": 3,
+      "startMs": 0,
+      "endMs": 6101,
+      "subtitles": {
+        "en": "We roast the coffee beans in a pan over the fire. This is synthetic test audio, not a person.",
+        "de": "Wir rösten die Kaffeebohnen in einer Pfanne über dem Feuer. Das ist synthetisches Testaudio, keine Person.",
+        "nl": "We roosteren de koffiebonen in een pan boven het vuur. Dit is synthetische testaudio, geen persoon.",
+        "sv": "Vi rostar kaffebönorna i en panna över elden. Det här är syntetiskt testljud, ingen person."
+      },
+      "topic": {
+        "en": "roasting the coffee",
+        "de": "roasting the coffee",
+        "nl": "roasting the coffee",
+        "sv": "roasting the coffee"
+      },
+      "draft": {
+        "en": true,
+        "de": true,
+        "nl": true,
+        "sv": true
+      },
+      "timing": "estimated"
+    }
+  ],
+  "addons": [
+    {
+      "id": "fact-1",
+      "text": {
+        "en": "Synthetic fixture fact: coffee cherries are red when ripe."
+      },
+      "checked": false,
+      "needs": [
+        "source"
+      ],
+      "kind": "fact"
+    },
+    {
+      "id": "recipe",
+      "text": {
+        "en": "Synthetic fixture recipe\n1. Grind the beans.\n2. Add hot water."
+      },
+      "checked": false,
+      "kind": "recipe"
+    },
+    {
+      "id": "beans-250",
+      "text": {
+        "en": "Synthetic fixture beans, 250 g"
+      },
+      "checked": false,
+      "needs": [
+        "price"
+      ],
+      "kind": "product",
+      "currency": "GMD"
+    },
+    {
+      "id": "farm-card",
+      "text": {
+        "en": "Synthetic fixture farm card."
+      },
+      "checked": false,
+      "needs": [
+        "phone"
+      ],
+      "kind": "farm-card"
+    }
+  ],
+  "model": {
+    "id": "multilingual-e5-small",
+    "dir": "model/multilingual-e5-small",
+    "source": "Xenova/multilingual-e5-small",
+    "revision": "761b726dd34fb83930e26aab4e9ac3899aa1fa78",
+    "queryPrefix": "query: ",
+    "dim": 384,
+    "quantization": "int8",
+    "vocab": "full",
+    "sizeBytes": 135392183
+  },
+  "embeddings": {
+    "file": "embeddings.f32",
+    "count": 12,
+    "dim": 384,
+    "dtype": "float32",
+    "passagePrefix": "passage: ",
+    "rows": [
+      {
+        "momentId": "c1-m1",
+        "lang": "en"
+      },
+      {
+        "momentId": "c1-m1",
+        "lang": "de"
+      },
+      {
+        "momentId": "c1-m1",
+        "lang": "nl"
+      },
+      {
+        "momentId": "c1-m1",
+        "lang": "sv"
+      },
+      {
+        "momentId": "c2-m1",
+        "lang": "en"
+      },
+      {
+        "momentId": "c2-m1",
+        "lang": "de"
+      },
+      {
+        "momentId": "c2-m1",
+        "lang": "nl"
+      },
+      {
+        "momentId": "c2-m1",
+        "lang": "sv"
+      },
+      {
+        "momentId": "c3-m1",
+        "lang": "en"
+      },
+      {
+        "momentId": "c3-m1",
+        "lang": "de"
+      },
+      {
+        "momentId": "c3-m1",
+        "lang": "nl"
+      },
+      {
+        "momentId": "c3-m1",
+        "lang": "sv"
+      }
+    ]
+  },
+  "thresholds": {
+    "match": 0.8525,
+    "margin": 0.05
+  },
+  "sizes": {
+    "audio/clip01.m4a": 33090,
+    "audio/clip02.m4a": 39351,
+    "audio/clip03.m4a": 36323,
+    "embeddings.f32": 18432,
+    "subtitles/clip01.de.vtt": 243,
+    "subtitles/clip01.en.vtt": 209,
+    "subtitles/clip01.nl.vtt": 240,
+    "subtitles/clip01.sv.vtt": 244,
+    "subtitles/clip02.de.vtt": 259,
+    "subtitles/clip02.en.vtt": 221,
+    "subtitles/clip02.nl.vtt": 253,
+    "subtitles/clip02.sv.vtt": 254,
+    "subtitles/clip03.de.vtt": 272,
+    "subtitles/clip03.en.vtt": 230,
+    "subtitles/clip03.nl.vtt": 263,
+    "subtitles/clip03.sv.vtt": 259
+  },
+  "checksums": {
+    "audio/clip01.m4a": "ebc9fd6a3ca40d36be3a3af07dc4b68a6aa916af4070c0ab797d836c6bd34441",
+    "audio/clip02.m4a": "acc69694f3ac27fb6ecb21b71c270bbda0548fd76d43738e35b182c3f17bcc6e",
+    "audio/clip03.m4a": "6765358824f70dce5ea7b41b247e88c3f9607793bb0ed9a5b502522df2c25d5e",
+    "embeddings.f32": "3315b19ba0ef031ae68a2de48ac7804d7dad531db9c0e7cf72c7b7776c9d08ae",
+    "subtitles/clip01.de.vtt": "708c6729ff246f454717d65617c18fc08d3dc7acdeff9d25287373d7ad4ce1de",
+    "subtitles/clip01.en.vtt": "4420e1529e6dd6eeed48219363f5a2a6ae681c91c97686a7c69f6e433e455baa",
+    "subtitles/clip01.nl.vtt": "3f2480d696f2b090c2428e707a4d2881cfccd79ea42d6afe52715f77cbf8fdd8",
+    "subtitles/clip01.sv.vtt": "f8fb831dc016bc9c03d3e405f39b9eb8a95b587af36ad8f90aa5f2ad965b5325",
+    "subtitles/clip02.de.vtt": "6603e1bf67238291e7614b49f3c65b3442f835851af600a9a556b024742f9ac2",
+    "subtitles/clip02.en.vtt": "55ddc76db6fe7dfb3491dd1e1a3e7d3672facb87b0dbf40aa74a29093feb0028",
+    "subtitles/clip02.nl.vtt": "165ac38fe6ba7cd93416a5ab037a3e0bb2624cb1bcdaa82a09e6b7ca81fcc622",
+    "subtitles/clip02.sv.vtt": "f32ddbe979e294b4bee007514ba5fdff37678a801f72ffce6afd8559fcb52e31",
+    "subtitles/clip03.de.vtt": "cc2d8d8c5c1fa085c635a82dc64c4f1be5279d5802715cca7ca4fb46d25fc114",
+    "subtitles/clip03.en.vtt": "41c72e2ebccc5c5bb4dc339439d1753e83efa15d8b19dfa896c8d022bad0536c",
+    "subtitles/clip03.nl.vtt": "f85093ff9ee53ef09703adbf70202626d6e1016668baeb2ecf90250bde27ab9f",
+    "subtitles/clip03.sv.vtt": "602778d49b75d3acac9c5c0f07caba21d748645607ae7f3bf85fce9f8088466b"
+  },
+  "labels": {
+    "standIn": [
+      "Synthetic test tone, not a voice"
+    ],
+    "standInVoice": [],
+    "syntheticVoice": [],
+    "aiDubbed": []
+  }
+}

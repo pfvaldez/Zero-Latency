@@ -113,7 +113,11 @@ async function dirBytes(dir: string): Promise<number | null> {
   }
 }
 
-export async function runEval(farm: string, now = new Date()): Promise<EvalResults> {
+export async function runEval(
+  farm: string,
+  now = new Date(),
+  opts: { write?: boolean } = {},
+): Promise<EvalResults> {
   const clips = await loadClips(farm);
   const questions = await loadQuestions(farm);
   const lock = await readLock();
@@ -294,6 +298,7 @@ export async function runEval(farm: string, now = new Date()): Promise<EvalResul
     },
   };
 
+  if (opts.write === false) return results;
   const evalDir = join(contentDir(farm), "eval");
   await mkdir(evalDir, { recursive: true });
   await writeFile(join(evalDir, "results.json"), `${JSON.stringify(results, null, 2)}\n`);

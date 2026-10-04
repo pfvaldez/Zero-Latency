@@ -21,7 +21,7 @@
     "pack:build": "bun run --cwd packages/pack build",
     "pack:fixture": "bun run --cwd packages/pack fixture",
     "eval": "bun run --cwd packages/pack eval",
-    "test:model": "vitest run --config packages/pack/vitest.model.config.ts"
+    "test:model": "vitest run --root packages/pack --config vitest.model.config.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
