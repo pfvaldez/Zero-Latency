@@ -96,7 +96,17 @@ export interface FarmPackManifest {
   thresholds: Thresholds; // calibrated by pipeline/eval
   sizes: Record<string, number>;
   checksums: Record<string, string>;
-  labels: { standIn: string[]; syntheticVoice: string[] };
+  labels: {
+    // Other stand-ins (placeholder content, stand-in software): demo packs only.
+    standIn: string[];
+    // A disclosed stand-in voice: the player shows "Voice: {person}, standing in for Noor"
+    // (i18n key labels.standInVoice) in every guest language. May ship in production.
+    standInVoice: { person: string; files: string[] }[];
+    // AI voice files made from checked text (narrator audio), labeled "AI narrator voice".
+    syntheticVoice: string[];
+    // AI-dubbed audio (a person's voice dubbed into another language): demo packs only.
+    aiDubbed: string[];
+  };
 }
 
 export interface MatchResult {

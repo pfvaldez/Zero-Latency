@@ -102,6 +102,7 @@ export const de: Strings = {
   "labels.demo": "Demomodus",
   "labels.draftTranslation": "Entwurf einer Übersetzung, noch nicht geprüft",
   "labels.standIn": "Platzhalter: {what}",
+  "labels.standInVoice": "Stimme: {person}, in Vertretung für Noor",
   "labels.aiVoice": "KI-Sprecherstimme",
   "labels.synthetic": "Synthetische Beispieldaten",
 };

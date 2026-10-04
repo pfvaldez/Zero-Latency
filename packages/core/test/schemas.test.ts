@@ -50,7 +50,7 @@ function manifest(overrides: Partial<FarmPackManifest> = {}): FarmPackManifest {
     thresholds: { match: 0.8, margin: 0.05 },
     sizes: { "clip1.mp3": 480_000 },
     checksums: { "clip1.mp3": "abc123" },
-    labels: { standIn: [], syntheticVoice: [] },
+    labels: { standIn: [], standInVoice: [], syntheticVoice: [], aiDubbed: [] },
     ...overrides,
   };
 }
@@ -106,7 +106,12 @@ describe("FarmPackManifestSchema", () => {
         },
       ],
       addons: [{ id: "r", kind: "recipe", text: { en: "x" }, checked: false }],
-      labels: { standIn: ["noorLang: stand-in voice"], syntheticVoice: ["narrator"] },
+      labels: {
+        standIn: ["noorLang: stand-in voice"],
+        standInVoice: [{ person: "Preet", files: ["clip01.m4a"] }],
+        syntheticVoice: ["narrator"],
+        aiDubbed: ["clip01_wo.m4a"],
+      },
     });
     expect(FarmPackManifestSchema.safeParse(demo).success).toBe(true);
   });
@@ -128,7 +133,9 @@ describe("FarmPackManifestSchema", () => {
     const unchecked = manifest({
       addons: [{ id: "f", kind: "fact", text: {}, source: "s", checked: false }],
     });
-    const standIn = manifest({ labels: { standIn: ["x"], syntheticVoice: [] } });
+    const standIn = manifest({
+      labels: { standIn: ["x"], standInVoice: [], syntheticVoice: [], aiDubbed: [] },
+    });
     for (const bad of [withDraft, unchecked, standIn]) {
       expect(FarmPackManifestSchema.safeParse(bad).success).toBe(false);
     }
@@ -208,6 +215,54 @@ describe("FarmPackManifestSchema", () => {
       ],
     });
     expect(FarmPackManifestSchema.safeParse(m).success).toBe(false);
+  });
+});
+
+describe("voice labels: a disclosed stand-in voice may ship, the rest is demo-only", () => {
+  const labels = (over: object) => ({
+    ...manifest().labels,
+    ...over,
+  });
+  const ok = (mode: "demo" | "production", over: object) =>
+    FarmPackManifestSchema.safeParse({ ...manifest(), mode, labels: labels(over) }).success;
+  const voice = { standInVoice: [{ person: "Preet", files: ["clip01.m4a"] }] };
+
+  it("allows a disclosed stand-in voice in a production pack (and in a demo pack)", () => {
+    expect(ok("production", voice)).toBe(true);
+    expect(ok("demo", voice)).toBe(true);
+  });
+
+  it("still refuses every other stand-in in production, and allows it in demo", () => {
+    expect(ok("production", { ...voice, standIn: ["placeholder matcher"] })).toBe(false);
+    expect(ok("demo", { ...voice, standIn: ["placeholder matcher"] })).toBe(true);
+  });
+
+  it("refuses AI-dubbed audio in production, allows it in demo", () => {
+    expect(ok("production", { ...voice, aiDubbed: ["clip01_wo.m4a"] })).toBe(false);
+    expect(ok("demo", { ...voice, aiDubbed: ["clip01_wo.m4a"] })).toBe(true);
+  });
+
+  it("allows labeled narrator audio (AI narrator voice) in production", () => {
+    expect(ok("production", { syntheticVoice: ["fact1.m4a"] })).toBe(true);
+  });
+
+  it("refuses a stand-in voice entry with no person or no files, in any mode", () => {
+    for (const bad of [
+      [{ person: "", files: ["a.m4a"] }],
+      [{ person: "Preet", files: [] }],
+      [{ person: "Preet" }],
+      [{ person: "Preet", files: ["a.m4a"], extra: 1 }],
+    ]) {
+      expect(ok("demo", { standInVoice: bad })).toBe(false);
+    }
+  });
+
+  it("requires both new label lists", () => {
+    const { standInVoice: _s, ...noVoice } = manifest().labels;
+    const { aiDubbed: _a, ...noDubbed } = manifest().labels;
+    for (const bad of [noVoice, noDubbed]) {
+      expect(FarmPackManifestSchema.safeParse({ ...manifest(), labels: bad }).success).toBe(false);
+    }
   });
 });
 

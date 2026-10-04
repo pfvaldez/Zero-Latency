@@ -30,6 +30,7 @@ Phase 4 first half: the guest app shell. Read CLAUDE.md, docs/PRD.md sections 6â
 - Zustand store for guest UI state (language, current stop, ask outcome); language persisted
 - Routes: / (guest) and /coop (placeholder)
 - Pack download screen with size and progress, StopList, Player with WebVTT subtitles and the GSAP progress timeline (reduced motion respected), FunFact, RecipeCard, FarmCard
+- The Player shows t(lang, "labels.standInVoice", { person }) ("Voice: Preet, standing in for Noor") for every clip whose audio is listed in manifest.labels.standInVoice, and "AI-dubbed" for files in labels.aiDubbed (demo packs only); a component test covers both
 - vite-plugin-pwa: precache the shell; cache the pack at download
 - Animate UI Sheet for overlays; Tailwind tokens from TRD 6.5 (cyan is a fill only); WCAG 2.2 AA; subtitles at least 20 px
 - Tests: component tests for StopList and Player; Playwright: download the pack, go offline, reload, play stop 1

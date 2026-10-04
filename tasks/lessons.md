@@ -82,7 +82,7 @@ Read at the start of every session. After any correction or bug, add an entry: w
 ### L-011: Prototype stand-ins must be labeled
 - **What happened:** The first prototype matched questions with a keyword list instead of the e5 model.
 - **Rule:** Any stand-in must be labeled in the UI (demo mode), in the docs and in the video until it's replaced.
-- **Check:** `manifest.labels.standIn` is empty in the production pack.
+- **Check:** `manifest.labels.standIn` is empty in the production pack. (A disclosed stand-in voice is the one exception: it is listed in `labels.standInVoice`, never in `standIn`, and the player shows its label.)
 
 ### L-012: Git ran in the home folder
 - **What happened:** Setup commands assumed paths; a failed `cd` made git run in the home folder, which was an accidental repo.

@@ -182,11 +182,16 @@ export const FarmPackManifestSchema = z
     checksums: z.record(z.string(), z.string().min(1)),
     labels: z.strictObject({
       standIn: z.array(z.string()),
+      standInVoice: z.array(
+        z.strictObject({ person: z.string().min(1), files: z.array(z.string().min(1)).min(1) }),
+      ),
       syntheticVoice: z.array(z.string()),
+      aiDubbed: z.array(z.string()),
     }),
   })
   // Checked content only (non-negotiable 5) and honest labels (non-negotiable 9, L-011): a
-  // production pack carries no draft text, no unchecked add-on and no stand-in. The pack builder
+  // production pack carries no draft text, no unchecked add-on, no stand-in and no AI-dubbed audio.
+  // A disclosed stand-in voice (labels.standInVoice) is allowed: the player shows its label. The pack builder
   // excludes these; this refusal is the second line of defence on the device and in CI.
   .superRefine((pack, ctx) => {
     if (pack.mode !== "production") return;
@@ -217,6 +222,13 @@ export const FarmPackManifestSchema = z
         });
       }
     });
+    if (pack.labels.aiDubbed.length > 0) {
+      ctx.addIssue({
+        code: "custom",
+        message: "AI-dubbed audio is demo-only: a production pack must not include it",
+        path: ["labels", "aiDubbed"],
+      });
+    }
     if (pack.labels.standIn.length > 0) {
       ctx.addIssue({
         code: "custom",

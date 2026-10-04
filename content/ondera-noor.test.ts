@@ -91,6 +91,7 @@ describe("recordings", () => {
     expect(gitignore).toContain("content/**/recordings/en/");
     expect(gitignore).toContain("content/**/recordings/wo/");
     expect(gitignore).toContain("pipeline/build/");
+    expect(gitignore.split("\n")).toContain(".env"); // pipeline/.env holds the ElevenLabs key
   });
 });
 

@@ -26,7 +26,7 @@ flowchart LR
     CHK -->|checked only| PACK["Farm pack builder"]
     EMB --> PACK
     MOD["e5-small to ONNX int8"] --> PACK
-    TTS["ElevenLabs narrator audio from checked text (P1, labeled)"] --> PACK
+    TTS["ElevenLabs narrator audio from checked text (P1, labeled); AI dubbing and speech-to-text only with a confirmed consent row"] --> PACK
   end
   PACK -->|"manifest, audio, subtitles, embeddings, model"| HOST[("Static host or Supabase Storage")]
   subgraph Phone["Guest's phone (offline after one download)"]
@@ -56,7 +56,7 @@ flowchart LR
 | NLLB-200 distilled 600M | Laptop or Colab | Once per content change | Drafts only; a person checks before guests see anything |
 | multilingual-e5-small | Guest's phone, Web Worker | Every question | The only model on the device; can't generate text, only measure similarity |
 | Groq (P1) | Supabase Edge Function | After sync | Cross-check themes for feedback; fixed enum output; never guest- or Noor-facing |
-| ElevenLabs (P1) | Pipeline | Once per add-on change | Narrator audio from checked text, labeled; not Noor's voice |
+| ElevenLabs | Pipeline | Once per add-on change; once per recording | Build time only. Narrator audio from checked text (P1, labeled; not Noor's voice). AI dubbing and speech-to-text of a recording only when its owner has a confirmed row in `docs/CONSENT.md` |
 
 ## 3. Orchestration (key flows)
 
@@ -113,7 +113,7 @@ flowchart LR
 | Backend | Supabase: Postgres, RLS, Edge Functions (Deno), Auth, Storage, pg_cron | One managed backend for data, auth, functions and scheduling |
 | Validation | Zod (client, functions, Groq output) | One schema language end to end |
 | Cloud LLM (P1) | Groq, strict JSON schema (a GPT-OSS model for strict mode; Kimi K2 only with best-effort parsing and validation) | Fast classification into a fixed enum |
-| Voice (P1) | ElevenLabs text-to-speech, build time | Narrator audio for add-ons in visitor languages |
+| Voice | ElevenLabs, build time | Narrator audio for add-ons in visitor languages (P1); AI dubbing and speech-to-text of recordings with a confirmed consent row |
 | Pipeline | Python 3.12, uv, transformers, torch, torchaudio (MMS forced aligner), optimum[onnxruntime], sacrebleu, jiwer, pytest | Standard, reproducible |
 | Quality | Biome, Vitest, Testing Library, Playwright, Deno test | Fast, Bun-friendly |
 | CI | GitHub Actions with `oven-sh/setup-bun`, uv | Runs checks on every push |
@@ -251,7 +251,7 @@ export interface FarmPackManifest {
   embeddings: { file: string; count: number; dim: 384; dtype: 'float32' };
   thresholds: { match: number; margin: number };   // calibrated by pipeline/eval
   sizes: Record<string, number>; checksums: Record<string, string>;
-  labels: { standIn: string[]; syntheticVoice: string[] };
+  labels: { standIn: string[]; standInVoice: { person: string; files: string[] }[]; syntheticVoice: string[]; aiDubbed: string[] };
 }
 
 export interface MatchResult { momentId: string; score: number }
@@ -467,7 +467,7 @@ create policy "members read questions" on questions for select using (is_member(
 
 - `pipeline/asknoor/tts_addons.py` converts checked add-on text in each visitor language into narrator audio with a stock voice. No cloning: this step never uses anyone's voice.
 - Files are listed in `manifest.labels.syntheticVoice`, and the UI shows "AI narrator voice" next to them.
-- **Guest audio and Wolof (decided with the captain):** the clips guests hear in the tour are Preet's English recordings of Noor's script, labeled in the app as Noor's stand-in voice (`manifest.labels.standIn`). The AI-dubbed Wolof versions (ElevenLabs, made with Preet's consent) are synthetic data: they feed the pipeline and the Wolof evaluation, are listed in `labels.syntheticVoice`, and ship only in demo packs until a Wolof speaker checks them. A production pack excludes the dubbed Wolof audio. The schema also rejects any production pack that lists a stand-in, so the English stand-in voice cannot ship in production until Noor's own recordings replace it. **Consent:** a dub reproduces the speaker's voice, so it needs that person's explicit written consent (`docs/CONSENT.md`; Preet's row is pending). The pipeline refuses any dubbed audio whose consent row is not `confirmed`, labels it "AI-dubbed" and never presents it as the person's own words. Noor's voice is never synthesized.
+- **Guest audio and Wolof (decided with the captain):** the clips guests hear in the tour are Preet's English recordings of Noor's script. They are a **disclosed stand-in voice**, listed in `manifest.labels.standInVoice` as `{ person: "Preet", files }`, and the player shows "Voice: Preet, standing in for Noor" (i18n key `labels.standInVoice`, in en, de, nl and sv) for every clip in those files. With that disclosure the pack may ship in **production**. Everything else stays demo-only: other stand-ins (`labels.standIn`), drafts, and AI-dubbed audio (`labels.aiDubbed`). The AI-dubbed Wolof versions (ElevenLabs, made with Preet's confirmed consent) are synthetic data that feed the pipeline and the Wolof evaluation and reach guests only in demo packs until a Wolof speaker checks them. The manifest schema refuses a production pack with a draft moment, an unchecked or still-needy add-on, a stand-in or AI-dubbed audio. **Consent:** a dub or a transcription reproduces or uploads a person's voice, so each needs that person's explicit written consent (`docs/CONSENT.md`: rows for dubbing and transcription; a `publishing` row covers showing the recordings in the demo app and video, always labeled). The pipeline refuses dubbed audio or a transcription whose row is not exactly `confirmed`, labels dubbed audio "AI-dubbed" and never presents it as the person's own words. Noor's voice is never synthesized. Raw audio stays out of git either way. The de, nl and sv strings (including the stand-in voice label) are still unchecked drafts, so a production pack waits for the native-speaker check.
 - Optional evaluation: compare ElevenLabs speech-to-text against MMS on the same recordings, and report both.
 
 ### 6.9 Pipeline (Python)

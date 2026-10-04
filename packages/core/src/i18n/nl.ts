@@ -98,6 +98,7 @@ export const nl: Strings = {
   "labels.demo": "Demomodus",
   "labels.draftTranslation": "Conceptvertaling, nog niet gecontroleerd",
   "labels.standIn": "Plaatsvervanger: {what}",
+  "labels.standInVoice": "Stem: {person}, ter vervanging van Noor",
   "labels.aiVoice": "AI-verteller",
   "labels.synthetic": "Synthetische voorbeeldgegevens",
 };

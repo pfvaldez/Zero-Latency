@@ -133,9 +133,9 @@ Evidence still to collect (Preet, with source, year and country): tourism arriva
 ## 11. Content requirements
 
 - Noor's clips 1–7 from Preet's script, with three fixes: clip 4 names the Ondera Coffee Cooperative; clip 5 doesn't imply a meal is served; clip 7 says "we'll stay down here" rather than skipping the roasting. Clip 8 (staying overnight) is held back for the demo loop.
-- Guest audio: guests hear Preet's English recordings of Noor's script as **Noor's labeled stand-in voice** (labeled in the app, the data card and the video). Noor speaks the national language with tourists, as the brief says; the stand-in stays until Noor records her own.
+- Guest audio: guests hear Preet's English recordings of Noor's script as a **disclosed stand-in voice**. The player shows "Voice: Preet, standing in for Noor" in every guest language, and with that disclosure the pack may ship in production. Noor speaks the national language with tourists, as the brief says; the stand-in stays until Noor records her own.
 - Noor's language is Wolof. AI-dubbed Wolof versions of the clips (ElevenLabs, made with Preet's consent) are **labeled synthetic data**: they feed the pipeline and the Wolof evaluation, and reach guests only in demo mode until a Wolof speaker checks them. Noor's monthly text and her order line are in Wolof, checked by a Wolof speaker before they are used.
-- Voice rule: the AI-dubbed Wolof versions need Preet's written consent, tracked in `docs/CONSENT.md` (status pending until the captain confirms her written yes). They are always labeled "AI-dubbed" and never presented as Preet's or Noor's own words.
+- Voice rule: the AI-dubbed Wolof versions need Preet's written consent, tracked in `docs/CONSENT.md` (dubbing: `confirmed` on 2026-10-03; transcription and publishing: `pending`). They are always labeled "AI-dubbed" and never presented as Preet's or Noor's own words.
 - Visitor languages: three or four, chosen from The Gambia's tourist-arrival data. Draft: English, Dutch, Swedish, German.
 - Add-ons voiced by Preet as the narrator, never as Noor: three fun facts with sources, one recipe confirmed as Noor's, three products with Noor-set prices, one farm card.
 - Test set: about 40 questions (4–5 phrasings per clip) plus about 10 Noor hasn't covered, labeled with the correct moment or "not covered."
