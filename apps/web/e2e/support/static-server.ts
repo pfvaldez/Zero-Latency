@@ -28,10 +28,13 @@ export async function serveDist(
   root: string,
 ): Promise<{ origin: string; close: () => Promise<void> }> {
   const server: Server = createServer((req, res) => {
-    const path = normalize(decodeURIComponent((req.url ?? "/").split("?")[0] ?? "/")).replace(
-      /^(\.\.[/\\])+/,
-      "",
-    );
+    let raw = (req.url ?? "/").split("?")[0] ?? "/";
+    try {
+      raw = decodeURIComponent(raw);
+    } catch {
+      raw = "/"; // a malformed escape gets the app shell
+    }
+    const path = normalize(raw).replace(/^(\.\.[/\\])+/, "");
     let file = join(root, path);
     if (!file.startsWith(root) || !existsSync(file) || statSync(file).isDirectory()) {
       file = join(root, "index.html");

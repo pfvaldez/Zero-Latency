@@ -202,7 +202,7 @@ Rules for this phase: Bun only (no npm, yarn or pnpm); Node 24 runs the Node-bas
 
 **For later phases**
 - vite-plugin-pwa issue #894 reports that an iPhone home-screen PWA won't play video from the service-worker cache. Nobody has confirmed audio, so Pablo should test Noor's clips on a real iPhone early in Phase 4.
-- The airplane-mode e2e (the most important test): since Playwright 1.57, `setOffline(true)` in Chromium also blocks the service worker's own fetches, so the test is valid. Use the Pixel profile (WebKit with offline and service workers has an open bug, #42775). Don't set `use.offline`, because the worker must install while online. `navigator.onLine` can read `true` wrongly in 1.62 and 1.63 (#42174), so assert on the UI instead.
+- The airplane-mode e2e (the most important test): since Playwright 1.57, `setOffline(true)` in Chromium also blocks the service worker's own fetches, so the test is valid. Use the Pixel profile (WebKit with offline and service workers has an open bug, #42775). **Update 2026-10-04:** a WebKit project (`mobile-safari`) now runs `e2e/offline-stop-link.spec.ts`; it avoids that bug by shutting a test-owned server down instead of calling `setOffline`. Don't set `use.offline`, because the worker must install while online. `navigator.onLine` can read `true` wrongly in 1.62 and 1.63 (#42174), so assert on the UI instead.
 </details>
 
 ## Phase 1: Core domain and guardrails (Bee with Claude Code, about 1.5 h)

@@ -66,9 +66,13 @@ test("control: with the server down and no service worker, the stop link does fa
 }) => {
   const server = await serveDist(DIST);
   const context = await browser.newContext({ serviceWorkers: "block" });
-  const page = await context.newPage();
-  await page.goto(`${server.origin}/`);
-  await server.close();
-  await expect(page.goto(`${server.origin}/stop/3`)).rejects.toThrow();
-  await context.close();
+  try {
+    const page = await context.newPage();
+    await page.goto(`${server.origin}/`);
+    await server.close();
+    await expect(page.goto(`${server.origin}/stop/3`)).rejects.toThrow();
+  } finally {
+    await server.close().catch(() => {});
+    await context.close();
+  }
 });
