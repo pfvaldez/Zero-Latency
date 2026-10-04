@@ -6,6 +6,10 @@
   "recipe": "Slice the rows of the 8-bit word-embedding table of the base int8 model to the kept ids; renumber the tokenizer; change nothing else",
   "keepIdsSha256": "2a140211c9a3c7350a461019deaffc2b116b06c2840cd0d377c1549e2da194eb",
   "keepCount": 52005,
+  "release": {
+    "repo": "pfvaldez/Zero-Latency",
+    "tag": "model-trimmed-v1"
+  },
   "files": [
     {
       "path": "config.json",
