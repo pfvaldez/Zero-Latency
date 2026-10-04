@@ -156,6 +156,8 @@ async function releaseSources(
   return (path) => {
     const asset = assets.find((a) => a.name === releaseAssetName(path));
     if (!asset) throw new Error(`release ${tag} has no asset ${releaseAssetName(path)}`);
+    if (!asset.url.startsWith("https://api.github.com/"))
+      throw new Error(`refusing to send the token to ${asset.url}`);
     return {
       url: asset.url,
       init: { headers: { ...headers, Accept: "application/octet-stream" } },

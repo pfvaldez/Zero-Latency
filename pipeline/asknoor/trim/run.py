@@ -11,6 +11,7 @@ so the trimmed model can be reproduced without the text corpora.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import sys
@@ -130,7 +131,7 @@ def fidelity(keep_path: Path, trimmed_dir: Path, out: Path) -> dict:
         "what": "Share of text that the trimmed tokenizer splits into exactly the pieces of the full tokenizer (identical), and the share of pieces dropped.",
         "keepCount": len(keep),
         "heldOut": "every 20th line of the Wikipedia and Tatoeba (and FLEURS wo train) corpus, first 300 per language; never used to choose the keep list. content = our own clip text, translations and interface strings (400 lines), which the keep list covers by construction.",
-        "tokenizerSha256": __import__("hashlib").sha256((trimmed_dir / "multilingual-e5-small" / "tokenizer.json").read_bytes()).hexdigest(),
+        "tokenizerSha256": hashlib.sha256((trimmed_dir / "multilingual-e5-small" / "tokenizer.json").read_bytes()).hexdigest(),
         "byLanguage": result,
     }
     out.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
