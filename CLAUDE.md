@@ -28,37 +28,93 @@ The brief's workflow we name in the video: **learning from visitor feedback**. T
 
 ## Workflow orchestration
 
-### 1. Plan mode by default
+# CLAUDE.md
+
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
+
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+## 1. Think Before Coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
 - Enter plan mode for any non-trivial task (3+ steps or an architectural decision).
 - If something goes sideways, stop and re-plan immediately. Don't keep pushing.
 - Use plan mode for verification steps, not just building.
 - Write detailed specs up front to reduce ambiguity.
 
-### 2. Subagent strategy
-- Use subagents liberally to keep the main context window clean.
-- Offload research, exploration and parallel analysis to subagents.
-- For complex problems, add compute through subagents.
-- One task per subagent, for focused execution.
+## 2. Simplicity First
 
-### 3. Self-improvement loop
-- After any correction from the user, add the pattern to `tasks/lessons.md`.
-- Write a rule for yourself that prevents the same mistake.
-- Iterate on these lessons until the mistake rate drops.
-- Review lessons at the start of every session.
+**Minimum code that solves the problem. Nothing speculative.**
 
-### 4. Verification before done
-- Never mark a task complete without proving it works.
-- Diff behavior between main and your change when relevant.
-- Ask yourself: "Would a staff engineer approve this?"
-- Run tests, check logs, demonstrate correctness.
-
-### 5. Demand elegance (balanced)
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
 - For non-trivial changes, pause and ask whether there is a more elegant way.
 - If a fix feels hacky: "Knowing everything I know now, implement the elegant solution."
 - Skip this for simple, obvious fixes. Don't over-engineer.
 - Challenge your own work before presenting it.
 
-### 6. Autonomous bug fixing
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+### 5. Subagent strategy
+- Use subagents liberally to keep the main context window clean.
+- Offload research, exploration and parallel analysis to subagents.
+- For complex problems, add compute through subagents.
+- One task per subagent, for focused execution.
+
+### 6. Self-improvement loop
+- After any correction from the user, add the pattern to `tasks/lessons.md`.
+- Write a rule for yourself that prevents the same mistake.
+- Iterate on these lessons until the mistake rate drops.
+- Review lessons at the start of every session.
+
+### 7. Verification before done
+- Never mark a task complete without proving it works.
+- Diff behavior between main and your change when relevant.
+- Ask yourself: "Would a staff engineer approve this?"
+- Run tests, check logs, demonstrate correctness.
+
+### 8. Autonomous bug fixing
 - When given a bug report, fix it. Don't ask for hand-holding.
 - Point at logs, errors and failing tests, then resolve them.
 - Zero context switching required from the user.
@@ -156,3 +212,5 @@ The brief's workflow we name in the video: **learning from visitor feedback**. T
 - `guardrail-reviewer`: after any change to `apps/web`, `packages/core`, `supabase` or `pipeline`, and at every checkpoint. Read-only; checks the diff against the non-negotiables.
 - `test-verifier`: before marking any task done and at every checkpoint. Runs install, check, typecheck, test and e2e (plus pytest if `pipeline/` changed) and reports a pass/fail table.
 - `docs-researcher`: before writing config or integration code for any library in the stack. Returns the current version, the Bun or uv install command, a minimal snippet and sources.
+
+

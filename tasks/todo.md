@@ -22,7 +22,7 @@ Slices 1 to 4 replace the old 8:00 PM, 10:00 PM, midnight and 4:00 AM checkpoint
 Each slice ends working and tested, and no mocks ship: a stand-in used while a later slice is built is labeled in demo mode and is replaced by the slice that owns the real thing. Labels for unchecked content are honesty, not mocks. The phases below stay the task inventory; the slices are the delivery order and the checkpoint times in the table above.
 
 ### Slice 1: guest app offline, real guardrails
-- [ ] The guest app plays a clip offline after one pack download (the airplane-mode e2e passes)
+- [x] The guest app plays a clip offline after one pack download (the airplane-mode e2e passes) Proof: 2026-10-04, local on origin/main `bf18b55`, Node 24.21.0, Bun 1.3.10: `bun run e2e` 4 passed (offline tour, request-watcher control, smoke, stop links + scanner); `bun run check` and `bun run typecheck` clean; `bun run test` 643 passed; `bun run test:model` 7 passed, 3 skipped
 - [ ] Questions go through the real guardrails in `packages/core` (`decideSafety`, `decide`, `themeOf`, `redact`); until Slice 2 the matcher is the labeled `FakeMatcher` stand-in, shown in demo mode only
 - Done when: the offline Playwright test passes, `bun run test:coverage` and `bun run check` are green
 
