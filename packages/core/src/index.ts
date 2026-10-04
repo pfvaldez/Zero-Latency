@@ -20,6 +20,7 @@ export {
   RecipeFileSchema,
   type RecordingsFile,
   RecordingsFileSchema,
+  type SmsTemplatesFile,
   SmsTemplatesFileSchema,
   TEST_QUESTION_COLUMNS,
   type TestQuestionRow,

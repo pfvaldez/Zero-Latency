@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import committedSchema from "../schema/manifest.schema.json" with { type: "json" };
 import { FarmPackManifestSchema, manifestJsonSchema, OutboxItemSchema } from "../src/schemas.ts";
-import type { FarmPackManifest, OutboxItem } from "../src/types.ts";
+import { type FarmPackManifest, type NoorText, type OutboxItem, THEME_IDS } from "../src/types.ts";
 
 const UUID = "3f2504e0-4f89-41d3-9a0c-0305e82c3301";
 const FARM_ID = "7c9e6679-7425-40de-944b-e07fc1f90ae7";
@@ -127,6 +127,27 @@ describe("FarmPackManifestSchema", () => {
       },
     });
     expect(FarmPackManifestSchema.safeParse(demo).success).toBe(true);
+  });
+
+  it("allows Noor's Wolof drafts (noorText) in a demo pack and refuses them in production", () => {
+    const noorText = {
+      lang: "wo" as const,
+      status: "draft" as const,
+      monthly: { en: "m {guests}", wo: "m {guests}" },
+      orderLine: { en: "o {items}", wo: "o {items}" },
+      themeLabels: Object.fromEntries(
+        THEME_IDS.map((id) => [id, { en: id, wo: `wo-${id}` }]),
+      ) as NoorText["themeLabels"],
+    };
+    expect(FarmPackManifestSchema.safeParse(manifest({ mode: "demo", noorText })).success).toBe(
+      true,
+    );
+    expect(FarmPackManifestSchema.safeParse(manifest({ noorText })).success).toBe(false);
+    const missing = { ...noorText, themeLabels: { stay: noorText.themeLabels.stay } };
+    expect(
+      FarmPackManifestSchema.safeParse(manifest({ mode: "demo", noorText: missing as never }))
+        .success,
+    ).toBe(false);
   });
 
   it("rejects a production manifest with draft text, an unchecked add-on or a stand-in", () => {

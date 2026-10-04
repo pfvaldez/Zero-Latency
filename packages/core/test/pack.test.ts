@@ -10,6 +10,7 @@ import {
   ProductsFileSchema,
   RecipeFileSchema,
   RecordingsFileSchema,
+  SmsTemplatesFileSchema,
 } from "../src/content.ts";
 import {
   addonSentences,
@@ -19,6 +20,7 @@ import {
   type Translations,
 } from "../src/pack.ts";
 import { FarmPackManifestSchema } from "../src/schemas.ts";
+import { THEME_IDS } from "../src/types.ts";
 import { splitSentences } from "../src/vtt.ts";
 
 // A fake hash: deterministic and different for different text. core cannot use Node's crypto.
@@ -675,5 +677,47 @@ describe("index-only passages", () => {
       },
     };
     expect(FarmPackManifestSchema.safeParse(unflagged).success).toBe(false);
+  });
+});
+
+describe("Noor's Wolof drafts (noorText)", () => {
+  const woDraft = (text: string) => ({ text, status: "draft" as const });
+  const templates = (missing = false) =>
+    SmsTemplatesFileSchema.parse({
+      note: "test",
+      monthly: {
+        en: "This month: {guests} guests. {orders} orders ({items} items). Loved: {loved}. Most asked: {asked} ({askedCount}). Most wished for: {wished}.",
+        wo: woDraft("wo monthly {guests} {orders} {items} {loved} {asked} {askedCount} {wished}"),
+      },
+      orderLine: {
+        en: "Order: {items} items, total {total} {currency}. Noor confirms payment.",
+        wo: missing
+          ? { text: null, status: "needs-nllb-draft" }
+          : woDraft("wo order {items} {total} {currency}"),
+      },
+      themeLabels: Object.fromEntries(
+        THEME_IDS.map((id) => [id, { en: id, wo: woDraft(`wo-${id}`) }]),
+      ),
+    });
+
+  it("is in a demo plan, as a draft next to its English source", () => {
+    const plan = planPack(input({ smsTemplates: templates() }), "demo");
+    expect(plan.noorText?.status).toBe("draft");
+    expect(plan.noorText?.orderLine.wo).toBe("wo order {items} {total} {currency}");
+    expect(plan.noorText?.themeLabels.stay.wo).toBe("wo-stay");
+  });
+
+  it("is never in a production plan, even when every draft exists", () => {
+    const plan = planPack(input({ checks: CHECKED, smsTemplates: templates() }), "production");
+    expect(plan.noorText).toBeUndefined();
+  });
+
+  it("is left out, and the exclusion says why, while any Wolof draft is missing", () => {
+    const plan = planPack(input({ smsTemplates: templates(true) }), "demo");
+    expect(plan.noorText).toBeUndefined();
+    expect(plan.excluded).toContainEqual({
+      what: "Noor's Wolof texts",
+      why: "not every Wolof draft exists yet",
+    });
   });
 });

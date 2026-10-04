@@ -255,6 +255,84 @@
     "match": 0.8675,
     "margin": 0.05
   },
+  "noorText": {
+    "lang": "wo",
+    "status": "draft",
+    "monthly": {
+      "en": "This month: {guests} guests shared feedback. {orders} orders ({items} items). Loved: {loved}. Most asked: {asked} ({askedCount}). Most wished for: {wished}.",
+      "wo": "Ci weer bii: {guests} ay doxandéem àddatu nañu. {orders} àddukaay yi ({items} yëf yi). Love: {loved}. Ñoo laaj: {asked} ({askedCount}). Ñoo bëgg: {wished}."
+    },
+    "orderLine": {
+      "en": "Order: {items} items, total {total} {currency}. Noor confirms payment.",
+      "wo": "Jëfandikukat: {items} item, total {total} {currency}. Noor xamal na ko."
+    },
+    "themeLabels": {
+      "stay": {
+        "en": "staying overnight",
+        "wo": "toog ci guddi"
+      },
+      "food": {
+        "en": "food",
+        "wo": "ñam"
+      },
+      "buy": {
+        "en": "buying coffee",
+        "wo": "jënd kafe"
+      },
+      "price": {
+        "en": "prices",
+        "wo": "xaalis yi"
+      },
+      "path": {
+        "en": "the walk",
+        "wo": "dox"
+      },
+      "kids": {
+        "en": "children",
+        "wo": "doom"
+      },
+      "roast": {
+        "en": "roasting",
+        "wo": "réer"
+      },
+      "picking": {
+        "en": "picking",
+        "wo": "jëllu"
+      },
+      "story": {
+        "en": "Noor's story",
+        "wo": "Kàddug Noor"
+      },
+      "view": {
+        "en": "the view",
+        "wo": "gis-gisu bi"
+      },
+      "welcome": {
+        "en": "the welcome",
+        "wo": "xët yi ci wàll gi"
+      },
+      "taste": {
+        "en": "taste",
+        "wo": "xam-xam"
+      },
+      "length": {
+        "en": "tour length",
+        "wo": "Jëfandikukat bi"
+      },
+      "wifi": {
+        "en": "wifi",
+        "wo": "wifi"
+      },
+      "transport": {
+        "en": "transport",
+        "wo": "xët yi ci suuf am nañ ab lëkkalekaay buy jëm"
+      },
+      "other": {
+        "en": "other topics",
+        "wo": "yeneen yëngu-yëngu"
+      }
+    }
+  },
   "farmCode": {
     "algorithm": "pbkdf2-sha256",
     "iterations": 100000,
