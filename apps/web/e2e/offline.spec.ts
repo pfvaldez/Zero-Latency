@@ -6,6 +6,7 @@
 //   bun run pack:model --trimmed --into apps/web/public/packs/fixture   (or without --trimmed)
 
 import { expect, test } from "@playwright/test";
+import { watchRequests } from "./support/watch.ts";
 
 const OUTBOX_DB = "asknoor-outbox";
 
@@ -25,30 +26,6 @@ const outboxCount = (page: import("@playwright/test").Page) =>
       }),
     OUTBOX_DB,
   );
-
-type Context = import("@playwright/test").BrowserContext;
-
-/** Watches every request of the context (the page, its worker and the service worker). */
-function watchRequests(context: Context, origin: string) {
-  let offline = false;
-  const foreign: string[] = [];
-  const failedOffline: string[] = [];
-  context.on("request", (r) => {
-    const url = r.url();
-    if (url.startsWith("data:") || url.startsWith("blob:")) return;
-    if (new URL(url).origin !== origin) foreign.push(url);
-  });
-  context.on("requestfailed", (r) => {
-    if (offline) failedOffline.push(`${r.url()} (${r.failure()?.errorText})`);
-  });
-  return {
-    foreign,
-    failedOffline,
-    goOffline() {
-      offline = true;
-    },
-  };
-}
 
 test("control: the request watcher does catch a request that leaves the page", async ({
   page,
