@@ -14,21 +14,31 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
-  use: {
-    baseURL,
-    trace: "on-first-retry",
-    permissions: ["camera"],
-    launchOptions: {
-      args: [
-        "--use-fake-device-for-media-stream",
-        "--use-fake-ui-for-media-stream",
-        `--use-file-for-fake-video-capture=${FAKE_CAMERA}`,
-      ],
+  use: { baseURL, trace: "on-first-retry" },
+  projects: [
+    {
+      name: "mobile-chrome",
+      use: {
+        ...devices["Pixel 7"],
+        // The fake camera (Chromium flags) for the scanner test.
+        permissions: ["camera"],
+        launchOptions: {
+          args: [
+            "--use-fake-device-for-media-stream",
+            "--use-fake-ui-for-media-stream",
+            `--use-file-for-fake-video-capture=${FAKE_CAMERA}`,
+          ],
+        },
+      },
     },
-  },
-  // Chromium only: Playwright's service-worker and offline APIs are Chromium-only, and the
-  // airplane-mode test (Slice 1) needs them.
-  projects: [{ name: "mobile-chrome", use: { ...devices["Pixel 7"] } }],
+    {
+      // iOS Safari's engine. A guest scans a stop's QR code with the iPhone Camera app in airplane
+      // mode, and Safari opens /stop/n: the service worker must answer that navigation offline.
+      name: "mobile-safari",
+      use: { ...devices["iPhone 14"] },
+      testMatch: /offline-stop-link\.spec\.ts/,
+    },
+  ],
   webServer: {
     // Always a fresh build: a leftover preview server would test an old bundle.
     command: "bun run build && bun run preview",

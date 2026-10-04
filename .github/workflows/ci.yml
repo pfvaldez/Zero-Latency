@@ -101,6 +101,6 @@ jobs:
       # The airplane-mode end-to-end test (non-negotiable 1). It needs the model inside the
       # fixture pack, which is not committed, so stage the verified model there first.
       - run: bun run pack:model --into apps/web/public/packs/fixture
-      - run: bunx playwright install --with-deps chromium
+      - run: bunx playwright install --with-deps chromium webkit
         working-directory: apps/web
       - run: bun run e2e
