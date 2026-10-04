@@ -561,6 +561,10 @@
                   "nl",
                   "sv"
                 ]
+              },
+              "indexOnly": {
+                "type": "boolean",
+                "const": true
               }
             },
             "required": [

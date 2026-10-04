@@ -1,0 +1,201 @@
+{
+  "note": "Short question-style phrasings per clip, written without looking at the test questions and NEVER shown to a guest or to Noor. They only help the matcher find the clip; the guest still confirms every match. Unchecked machine text: draft, labeled indexOnly in the manifest.",
+  "writer": "an isolated Claude subagent that was given only the clip scripts and topics in its prompt and read no repository file (its transcript shows no access to the test questions)",
+  "draft": true,
+  "neverShown": true,
+  "removedAsDuplicates": [
+    {
+      "clip": "5",
+      "lang": "en",
+      "text": "What else do you grow besides coffee?",
+      "questionId": "q009"
+    },
+    {
+      "clip": "5",
+      "lang": "sv",
+      "text": "Vad odlar ni mer än kaffe?",
+      "questionId": "q096"
+    },
+    {
+      "clip": "8",
+      "lang": "nl",
+      "text": "Kan ik op de boerderij overnachten?",
+      "questionId": "q073"
+    }
+  ],
+  "clips": {
+    "1": {
+      "en": [
+        "Who runs this farm and who is Noor?",
+        "farm owner introduction",
+        "Has your family farmed here for a long time?"
+      ],
+      "de": [
+        "Wer führt diese Farm und wer ist Noor?",
+        "Begrüßung der Gastgeberin",
+        "Lebt Ihre Familie schon lange hier am Hang?"
+      ],
+      "nl": [
+        "Wie runt deze boerderij en wie is Noor?",
+        "welkomstwoord van de eigenaar",
+        "Woont jouw familie hier al lang op de heuvel?"
+      ],
+      "sv": [
+        "Vem driver gården och vem är Noor?",
+        "välkomstord från ägaren",
+        "Har din familj odlat här i många år?"
+      ]
+    },
+    "2": {
+      "en": [
+        "How do you grow and pick the coffee?",
+        "hand picking ripe cherries",
+        "Why does your coffee taste sweet?"
+      ],
+      "de": [
+        "Wie wird der Kaffee angebaut und geerntet?",
+        "Kirschen von Hand pflücken",
+        "Warum schmeckt euer Kaffee so süß?"
+      ],
+      "nl": [
+        "Hoe telen en plukken jullie de koffie?",
+        "rijpe rode bessen met de hand",
+        "Waarom smaakt jullie koffie zo zoet?"
+      ],
+      "sv": [
+        "Hur odlar och plockar ni kaffet?",
+        "handplockade röda bär",
+        "Varför smakar ert kaffe så sött?"
+      ]
+    },
+    "3": {
+      "en": [
+        "How do you roast the coffee beans?",
+        "roasting over fire",
+        "How do you know when the beans are done?"
+      ],
+      "de": [
+        "Wie röstet ihr die Kaffeebohnen?",
+        "Rösten in der Pfanne",
+        "Woran erkennt man, dass die Bohnen fertig sind?"
+      ],
+      "nl": [
+        "Hoe roosteren jullie de koffiebonen?",
+        "branden boven open vuur",
+        "Hoe weet je wanneer de bonen klaar zijn?"
+      ],
+      "sv": [
+        "Hur rostar ni kaffebönorna?",
+        "rostning i panna över eld",
+        "Hur vet man när bönorna är färdiga?"
+      ]
+    },
+    "4": {
+      "en": [
+        "What is the Ondera cooperative?",
+        "coop membership and prices",
+        "Who came up with the idea for this tour?"
+      ],
+      "de": [
+        "Was ist die Ondera-Kooperative?",
+        "Mitgliedschaft in der Genossenschaft",
+        "Wer hatte die Idee für diese Tour?"
+      ],
+      "nl": [
+        "Wat is de Ondera-coöperatie?",
+        "lid van de coöperatie, betere prijzen",
+        "Wie heeft deze rondleiding bedacht?"
+      ],
+      "sv": [
+        "Vad är Ondera-kooperativet?",
+        "medlem i kooperativet och bättre priser",
+        "Vem kom på idén till den här turen?"
+      ]
+    },
+    "5": {
+      "en": [
+        "maize and beans",
+        "What does your family eat from the farm?"
+      ],
+      "de": [
+        "Was baut ihr außer Kaffee noch an?",
+        "Mais und Bohnen",
+        "Wovon ernährt sich Ihre Familie übers Jahr?"
+      ],
+      "nl": [
+        "Wat verbouwen jullie naast koffie nog meer?",
+        "mais en bonen",
+        "Waar leeft jouw gezin van het hele jaar?"
+      ],
+      "sv": [
+        "majs och bönor",
+        "Vad lever din familj på under året?"
+      ]
+    },
+    "6": {
+      "en": [
+        "Can I buy coffee to take home?",
+        "buy fresh coffee souvenir",
+        "Where do I get a bag of coffee?"
+      ],
+      "de": [
+        "Kann ich Kaffee zum Mitnehmen kaufen?",
+        "frischen Kaffee kaufen",
+        "Wo bekomme ich eine Tüte Kaffee?"
+      ],
+      "nl": [
+        "Kan ik koffie kopen om mee te nemen?",
+        "verse koffie kopen",
+        "Waar haal ik een zakje koffie?"
+      ],
+      "sv": [
+        "Kan jag köpa kaffe med mig hem?",
+        "köpa nyrostat kaffe",
+        "Var får jag tag i en påse kaffe?"
+      ]
+    },
+    "7": {
+      "en": [
+        "Is the hike to the coffee hard?",
+        "what to wear and bring on the climb",
+        "What if I can't manage the steep path?"
+      ],
+      "de": [
+        "Ist der Aufstieg zum Kaffee anstrengend?",
+        "was mitnehmen, Schuhe und Wasser",
+        "Was tun, wenn mir der steile Weg zu schwer ist?"
+      ],
+      "nl": [
+        "Is de wandeling naar de koffie zwaar?",
+        "wat meenemen, schoenen en water",
+        "Wat als ik het steile pad niet aankan?"
+      ],
+      "sv": [
+        "Är vandringen upp till kaffet jobbig?",
+        "vad ska jag ha på mig och ta med",
+        "Vad händer om jag inte orkar den branta stigen?"
+      ]
+    },
+    "8": {
+      "en": [
+        "Can I stay overnight at the farm?",
+        "rooms or accommodation",
+        "Is there a place to sleep nearby?"
+      ],
+      "de": [
+        "Kann man auf der Farm übernachten?",
+        "Zimmer oder Unterkunft",
+        "Gibt es eine Schlafmöglichkeit in der Nähe?"
+      ],
+      "nl": [
+        "kamers of een slaapplek",
+        "Is er een logeeradres in de buurt?"
+      ],
+      "sv": [
+        "Går det att övernatta på gården?",
+        "rum eller boende",
+        "Finns det någonstans att sova i närheten?"
+      ]
+    }
+  }
+}

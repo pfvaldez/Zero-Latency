@@ -12,6 +12,7 @@ import {
   FarmCardFileSchema,
   type FarmPackManifest,
   FarmPackManifestSchema,
+  IndexPassagesFileSchema,
   PackError,
   type PackInput,
   type PackMode,
@@ -82,6 +83,12 @@ interface AudioReport {
   clips: Record<string, { duration_ms: number; head_silence_s: number; tail_silence_s: number }>;
 }
 
+/** The index-only phrasings, or null when the farm has none yet. */
+async function loadIndexPassages(dir: string) {
+  const raw = await optionalJson(join(dir, "index-passages.json"));
+  return raw === null ? null : IndexPassagesFileSchema.parse(raw);
+}
+
 export async function loadPackInput(farm: string): Promise<PackInput> {
   const dir = contentDir(farm);
   const report = (await json(join(dir, "recordings", "audio-report.json"))) as AudioReport;
@@ -116,6 +123,7 @@ export async function loadPackInput(farm: string): Promise<PackInput> {
     transcripts: new Map([...transcripts].map(([n, t]) => [n, t])),
     clipTranslations: await translations("clips.json", "clips"),
     addonTranslations: await translations("addons.json", "items"),
+    indexPassages: await loadIndexPassages(dir),
     consent: parseConsent(await readFile(join(REPO_ROOT, "docs", "CONSENT.md"), "utf8")),
     sha256: (text) => hex(text),
   };
@@ -224,7 +232,11 @@ export async function buildPack(opts: BuildOptions): Promise<BuiltPack> {
       dim: 384,
       dtype: "float32",
       passagePrefix: "passage: ",
-      rows: plan.passages.map((p) => ({ momentId: p.momentId, lang: p.lang })),
+      rows: plan.passages.map((p) => ({
+        momentId: p.momentId,
+        lang: p.lang,
+        ...(p.indexOnly ? { indexOnly: true as const } : {}),
+      })),
     },
     thresholds: opts.thresholds ?? (await readThreshold(opts.farm)),
     sizes,

@@ -11,6 +11,8 @@ export {
   ClipsFileSchema,
   FactsFileSchema,
   FarmCardFileSchema,
+  type IndexPassagesFile,
+  IndexPassagesFileSchema,
   MONTHLY_PLACEHOLDERS,
   ORDER_LINE_PLACEHOLDERS,
   ProductsFileSchema,
@@ -57,6 +59,12 @@ export {
   type Strings,
   t,
 } from "./i18n/index.ts";
+export {
+  type AuditPassage,
+  type AuditQuestion,
+  type LeakageReport,
+  leakageAudit,
+} from "./leakage.ts";
 export {
   type AudioMeta,
   addonSentences,

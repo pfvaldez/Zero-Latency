@@ -102,6 +102,38 @@ export const RecordingsFileSchema = z.strictObject({
   ),
 });
 
+// ---- index-passages.json ---------------------------------------------------------------------
+
+const phrases = z.array(z.string().min(3).max(200));
+// Short question-style phrasings per clip and language, written without looking at the test
+// questions and NEVER shown to a guest or to Noor: they only help the matcher find the clip. They
+// are unchecked machine text, so the file says so, and the manifest marks their rows `indexOnly`.
+export const IndexPassagesFileSchema = z.strictObject({
+  note,
+  writer: z.string().min(1),
+  draft: z.literal(true),
+  neverShown: z.literal(true),
+  // Phrasings removed because they repeated a test question exactly (never rewritten).
+  removedAsDuplicates: z.array(
+    z.strictObject({
+      clip: z.string(),
+      lang: z.string(),
+      text: z.string(),
+      questionId: z.string(),
+    }),
+  ),
+  clips: z.record(
+    z.string().regex(/^\d+$/),
+    z.strictObject({
+      en: phrases.min(1),
+      de: phrases.min(1),
+      nl: phrases.min(1),
+      sv: phrases.min(1),
+    }),
+  ),
+});
+export type IndexPassagesFile = z.infer<typeof IndexPassagesFileSchema>;
+
 // ---- checks.json -----------------------------------------------------------------------------
 
 // Who checked what, when. Anything without an entry is a draft.

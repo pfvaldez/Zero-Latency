@@ -95,7 +95,9 @@ describe("docs/DATA_CARD.md", () => {
       expect(row, name).toBeDefined();
       expect(row, name).toMatch(/[Pp]lanned/);
     }
-    expect(md).toContain("**planned, Slice 4 step 2, not built**");
+    // Index-only passages are built now: the doc may describe them as present only if the code has the flag.
+    expect(read("packages/core/src/schemas.ts")).toContain("indexOnly");
+    expect(md).toContain("Index-only passages");
   });
 
   it("has a labels table covering the synthetic, stand-in, AI-dubbed and machine-draft items", () => {

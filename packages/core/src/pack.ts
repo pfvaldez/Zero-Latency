@@ -15,6 +15,7 @@ import {
   type AddonContent,
   type ChecksFile,
   type ClipsFile,
+  type IndexPassagesFile,
   type RecordingsFile,
   toAddons,
 } from "./content.ts";
@@ -55,6 +56,8 @@ export interface PackInput {
   /** null when no translation file exists yet. */
   clipTranslations: Translations | null;
   addonTranslations: Translations | null;
+  /** Index-only phrasings (never shown); null when the file does not exist. */
+  indexPassages: IndexPassagesFile | null;
   consent: readonly ConsentRow[];
   /** sha256 hex of a string; injected so core stays free of Node and browser APIs. */
   sha256: (text: string) => string;
@@ -74,7 +77,7 @@ export interface PackPlan {
   addons: Addon[];
   labels: FarmPackManifest["labels"];
   /** The passages to embed, in the order of the embedding rows. */
-  passages: { momentId: string; lang: VisitorLang; text: string }[];
+  passages: { momentId: string; lang: VisitorLang; text: string; indexOnly?: true }[];
   files: PlannedFile[];
   excluded: { what: string; why: string }[];
 }
@@ -324,6 +327,16 @@ export function planPack(
       }
       planned.dubbed = dubbed;
       plan.labels.aiDubbed.push(dubbed.audio);
+    }
+    // Index-only passages: extra matrix rows for this moment, never shown anywhere. They are in both
+    // modes (captain's decision, 2026-10-04) and only for published clips, since this loop skips the
+    // held-back one. They are not part of moment.subtitles or the topic.
+    const index = input.indexPassages?.clips[String(clip.id)];
+    if (index) {
+      for (const lang of ["en", "de", "nl", "sv"] as const) {
+        for (const text of index[lang])
+          plan.passages.push({ momentId: clip.momentId, lang, text, indexOnly: true });
+      }
     }
     plan.clips.push(planned);
   }

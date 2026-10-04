@@ -6,6 +6,7 @@ import {
   ClipsFileSchema,
   FactsFileSchema,
   FarmCardFileSchema,
+  IndexPassagesFileSchema,
   ProductsFileSchema,
   RecipeFileSchema,
   RecordingsFileSchema,
@@ -163,6 +164,7 @@ function input(over: Partial<PackInput> = {}): PackInput {
     transcripts: new Map(),
     clipTranslations: translationsFor(),
     addonTranslations: addonTranslations(),
+    indexPassages: null,
     consent: CONSENT_ALL,
     sha256,
     ...over,
@@ -557,5 +559,121 @@ describe("synthetic tones (the committed fixture)", () => {
   it("can never ship in production: the manifest schema refuses a stand-in", () => {
     const p = planPack(toneInput(), "production", { allowSyntheticTones: true });
     expect(p.labels.standIn).toEqual(["Synthetic test tone, not a voice"]);
+  });
+});
+
+describe("index-only passages", () => {
+  const four = (n: number) => ({
+    en: [`Phrase en one ${n}`, `Phrase en two ${n}`],
+    de: [`Phrase de ${n}`],
+    nl: [`Phrase nl ${n}`],
+    sv: [`Phrase sv ${n}`],
+  });
+  const index = IndexPassagesFileSchema.parse({
+    writer: "an isolated assistant",
+    draft: true,
+    neverShown: true,
+    removedAsDuplicates: [],
+    clips: { "1": four(1), "2": four(2), "3": four(3), "8": four(8) },
+  });
+  const withIndex = (mode: "demo" | "production", options: { publish?: number[] } = {}) =>
+    planPack(input({ checks: CHECKED, indexPassages: index }), mode, options);
+  const rows = (p: ReturnType<typeof planPack>) => p.passages.filter((x) => x.indexOnly);
+
+  it("add matrix rows for each included moment in both modes, flagged indexOnly (the captain's decision)", () => {
+    for (const mode of ["demo", "production"] as const) {
+      const p = withIndex(mode);
+      expect(rows(p).length).toBe(p.clips.length * 5); // 2 + 1 + 1 + 1 phrasings per clip
+      expect(rows(p).every((x) => x.indexOnly === true)).toBe(true);
+    }
+  });
+
+  it("are in languages the pack does not otherwise carry, because they are only matched, never shown", () => {
+    const p = withIndex("production");
+    expect(p.visitorLangs).toEqual(["en"]);
+    expect(rows(p).some((x) => x.lang === "de")).toBe(true);
+  });
+
+  it("are never shown: not in any moment's subtitles or topic, nor in any subtitle file or add-on", () => {
+    for (const mode of ["demo", "production"] as const) {
+      const p = withIndex(mode);
+      const phrases = rows(p).map((x) => x.text);
+      const shown = JSON.stringify([p.moments, p.addons, p.files, p.clips]);
+      for (const text of phrases) expect(shown, text).not.toContain(text);
+    }
+  });
+
+  it("are left out for the held-back clip, and join it when it is published", () => {
+    expect(rows(withIndex("demo")).some((x) => x.momentId === "c8-m1")).toBe(false);
+    expect(rows(withIndex("demo", { publish: [8] })).some((x) => x.momentId === "c8-m1")).toBe(
+      true,
+    );
+  });
+
+  it("are left out of a production clip that has no checked English text", () => {
+    const p = withIndex("production");
+    expect(rows(p).some((x) => x.momentId === "c3-m1")).toBe(false); // clip 3 is unchecked, so excluded
+  });
+
+  it("change nothing when there are none", () => {
+    const plain = planPack(input({ checks: CHECKED }), "demo");
+    expect(rows(plain)).toEqual([]);
+    expect(plain.passages.length).toBe(
+      planPack(input({ checks: CHECKED, indexPassages: null }), "demo").passages.length,
+    );
+  });
+
+  it("make a manifest that validates in production, with rows in a language the pack does not list", () => {
+    const p = withIndex("production");
+    const manifest = {
+      packId: "t",
+      farmId: "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      farmSlug: "ondera-noor",
+      version: 1,
+      mode: "production",
+      createdAt: "2026-10-04T01:00:00Z",
+      noorLang: "wo",
+      visitorLangs: p.visitorLangs,
+      clips: p.clips,
+      moments: p.moments,
+      addons: p.addons,
+      model: {
+        id: "multilingual-e5-small",
+        dir: "model/multilingual-e5-small",
+        source: "Xenova/multilingual-e5-small",
+        revision: "761b726dd34fb83930e26aab4e9ac3899aa1fa78",
+        queryPrefix: "query: ",
+        dim: 384,
+        quantization: "int8",
+        vocab: "full",
+        sizeBytes: 1,
+      },
+      embeddings: {
+        file: "embeddings.f32",
+        count: p.passages.length,
+        dim: 384,
+        dtype: "float32",
+        passagePrefix: "passage: ",
+        rows: p.passages.map((x) => ({
+          momentId: x.momentId,
+          lang: x.lang,
+          ...(x.indexOnly ? { indexOnly: true } : {}),
+        })),
+      },
+      thresholds: { match: 0.85, margin: 0.05 },
+      sizes: {},
+      checksums: {},
+      labels: p.labels,
+    };
+    expect(FarmPackManifestSchema.safeParse(manifest).success).toBe(true);
+    // The same rows without the flag name a language the pack does not carry, which is refused.
+    const unflagged = {
+      ...manifest,
+      embeddings: {
+        ...manifest.embeddings,
+        rows: manifest.embeddings.rows.map((r) => ({ momentId: r.momentId, lang: r.lang })),
+      },
+    };
+    expect(FarmPackManifestSchema.safeParse(unflagged).success).toBe(false);
   });
 });
