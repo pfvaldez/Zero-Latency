@@ -522,7 +522,38 @@
             "type": "string"
           }
         },
+        "standInVoice": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "person": {
+                "type": "string",
+                "minLength": 1
+              },
+              "files": {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": [
+              "person",
+              "files"
+            ],
+            "additionalProperties": false
+          }
+        },
         "syntheticVoice": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aiDubbed": {
           "type": "array",
           "items": {
             "type": "string"
@@ -531,7 +562,9 @@
       },
       "required": [
         "standIn",
-        "syntheticVoice"
+        "standInVoice",
+        "syntheticVoice",
+        "aiDubbed"
       ],
       "additionalProperties": false
     }

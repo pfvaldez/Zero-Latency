@@ -97,6 +97,19 @@ describe("safety card", () => {
   });
 });
 
+describe("stand-in voice label", () => {
+  it("names the person and Noor in every guest language", () => {
+    for (const lang of VISITOR_LANGS) {
+      const label = t(lang, "labels.standInVoice", { person: "Preet" });
+      expect(label, lang).toContain("Preet");
+      expect(label, lang).toContain("Noor");
+    }
+    expect(t("en", "labels.standInVoice", { person: "Preet" })).toBe(
+      "Voice: Preet, standing in for Noor",
+    );
+  });
+});
+
 describe("t", () => {
   it("fills placeholders, including numbers", () => {
     expect(t("en", "ask.confirm", { topic: "roasting" })).toBe(

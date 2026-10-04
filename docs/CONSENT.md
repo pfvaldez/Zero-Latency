@@ -8,3 +8,4 @@ Status values: `pending` (asked or planned, no written yes on file) and `confirm
 |---|---|---|---|---|
 | Preet Patel | AI dubbing of her English recordings into Wolof with ElevenLabs, for Ask Noor. Always labeled "AI-dubbed" | Written yes in the team Discord (message link not yet filed here; add it). Confirmed by the captain | 2026-10-03 | confirmed |
 | Preet Patel | Transcription of her English recordings with ElevenLabs speech-to-text at build time, for subtitles. Her voice is sent to ElevenLabs; the text comes back and is checked by her | Not yet recorded | Not yet recorded | pending |
+| Preet Patel | Publishing: her English recordings (as the stand-in for Noor's voice) and the AI-dubbed Wolof versions appear in the Ask Noor demo app and video, always labeled. Audio stays out of git either way | Not yet recorded | Not yet recorded | pending |

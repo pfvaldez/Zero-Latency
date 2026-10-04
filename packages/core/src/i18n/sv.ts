@@ -96,6 +96,7 @@ export const sv: Strings = {
   "labels.demo": "Demoläge",
   "labels.draftTranslation": "Utkast till översättning, inte kontrollerad än",
   "labels.standIn": "Platshållare: {what}",
+  "labels.standInVoice": "Röst: {person}, som ersättare för Noor",
   "labels.aiVoice": "AI-berättarröst",
   "labels.synthetic": "Syntetiska exempeldata",
 };

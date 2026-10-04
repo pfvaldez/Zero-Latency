@@ -100,6 +100,7 @@ export const en = {
   "labels.demo": "Demo mode",
   "labels.draftTranslation": "Draft translation, not yet checked",
   "labels.standIn": "Stand-in: {what}",
+  "labels.standInVoice": "Voice: {person}, standing in for Noor",
   "labels.aiVoice": "AI narrator voice",
   "labels.synthetic": "Synthetic example data",
 } as const;

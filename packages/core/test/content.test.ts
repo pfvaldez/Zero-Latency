@@ -257,7 +257,7 @@ describe("toAddons", () => {
       thresholds: { match: 0.8, margin: 0.05 },
       sizes: {},
       checksums: {},
-      labels: { standIn: [], syntheticVoice: [] },
+      labels: { standIn: [], standInVoice: [], syntheticVoice: [], aiDubbed: [] },
     };
     expect(ok(FarmPackManifestSchema, { ...base, mode: "demo" })).toBe(true);
     expect(ok(FarmPackManifestSchema, { ...base, mode: "production" })).toBe(false);
