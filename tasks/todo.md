@@ -83,6 +83,18 @@ Plan approved 2026-10-04 (answers: clip 8 held back in every pack and published 
 - [ ] ElevenLabs narrator audio from checked text, labeled as an AI voice
 - Done when: the numbers are in `docs/EVAL.md` with their limits, and every AI-voice file is listed in `labels.syntheticVoice`
 
+## Slice 4 (Bee's track): honest evaluation, coverage, smaller model, Wolof evidence, SMS fit, docs
+
+Plan approved 2026-10-04 (01:08 ET; freeze 4:30 AM). Order: 1 honest evaluation, 5 monthly text fit, 6 docs, 2 index-only passages, 4 Wolof evidence, 3 smaller model, 7 Groq and ElevenLabs if time. Answers: the trimmed model is hosted as a GitHub Release asset verified by sha256 (ask before uploading); index-only passages ship in production, labeled in the manifest; the shipped threshold is the strictest of the full-set pick and the two fold picks. Cut order if behind: 7, then 3, then the reverse FLORES run. Each step has its own branch, PR, guardrail review and merge.
+
+- [x] **1. Honest evaluation** (`feat/eval-cv`): the 116 questions are parallel across languages, so the split is by slot; tune on one half, report on the other, then swap; full-set numbers kept and labeled in sample Proof: `docs/EVAL.md`: pooled held-out false confirm **5.0%** (5 of 100, interval 2% to 11%), coverage **51.8%** (interval 39% to 64%), top-1 **83.9%**, fail-safe 97.7%; one fold alone shows 9.6% false confirm, so the variance is real; shipped `match` = **0.855** (full-set pick 0.8525, fold picks 0.855 and 0.8475); control: tuning on all questions makes the no-leak test fail
+- [ ] 5. Monthly text fits two segments (`fillTemplate` drops the lowest-priority parts)
+- [ ] 6. `docs/DATA_CARD.md` and `docs/RESPONSIBLE_AI.md` (drafts for Preet), with tests that check their claims
+- [ ] 2. Index-only passages (written by an isolated subagent; leakage audit; before and after on the held-out halves)
+- [ ] 4. Wolof evidence: FLORES-200 chrF (NLLB English to Wolof vs German), MMS word error rate on FLEURS Wolof, round trip on the 8 AI-dubbed clips
+- [ ] 3. Trimmed e5 vocabulary: top-1 within 2 points of the full model, pack under 50 MB
+- [ ] 7. Groq theme cross-check and review queue (pure parts; live run needs `GROQ_API_KEY`); ElevenLabs narrator audio (needs checked text and the key)
+
 ## Phase 0: Repo and tooling (Bee, about 45 min; estimate with pinning and verification: 75–90 min)
 
 Plan written 2026-10-03 19:57 ET (system clock) from docs checked the same day. **Approved the same evening with seven changes (rows D1, D4, D5, D9, D10, D11, D13 and D14 below). Built on branch `phase-0-tooling`.**

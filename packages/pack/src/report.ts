@@ -1,6 +1,6 @@
 // docs/EVAL.md: generated text from the evaluation results. Pure string building.
 
-import type { Metrics } from "@asknoor/core";
+import type { Fold, Metrics, PooledMetrics } from "@asknoor/core";
 
 const pct = (x: number, digits = 1) => `${(x * 100).toFixed(digits)}%`;
 const ci = (c: { low: number; high: number }) => `${pct(c.low, 0)} to ${pct(c.high, 0)}`;
@@ -29,6 +29,21 @@ export interface EvalResults {
   maxFalseConfirm: number;
   margin: number;
   primary: Metrics;
+  fullSet: Metrics | null;
+  fullSetPick: number | null;
+  foldPicks: (number | null)[];
+  honest: {
+    slotsA: number;
+    slotsB: number;
+    folds: [Fold, Fold];
+    pooled: PooledMetrics | null;
+    pooledCi: {
+      falseConfirm: { low: number; high: number };
+      coverage: { low: number; high: number };
+      top1: { low: number; high: number };
+    } | null;
+    byLang: { name: string; m: PooledMetrics }[];
+  };
   primaryCi: {
     falseConfirm: { low: number; high: number };
     coverage: { low: number; high: number };
@@ -72,6 +87,43 @@ const row = (name: string, m: Metrics) =>
 
 const mb = (b: number) => `${(b / 1e6).toFixed(1)} MB`;
 
+const pooledRow = (name: string, m: PooledMetrics) =>
+  `| ${name} | ${m.questions} | ${pct(m.top1Rate)} | ${pct(m.coverage)} | ${pct(m.falseConfirmRate)} | ${pct(m.failSafeRate)} |`;
+
+function honestSection(r: EvalResults): string[] {
+  const h = r.honest;
+  const out: string[] = ["## Honest estimate: tune on one half, report on the other", ""];
+  out.push(
+    `The ${r.questions.total} questions are ${h.slotsA + h.slotsB} slots, and slot i is the same question in all four languages (${r.questions.nonSafety / 4} ordinary slots, ${r.questions.safety / 4} safety slots). So the split is **by slot**: a German question and its English twin always land in the same half. Half A has ${h.slotsA} slots and half B ${h.slotsB}, balanced by expected answer. The threshold is chosen on one half only, then measured on the other; then the halves swap. Tuning never sees the half it is reported on (a test poisons the report half to prove it).`,
+    "",
+    "| Tuned on | Threshold chosen there | Measured on it (in sample) | Reported on | False confirm | Coverage | Top-1 | Fail-safe |",
+    "|---|---|---|---|---|---|---|---|",
+  );
+  for (const f of h.folds) {
+    out.push(
+      `| half ${f.tuneOn} | ${f.threshold ?? "none works"} | ${f.inSample ? `${pct(f.inSample.falseConfirmRate)} false confirm` : "-"} | half ${f.reportOn} | ${f.heldOut ? pct(f.heldOut.falseConfirmRate) : "-"} | ${f.heldOut ? pct(f.heldOut.coverage) : "-"} | ${f.heldOut ? pct(f.heldOut.top1Rate) : "-"} | ${f.heldOut ? pct(f.heldOut.failSafeRate) : "-"} |`,
+    );
+  }
+  if (h.pooled && h.pooledCi) {
+    const p = h.pooled;
+    out.push(
+      "",
+      `**Pooled held-out (every question reported once, with the threshold chosen without it): false confirm ${pct(p.falseConfirmRate)} (${p.wrongClipConfirm + p.confirmOnNever} of ${p.questions}, 95% interval ${ci(h.pooledCi.falseConfirm)}), coverage ${pct(p.coverage)} (${p.correctConfirm} of ${p.answered}, ${ci(h.pooledCi.coverage)}), top-1 ${pct(p.top1Rate)} (${ci(h.pooledCi.top1)}), fail-safe ${pct(p.failSafeRate)}.**`,
+      "",
+      "| Pooled held-out by language | Questions | Top-1 | Coverage | False confirm | Fail-safe |",
+      "|---|---|---|---|---|---|",
+    );
+    for (const x of h.byLang) out.push(pooledRow(`language ${x.name}`, x.m));
+  } else {
+    out.push(
+      "",
+      "No threshold met the limit on one of the halves, so there is no pooled held-out number.",
+    );
+  }
+  out.push("");
+  return out;
+}
+
 export function renderEval(r: EvalResults): string {
   const p = r.primary;
   const lines: string[] = [];
@@ -90,9 +142,16 @@ export function renderEval(r: EvalResults): string {
     `- Content hash: \`${r.contentHash}\`. Run on ${r.date}.`,
     "",
   );
+  lines.push(...honestSection(r));
   lines.push("## Chosen threshold", "");
   lines.push(
-    `**match = ${r.threshold}** (the lowest threshold with a false-confirm rate at or under ${pct(r.maxFalseConfirm, 0)}). Written to \`content/ondera-noor/eval/threshold.json\` and into every pack manifest. \`margin\` = ${r.margin} is recorded but not used in P0 (the "is it A or B?" step is P1).`,
+    `**match = ${r.threshold}**, the strictest of three picks: the full-set pick (${r.fullSetPick ?? "none"}) and the two fold picks (${r.foldPicks.map((x) => x ?? "none").join(" and ")}). It is never looser than any honest estimate, which fits "below the threshold, save for Noor". Written to \`content/ondera-noor/eval/threshold.json\` and into every pack manifest. \`margin\` = ${r.margin} is recorded but not used in P0 (the "is it A or B?" step is P1).`,
+    "",
+    r.fullSet
+      ? `**Tuned on the full set (in sample, kept for comparison):** at ${r.fullSetPick} the same questions give false confirm ${pct(r.fullSet.falseConfirmRate)}, coverage ${pct(r.fullSet.coverage)}, top-1 ${pct(r.fullSet.top1Rate)}. These are optimistic: the threshold was chosen on these questions. The held-out numbers above are the honest estimate.`
+      : "No threshold met the limit on the full set.",
+    "",
+    "The table below is the shipped threshold measured on all ordinary questions (still in sample, because the full-set pick is one of the three).",
     "",
     "| At the chosen threshold | Value | 95% interval |",
     "|---|---|---|",
@@ -196,9 +255,9 @@ export function renderEval(r: EvalResults): string {
   lines.push("## Honest limits", "");
   lines.push(
     "- The questions are synthetic and were written by the team who also chose the clips; real guests will phrase things differently and make other mistakes. German, Dutch and Swedish questions were not checked by native speakers.",
-    `- The threshold is in sample. With ${r.questions.nonSafety} ordinary questions, a 5% limit is about ${Math.round(r.questions.nonSafety * 0.05)} questions, so the intervals above are wide.`,
+    `- The shipped threshold (${r.threshold}) is the strictest of three picks, one of which was chosen on all the questions, so the table at the chosen threshold is still in sample. The pooled held-out figure is the honest estimate, but it is **not a measurement of ${r.threshold} itself**: each fold used its own threshold. With ${r.questions.nonSafety} ordinary questions, a 5% limit is about ${Math.round(r.questions.nonSafety * 0.05)} questions, so the intervals are wide and one fold alone can be far from the pooled number.`,
     "- Passages are the English script until Preet's transcript is checked; the subtitle text, and so the match text, will then change slightly. Run `bun run eval` again.",
-    "- **Embeddings differ a little between CPUs and runtimes.** The pack's passage vectors are made here with ONNX Runtime on Node; the phone embeds each question with ONNX Runtime Web. It is the same int8 model file, but the int8 kernels round differently: in CI the same passages on Linux x64 were at cosine 0.995 or better against the same passages on macOS arm64 (one passage at 0.9948). That can move a question's score by a few thousandths, which is the size of one threshold step. The threshold has not been checked against vectors made on a phone; do that with the offline end-to-end run before relying on 0.8525 to the last decimal.",
+    `- **Embeddings differ a little between CPUs and runtimes.** The pack's passage vectors are made here with ONNX Runtime on Node; the phone embeds each question with ONNX Runtime Web. It is the same int8 model file, but the int8 kernels round differently: in CI the same passages on Linux x64 were at cosine 0.995 or better against the same passages on macOS arm64 (one passage at 0.9948). That can move a question's score by a few thousandths, which is the size of one threshold step. The threshold has not been checked against vectors made on a phone; do that with the offline end-to-end run before relying on ${r.threshold} to the last decimal.`,
     "- Every guest confirms a match, so a false confirmation shows a wrong card the guest can reject; it never plays unconfirmed.",
     "",
   );

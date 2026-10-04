@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
+  assignSlots,
   ChecksFileSchema,
   ClipsFileSchema,
   decideSafety,
@@ -219,6 +220,19 @@ describe("eval/test-questions.csv", () => {
           `${lang} ${id}`,
         ).toBe(true);
     }
+  });
+
+  it("are parallel across languages (slot i is the same question everywhere), so the honest split can be by slot", () => {
+    const scored = questions.map((x) => ({
+      id: x.id,
+      lang: x.lang,
+      variant: x.variant,
+      expected: x.expected,
+      safetyHit: false,
+      results: [],
+    }));
+    const slots = assignSlots(scored); // throws if the languages are not parallel
+    expect(new Set(slots).size).toBe(questions.length / 4);
   });
 
   it("only points at clips that exist, with unique ids", () => {
