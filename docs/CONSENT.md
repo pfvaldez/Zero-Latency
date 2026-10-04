@@ -6,4 +6,4 @@ Status values: `pending` (asked or planned, no written yes on file) and `confirm
 
 | Person | What they consented to | Where | Date | Status |
 |---|---|---|---|---|
-| Preet Patel | AI dubbing of her English recordings into Wolof with ElevenLabs, for Ask Noor. Always labeled "AI-dubbed" | Not yet recorded (add the link or file name of her written yes) | Not yet recorded | pending |
+| Preet Patel | AI dubbing of her English recordings into Wolof with ElevenLabs, for Ask Noor. Always labeled "AI-dubbed" | Written yes in the team Discord (message link not yet filed here; add it) | 2026-10-03 | confirmed (set by the captain) |
