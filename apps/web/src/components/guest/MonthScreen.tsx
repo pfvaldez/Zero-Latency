@@ -30,7 +30,7 @@ export function MonthScreen({ lang, manifest }: { lang: VisitorLang; manifest: F
       <h2 id="month-title" className="text-2xl font-bold">
         {t(lang, "month.title")}
       </h2>
-      <p className="rounded-md border border-input bg-card p-3 text-base font-bold">
+      <p className="rounded-2xl border-l-4 border-accent bg-card p-3 text-base font-bold">
         {t(lang, "month.demoNote")}
       </p>
       {items && !summary?.hasData && <p>{t(lang, "month.empty")}</p>}

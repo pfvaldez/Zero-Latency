@@ -82,7 +82,7 @@ export function AskPanel({
         </label>
         <textarea
           id="ask-text"
-          className="min-h-24 rounded-md border border-input bg-card p-3 text-lg"
+          className="min-h-24 rounded-xl border border-input bg-card p-3 text-lg"
           placeholder={t(lang, "ask.placeholder")}
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -95,14 +95,14 @@ export function AskPanel({
       {view.step === "safety" && (
         <div
           role="alert"
-          className="flex flex-col gap-2 rounded-md border-2 border-input bg-card p-4"
+          className="flex flex-col gap-2 rounded-2xl border-2 border-destructive bg-card p-4"
         >
           <h3 className="text-xl font-bold">{t(lang, "ask.safety.title")}</h3>
           <p>{t(lang, "ask.safety.body")}</p>
         </div>
       )}
       {view.step === "confirm" && (
-        <div className="flex flex-col gap-3 rounded-md border border-input bg-card p-4">
+        <div className="flex flex-col gap-3 rounded-2xl border-l-4 border-ring bg-card p-4">
           <p className="text-xl">
             {t(lang, "ask.confirm", {
               topic: view.moment.topic[lang] ?? view.moment.topic.en ?? "",
@@ -125,7 +125,7 @@ export function AskPanel({
       {view.step === "saved" && (
         <div
           role="status"
-          className="flex flex-col gap-2 rounded-md border border-input bg-card p-4"
+          className="flex flex-col gap-2 rounded-2xl border-l-4 border-accent bg-card p-4"
         >
           <h3 className="text-xl font-bold">{t(lang, "ask.saved.title")}</h3>
           <p>{t(lang, "ask.saved.body")}</p>

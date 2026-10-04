@@ -15,11 +15,19 @@ export function App() {
   return (
     // Animate UI's accessibility advice: honour the guest's reduced-motion setting everywhere.
     <MotionConfig reducedMotion="user">
-      <main className="mx-auto flex min-h-dvh max-w-xl flex-col gap-4 p-4">
-        <header className="flex items-center justify-between gap-2">
-          <h1 className="text-3xl font-bold">{t(lang ?? "en", "app.name")}</h1>
+      <main className="mx-auto flex min-h-dvh max-w-xl flex-col gap-5 p-4">
+        <header className="relative flex min-h-36 items-end justify-between gap-2 overflow-hidden rounded-2xl bg-card p-4">
+          <img src="/hero.webp" alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <h1 className="relative rounded-xl bg-card/90 px-3 py-1 text-3xl font-semibold">
+            {t(lang ?? "en", "app.name")}
+          </h1>
           {lang && (
-            <Button variant="outline" size="sm" onClick={() => setLang(null)}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="relative bg-card"
+              onClick={() => setLang(null)}
+            >
               {t(lang, "lang.change")}
             </Button>
           )}

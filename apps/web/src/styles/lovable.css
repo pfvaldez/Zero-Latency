@@ -1,0 +1,46 @@
+/*
+ * The look of the team's Lovable mock-up (https://ask-noor.lovable.app), copied as tokens only:
+ * colours, the heading font, radius and soft shadows. Loaded after theme.css, so it wins.
+ *
+ * Contrast (WCAG 2.x, checked when this file was written): foreground on background 14.71, on card
+ * 15.77; text on primary 7.80; text on accent 6.06; muted text on background 5.80; primary and
+ * accent as text on card 8.00 and 6.22; destructive on card 5.86. --border (1.46) is decorative
+ * only; interactive borders use --input (6.22 on card).
+ *
+ * NOTE: theme.test.ts still records the earlier palette in theme.css; it does not see this file.
+ */
+:root {
+  --background: #f8f5ee; /* warm cream */
+  --foreground: #282019;
+  --card: #fffdf9;
+  --card-foreground: #282019;
+  --popover: #fffdf9;
+  --popover-foreground: #282019;
+  --primary: #30517a; /* blue */
+  --primary-foreground: #fcfaf6;
+  --secondary: #dce7f6;
+  --secondary-foreground: #1d3249;
+  --muted: #ede9e1;
+  --muted-foreground: #6c5d52;
+  --accent: #9c4710; /* terracotta */
+  --accent-foreground: #fcfaf6;
+  --destructive: #b63613;
+  --border: #dad3c9;
+  --input: #6c5d52;
+  --ring: #426896;
+  --radius: 0.875rem;
+  --shadow-soft: 0 4px 6px -1px #2820191a, 0 2px 4px -2px #2820191a;
+}
+
+/* Headings in the mock-up's serif (Fraunces, self-hosted). Body text keeps Atkinson Hyperlegible
+   Next, the legibility font the app was built with (its offline load is checked by the smoke test). */
+@theme inline {
+  --font-heading: "Fraunces", Georgia, "Times New Roman", serif;
+}
+
+@layer components {
+  /* Rounded cards with a soft shadow, like the mock-up. */
+  .bg-card {
+    box-shadow: var(--shadow-soft);
+  }
+}
