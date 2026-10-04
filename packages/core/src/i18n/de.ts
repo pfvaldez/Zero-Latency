@@ -113,4 +113,25 @@ export const de: Strings = {
   "labels.prototypeControl":
     "Prototyp-Kontrolle: Ein Farmcode ist nur eine Bremse, kein starker Schutz",
   "labels.aiDubbed": "KI-vertont",
+  "nav.month": "Noors Monat",
+  "month.title": "Noors Monat",
+  "month.demoNote":
+    "Demo: Ein Telefon steht für einen Monat synchronisierter Besuche. Das Senden ist noch nicht gebaut.",
+  "month.empty":
+    "Auf diesem Telefon sind noch keine Besuche gespeichert. Stell zuerst eine Frage, gib Feedback oder bestelle etwas.",
+  "month.phone": "Noors Telefon (Attrappe)",
+  "month.wolof": "Text auf Wolof",
+  "month.englishPreview": "Englische Vorschau desselben Textes",
+  "month.size": "{chars} Zeichen, {segments} SMS",
+  "month.dropped": "Weggelassen, damit es in zwei SMS passt: {parts}",
+  "labels.wolofDraft": "Entwurf, noch nicht von einer Wolof-sprechenden Person geprüft",
+  "player.hearWolof": "Diese Station auf Wolof hören (KI-vertont)",
+  "player.hearOriginal": "Originalaufnahme hören",
+  "player.dubNote":
+    "KI-vertontes Wolof: eine maschinell erzeugte Stimme aus der englischen Aufnahme. Es ist nicht Noors Stimme und nicht die eigenen Worte der sprechenden Person.",
+  "shop.orderLineWolof": "Für Noor, auf Wolof",
+  "player.dubTitle": "KI-vertonte Wolof-Fassung",
+  "player.dubSubtitlesNote":
+    "Wolof-Untertitel: eine maschinelle Übersetzung des Englischen, keine Abschrift dieser Aufnahme.",
+  "month.englishDraft": "Englischer Entwurf, noch nicht geprüft",
 };

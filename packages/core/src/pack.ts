@@ -17,9 +17,18 @@ import {
   type ClipsFile,
   type IndexPassagesFile,
   type RecordingsFile,
+  type SmsTemplatesFile,
   toAddons,
 } from "./content.ts";
-import type { Addon, Clip, FarmPackManifest, Moment, VisitorLang } from "./types.ts";
+import {
+  type Addon,
+  type Clip,
+  type FarmPackManifest,
+  type Moment,
+  type NoorText,
+  THEME_IDS,
+  type VisitorLang,
+} from "./types.ts";
 import {
   type Cue,
   cuesEstimated,
@@ -58,6 +67,8 @@ export interface PackInput {
   addonTranslations: Translations | null;
   /** Index-only phrasings (never shown); null when the file does not exist. */
   indexPassages: IndexPassagesFile | null;
+  /** Noor's templates with their NLLB Wolof drafts; used for the demo pack's `noorText` only. */
+  smsTemplates?: SmsTemplatesFile | null;
   consent: readonly ConsentRow[];
   /** sha256 hex of a string; injected so core stays free of Node and browser APIs. */
   sha256: (text: string) => string;
@@ -76,6 +87,8 @@ export interface PackPlan {
   moments: Moment[];
   addons: Addon[];
   labels: FarmPackManifest["labels"];
+  /** Demo plans only, and only when every Wolof draft exists. */
+  noorText?: NoorText;
   /** The passages to embed, in the order of the embedding rows. */
   passages: { momentId: string; lang: VisitorLang; text: string; indexOnly?: true }[];
   files: PlannedFile[];
@@ -127,6 +140,28 @@ function isChecked(checks: ChecksFile, id: string, boundTo?: string): boolean {
   const entry = checks.checks.find((c) => c.id === id);
   if (!entry?.checked) return false;
   return boundTo === undefined || entry.transcriptSha256 === boundTo;
+}
+
+/** The Wolof drafts of Noor's templates, or null while any of them is still missing. */
+export function noorTextOf(templates: SmsTemplatesFile): NoorText | null {
+  const wo = (w: { text: string | null }) => w.text;
+  const monthly = wo(templates.monthly.wo);
+  const orderLine = wo(templates.orderLine.wo);
+  if (monthly === null || orderLine === null) return null;
+  const themeLabels = {} as NoorText["themeLabels"];
+  for (const id of THEME_IDS) {
+    const label = templates.themeLabels[id];
+    const text = wo(label.wo);
+    if (text === null) return null;
+    themeLabels[id] = { en: label.en, wo: text };
+  }
+  return {
+    lang: "wo",
+    status: "draft",
+    monthly: { en: templates.monthly.en, wo: monthly },
+    orderLine: { en: templates.orderLine.en, wo: orderLine },
+    themeLabels,
+  };
 }
 
 export function planPack(
@@ -374,6 +409,17 @@ export function planPack(
       langsUsed.add(lang);
     }
     plan.addons.push({ ...addon, text });
+  }
+
+  // Wolof drafts of Noor's texts: demo packs only, and only when every one of them has been drafted.
+  if (!production && input.smsTemplates) {
+    const noor = noorTextOf(input.smsTemplates);
+    if (noor) plan.noorText = noor;
+    else
+      plan.excluded.push({
+        what: "Noor's Wolof texts",
+        why: "not every Wolof draft exists yet",
+      });
   }
 
   plan.visitorLangs = (["en", "de", "nl", "sv"] as const).filter((l) => langsUsed.has(l));

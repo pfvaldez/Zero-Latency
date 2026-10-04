@@ -220,6 +220,7 @@ export const FarmCardFileSchema = z
 
 export type ChecksFile = z.infer<typeof ChecksFileSchema>;
 export type ClipsFile = z.infer<typeof ClipsFileSchema>;
+export type SmsTemplatesFile = z.infer<typeof SmsTemplatesFileSchema>;
 export type RecordingsFile = z.infer<typeof RecordingsFileSchema>;
 export interface AddonContent {
   facts: z.infer<typeof FactsFileSchema>;

@@ -105,4 +105,25 @@ export const sv: Strings = {
   "shop.codeMissing": "Den här turen kan inte bekräfta beställningar än. Fråga Noor personligen.",
   "labels.prototypeControl": "Prototypkontroll: en gårdskod är bara en broms, inget starkt skydd",
   "labels.aiDubbed": "AI-dubbad",
+  "nav.month": "Noors månad",
+  "month.title": "Noors månad",
+  "month.demoNote":
+    "Demo: en telefon står för en månads synkade besök. Att skicka är inte byggt än.",
+  "month.empty":
+    "Inga besök är sparade på den här telefonen än. Ställ en fråga, lämna feedback eller lägg en beställning först.",
+  "month.phone": "Noors telefon (attrapp)",
+  "month.wolof": "Text på wolof",
+  "month.englishPreview": "Engelsk förhandsvisning av samma text",
+  "month.size": "{chars} tecken, {segments} sms",
+  "month.dropped": "Utelämnat för att få plats i två sms: {parts}",
+  "labels.wolofDraft": "Utkast, ännu inte kontrollerat av en wolof-talare",
+  "player.hearWolof": "Hör det här stoppet på wolof (AI-dubbat)",
+  "player.hearOriginal": "Hör originalinspelningen",
+  "player.dubNote":
+    "AI-dubbad wolof: en maskinskapad röst byggd på den engelska inspelningen. Det är inte Noors röst och inte talarens egna ord.",
+  "shop.orderLineWolof": "För Noor, på wolof",
+  "player.dubTitle": "AI-dubbad version på wolof",
+  "player.dubSubtitlesNote":
+    "Undertexter på wolof: en maskinöversättning av engelskan, inte en transkription av det här ljudet.",
+  "month.englishDraft": "Engelskt utkast, ännu inte kontrollerat",
 };

@@ -91,6 +91,19 @@ export interface Thresholds {
   margin: number;
 }
 
+/**
+ * Noor's texts in Wolof, as machine drafts (NLLB) next to their English source. DEMO packs only: a
+ * production pack never carries it until a Wolof speaker has checked the texts. The guest app shows
+ * them labeled "Draft, not yet checked by a Wolof speaker".
+ */
+export interface NoorText {
+  lang: "wo";
+  status: "draft";
+  monthly: { en: string; wo: string };
+  orderLine: { en: string; wo: string };
+  themeLabels: Record<ThemeId, { en: string; wo: string }>;
+}
+
 export interface FarmPackManifest {
   packId: string;
   farmId: string; // Supabase farms.id (a UUID); what outbox items and ingest carry
@@ -130,6 +143,8 @@ export interface FarmPackManifest {
   thresholds: Thresholds; // calibrated by pipeline/eval
   /** Prototype control: Noor's farm code as a salted hash. Absent: the shop cannot confirm an order. */
   farmCode?: FarmCode;
+  /** Demo packs only: Noor's order line and monthly text in Wolof (drafts) and their theme labels. */
+  noorText?: NoorText;
   sizes: Record<string, number>;
   checksums: Record<string, string>;
   labels: {

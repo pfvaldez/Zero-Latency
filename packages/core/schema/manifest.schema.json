@@ -629,6 +629,375 @@
       ],
       "additionalProperties": false
     },
+    "noorText": {
+      "type": "object",
+      "properties": {
+        "lang": {
+          "type": "string",
+          "const": "wo"
+        },
+        "status": {
+          "type": "string",
+          "const": "draft"
+        },
+        "monthly": {
+          "type": "object",
+          "properties": {
+            "en": {
+              "type": "string",
+              "minLength": 1
+            },
+            "wo": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "en",
+            "wo"
+          ],
+          "additionalProperties": false
+        },
+        "orderLine": {
+          "type": "object",
+          "properties": {
+            "en": {
+              "type": "string",
+              "minLength": 1
+            },
+            "wo": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "en",
+            "wo"
+          ],
+          "additionalProperties": false
+        },
+        "themeLabels": {
+          "type": "object",
+          "properties": {
+            "stay": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "food": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "buy": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "price": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "path": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "kids": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "roast": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "picking": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "story": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "view": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "welcome": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "taste": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "length": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "wifi": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "transport": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            },
+            "other": {
+              "type": "object",
+              "properties": {
+                "en": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "wo": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "en",
+                "wo"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "stay",
+            "food",
+            "buy",
+            "price",
+            "path",
+            "kids",
+            "roast",
+            "picking",
+            "story",
+            "view",
+            "welcome",
+            "taste",
+            "length",
+            "wifi",
+            "transport",
+            "other"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "lang",
+        "status",
+        "monthly",
+        "orderLine",
+        "themeLabels"
+      ],
+      "additionalProperties": false
+    },
     "farmCode": {
       "type": "object",
       "properties": {

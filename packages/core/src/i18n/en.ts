@@ -110,4 +110,25 @@ export const en = {
   "labels.prototypeControl":
     "Prototype control: a farm code is only a speed bump, not strong security",
   "labels.aiDubbed": "AI-dubbed",
+  "nav.month": "Noor's month",
+  "month.title": "Noor's month",
+  "month.demoNote":
+    "Demo: one phone stands in for a month of synced visits. Sending is not built yet.",
+  "month.empty":
+    "No visits are saved on this phone yet. Ask a question, leave feedback or place an order first.",
+  "month.phone": "Noor's phone (mock-up)",
+  "month.wolof": "Text in Wolof",
+  "month.englishPreview": "English preview of the same text",
+  "month.size": "{chars} characters, {segments} SMS",
+  "month.dropped": "Left out to fit two SMS: {parts}",
+  "labels.wolofDraft": "Draft, not yet checked by a Wolof speaker",
+  "player.hearWolof": "Hear this stop in Wolof (AI-dubbed)",
+  "player.hearOriginal": "Hear the original recording",
+  "player.dubNote":
+    "AI-dubbed Wolof: a machine-made voice built from the English recording. It is not Noor's voice, and not the speaker's own words.",
+  "shop.orderLineWolof": "For Noor, in Wolof",
+  "player.dubTitle": "AI-dubbed Wolof version",
+  "player.dubSubtitlesNote":
+    "Wolof subtitles: a machine translation of the English, not a transcript of this audio.",
+  "month.englishDraft": "English draft, not yet checked",
 } as const;

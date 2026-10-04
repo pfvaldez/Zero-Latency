@@ -213,6 +213,26 @@ export const FarmPackManifestSchema = z
       ),
     }),
     thresholds: z.strictObject({ match: unitInterval, margin: unitInterval }),
+    // Demo packs only (refused in production below): Noor's texts in Wolof, machine drafts.
+    noorText: z
+      .strictObject({
+        lang: z.literal("wo"),
+        status: z.literal("draft"),
+        monthly: z.strictObject({ en: z.string().min(1), wo: z.string().min(1) }),
+        orderLine: z.strictObject({ en: z.string().min(1), wo: z.string().min(1) }),
+        themeLabels: z.strictObject(
+          Object.fromEntries(
+            THEME_IDS.map((id) => [
+              id,
+              z.strictObject({ en: z.string().min(1), wo: z.string().min(1) }),
+            ]),
+          ) as Record<
+            (typeof THEME_IDS)[number],
+            z.ZodObject<{ en: z.ZodString; wo: z.ZodString }, z.core.$strict>
+          >,
+        ),
+      })
+      .optional(),
     // Prototype control: the salted hash of Noor's 4-digit farm code (never the code itself).
     farmCode: z
       .strictObject({
@@ -304,6 +324,13 @@ export const FarmPackManifestSchema = z
         code: "custom",
         message: "AI-dubbed audio is demo-only: a production pack must not include it",
         path: ["labels", "aiDubbed"],
+      });
+    }
+    if (pack.noorText) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Wolof drafts are demo-only: a production pack must not include noorText",
+        path: ["noorText"],
       });
     }
     if (pack.labels.standIn.length > 0) {

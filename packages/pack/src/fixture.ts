@@ -17,6 +17,7 @@ import {
   type Translations,
 } from "@asknoor/core";
 import { type BuiltPack, buildPack, sha256 } from "./build.ts";
+import { loadSmsTemplates } from "./load-content.ts";
 import { REPO_ROOT } from "./model.ts";
 
 export const FIXTURE_SLUG = "fixture";
@@ -160,6 +161,8 @@ export async function fixtureInput(): Promise<PackInput> {
     clipTranslations,
     addonTranslations: null,
     indexPassages: null,
+    // The fixture shows the real NLLB Wolof drafts of Noor's templates (demo only, labeled drafts).
+    smsTemplates: await loadSmsTemplates("ondera-noor"),
     consent: [],
     sha256: hash,
   };

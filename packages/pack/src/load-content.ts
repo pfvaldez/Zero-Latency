@@ -8,6 +8,8 @@ import {
   ChecksFileSchema,
   ClipsFileSchema,
   parseTestQuestions,
+  type SmsTemplatesFile,
+  SmsTemplatesFileSchema,
   type TestQuestionRow,
 } from "@asknoor/core";
 import { REPO_ROOT } from "./model.ts";
@@ -29,6 +31,18 @@ async function readJson(path: string): Promise<unknown> {
 
 export async function loadClips(farm: string): Promise<Clips> {
   return ClipsFileSchema.parse(await readJson(join(contentDir(farm), "clips.json")));
+}
+
+/** Noor's templates with their Wolof drafts (null if the file is missing). */
+export async function loadSmsTemplates(farm: string): Promise<SmsTemplatesFile | null> {
+  try {
+    return SmsTemplatesFileSchema.parse(
+      await readJson(join(contentDir(farm), "sms-templates.json")),
+    );
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw e;
+  }
 }
 
 export async function loadChecks(farm: string): Promise<ChecksFile> {

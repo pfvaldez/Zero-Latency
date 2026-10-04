@@ -26,7 +26,13 @@ import {
   type Translations,
 } from "@asknoor/core";
 import { DIM, loadEmbedder } from "./embed.ts";
-import { contentDir, loadChecks, loadClips, loadTranscripts } from "./load-content.ts";
+import {
+  contentDir,
+  loadChecks,
+  loadClips,
+  loadSmsTemplates,
+  loadTranscripts,
+} from "./load-content.ts";
 import {
   DEFAULT_CACHE,
   PACK_MODEL_ID,
@@ -138,6 +144,7 @@ export async function loadPackInput(farm: string): Promise<PackInput> {
     clipTranslations: await translations("clips.json", "clips"),
     addonTranslations: await translations("addons.json", "items"),
     indexPassages: await loadIndexPassages(dir),
+    smsTemplates: await loadSmsTemplates(farm),
     consent: parseConsent(await readFile(join(REPO_ROOT, "docs", "CONSENT.md"), "utf8")),
     sha256: (text) => hex(text),
   };
@@ -269,6 +276,7 @@ export async function buildPack(opts: BuildOptions): Promise<BuiltPack> {
     sizes,
     checksums,
     labels: plan.labels,
+    ...(plan.noorText ? { noorText: plan.noorText } : {}),
   };
   const valid = FarmPackManifestSchema.parse(manifest);
   await writeFile(join(outDir, "manifest.json"), `${JSON.stringify(valid, null, 2)}\n`);

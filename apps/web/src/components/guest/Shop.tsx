@@ -8,6 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/animate-ui/components/radix/sheet";
+import { orderLine as noorOrderLine } from "@/lib/month.ts";
 import { confirmOrder, orderTotal, productName, productsOf } from "@/lib/order.ts";
 import { useServices } from "@/services/context.tsx";
 import { DemoNotes } from "./Labels.tsx";
@@ -114,7 +115,8 @@ export function Shop({ lang, manifest }: { lang: VisitorLang; manifest: FarmPack
       {confirmed && <p role="status">{t(lang, "shop.confirmed")}</p>}
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom">
+        {/* Fits its content and scrolls on a small phone, so the confirm button is always reachable. */}
+        <SheetContent side="bottom" className="h-auto max-h-[90dvh] overflow-y-auto">
           <SheetHeader>
             <SheetTitle>{t(lang, "shop.showNoor")}</SheetTitle>
             <SheetDescription>{t(lang, "shop.noPayment")}</SheetDescription>
@@ -128,6 +130,19 @@ export function Shop({ lang, manifest }: { lang: VisitorLang; manifest: FarmPack
             <p className="px-4 text-2xl font-bold">
               {t(lang, "shop.total", { total: order.total, currency: order.currency })}
             </p>
+          )}
+          {manifest.mode === "demo" && manifest.noorText && (
+            <div className="flex flex-col gap-1 px-4">
+              <h3 className="text-xl font-bold">{t(lang, "shop.orderLineWolof")}</h3>
+              <p lang="wo" className="text-xl">
+                {noorOrderLine(manifest.noorText, "wo", {
+                  items: order.lines.reduce((n, l) => n + l.qty, 0),
+                  total: order.complete ? order.total : null,
+                  currency: order.currency,
+                })}
+              </p>
+              <p className="text-base font-bold">{t(lang, "labels.wolofDraft")}</p>
+            </div>
           )}
           <form onSubmit={confirm} className="flex flex-col gap-2 p-4">
             <label htmlFor="farm-code" className="font-bold">

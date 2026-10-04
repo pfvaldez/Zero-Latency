@@ -2,7 +2,7 @@ import type { VisitorLang } from "@asknoor/core";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type Tab = "stops" | "ask" | "shop" | "feedback";
+export type Tab = "stops" | "ask" | "shop" | "feedback" | "month";
 
 interface GuestState {
   /** The guest's language. Persisted: asked once, kept for the whole tour. */
