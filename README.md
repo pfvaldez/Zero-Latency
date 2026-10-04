@@ -62,17 +62,20 @@ A Groq-based cross-check of feedback themes is planned as a next step.
  
 The full report is `docs/EVAL.md`, regenerated with `bun run eval`.
  
-| Metric | First run |
+| Metric (synthetic questions, 116 in four languages) | Held-out result |
 |---|---|
 | Safety questions sent to the safety card | 16 of 16, with no ordinary question diverted |
-| Top-1 accuracy | 84% |
-| False confirmations | 3% (3 of 100; 95% interval 1–8%) |
-| Coverage (guest gets the right confirm card) | 50% |
-| Questions Noor never answers that were saved instead of matched | 100% |
-| Farm pack size | About 136 MB, almost all of it the model |
- 
-In the first run, the threshold (0.8525) was tuned on the full synthetic test set: 116 questions in English, German, Dutch and Swedish. Held-out results, coverage improvements and the Wolof evidence are in `docs/EVAL.md`.
- 
+| Top-1 accuracy, questions Noor can answer | 91.1% (95% interval 81% to 96%; 56 questions) |
+| False confirmations | 3.0% (3 of 100; 1% to 8%) |
+| Coverage (guest gets the right confirm card) | 73.2% (41 of 56; 60% to 83%) |
+| Questions Noor never answers that were saved, not matched | 97.7% |
+| Model files in the farm pack | 44.3 MB with the trimmed vocabulary, against 135.4 MB for the full model, with the same held-out top-1 |
+| Wolof machine translation (NLLB, FLORES-200 chrF) | English to Wolof 23.9, English to German 62.5 (300 sentences) |
+| Wolof speech recognition (MMS on FLEURS) | 38.2% word error rate, 12.0% character error rate (100 utterances) |
+| Round trip on the 8 AI-dubbed Wolof clips | chrF 15.3 (n = 8): the dubbed Wolof is unverified |
+
+"Held-out" means the match threshold (0.8675) is tuned on one half of the question slots and reported on the other half, then the halves swap, so no number was measured on the data that chose the threshold. The intervals are wide because there are only 116 synthetic questions. They were written by the team, not by guests, and German, Dutch and Swedish were not checked by native speakers. The in-sample numbers, the effect of the index-only phrasings, the timings and the limits are in `docs/EVAL.md`.
+
 ## Tech stack
  
 | Layer | Tools |
@@ -111,7 +114,7 @@ git config core.hooksPath .githooks   # once per clone
 bun install
 bun run dev          # guest app
 bun run test         # unit tests
-bun run e2e          # Playwright, including the airplane-mode test
+bun run e2e          # Playwright, including the airplane-mode test (needs the model in the fixture pack, see tasks/HANDOFF.md)
 bun run check        # Biome
 bun run typecheck
 bun run eval         # regenerates docs/EVAL.md
@@ -139,10 +142,11 @@ tasks           build plan, lessons and team tasks
 | Guardrails (`packages/core`) | Done |
 | Content, audio prep and test questions | Done |
 | Translation drafts, farm pack and evaluation | Done |
-| Guest app | In progress |
-| Backend and dashboard | In progress |
-| Wolof evidence and a smaller model | In progress |
- 
+| Wolof evidence and a smaller model | Done: measured (`docs/EVAL.md`); 44 MB trimmed model as a private GitHub Release asset |
+| Guest app | Demo path built: pack download, stops, stop links and QR scanner, player, ask, feedback, shop, offline PWA, airplane-mode test. Not built: sync, pack updates, polish. The real-audio pack waits for a consent row |
+| Backend and dashboard | Not started: nothing in the repository yet |
+| Monthly text and reviewer approval | Not started (checked template and held-report logic exist in `packages/core`) |
+
 ## Team
  
 - **Bhagyasri Uddandam**, AI and data
