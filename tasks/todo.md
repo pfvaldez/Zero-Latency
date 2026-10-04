@@ -145,14 +145,19 @@ Plan approved 2026-10-03 (`/Users/bhagi/.claude/plans/` copy of the plan). Built
 Guardrail-reviewer (2026-10-03): no violation of the ten non-negotiables after two fixes: `decide` failed open on a NaN threshold (now saves; test added), and the safety lexicon missed inflected forms such as "hurts", "snakes", "dizzy", "Kopfschmerzen" (added, with a test table). Tracked for later phases:
 - [ ] Phase 3 `pack.py`: in production mode fail while any language in `visitorLangs` is `draft` in `I18N_STATUS`, require every non-source subtitle to be checked (the `draft` flag on a moment is opt-in), and require every clip with synthetic audio to be listed in `labels.syntheticVoice`
 - [ ] Phase 3 eval: pick `thresholds.match` from the sweep; the schema allows 0 to 1 (a floor is not set because no calibrated value exists yet). Record that `margin`, `ambiguous` and the P1 "A or B" step are unused in the evaluation limits
-- [ ] Phase 5 `ingest`: redact emails and phone numbers (core has no `redact()` yet, so non-negotiable 7 is not met until it exists); decide whether feedback text should pass `decideSafety`
+- [ ] Phase 5 `ingest`: call `redact()` from core on every free-text field before storing, with a Deno test; decide whether feedback text should pass `decideSafety`
 - [ ] Phase 5 `monthly-summary`: refuse an unchecked template ("held") with a test, since `fillTemplate` checks only the labels
+
+Captain's follow-ups, same day:
+- [x] `farmId` is the Supabase `farms.id` UUID everywhere and `farmSlug` (`ondera-noor`) is for paths and pack folders Proof: `schemas.test.ts` rejects a slug as `farmId`, and rejects `../etc`, `a/b`, uppercase and spaces as `farmSlug`; schema regenerated; TRD 6.1 updated; `packages/core/schema` is excluded from Biome because it is generated
+- [x] `redact()` in core: emails and phone numbers (international, national, Gambian `+220` and 7-digit local) Proof: `redact.test.ts`, 46 tests including 10 Gambian formats and the things that must stay ("stop 3", `2026-10-03`, prices); non-negotiable 7 is now covered in core, and `ingest` still has to call it (Phase 5)
+- [x] `fillTemplate` segment math uses 153 (GSM-7) and 67 (UCS-2) per part, not 160 and 70 Proof: the limits were already right for plain text, and tests now pin 306/307/459/460 (GSM-7) and 134/135/201/202 (UCS-2). The check found one bug: `ceil(length / limit)` undercounts when an escape pair (`€`) or an emoji straddles a part boundary, so parts are now packed (a test with 152 + `€` + 152 septets needs 3 parts, not 2)
+- Result: 330 tests pass, core lines 100% (126 of 126)
 
 Open items for the captain and Preet (found while building):
 - The safety lexicon and theme hints are first drafts; review them against real questions.
 - The emergency number for the safety card is not in any string yet (content item for Preet).
 - Wolof uses `ë`, which is outside GSM-7, so a Wolof text is UCS-2 with 70 characters per segment. One segment will rarely be possible; `fillTemplate` flags it and allows two.
-- Manifest `farmId` is any non-empty string, while the TRD's ingest example uses a UUID. Settle which one the pack carries before Phase 5.
 
 ## Phase 2: Content (Preet, in parallel)
 
