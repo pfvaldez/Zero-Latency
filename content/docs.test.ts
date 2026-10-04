@@ -33,6 +33,9 @@ describe("docs/RESPONSIBLE_AI.md", () => {
         ? source.includes(`def ${title}(`)
         : source.includes(title);
       expect(found, `${file} :: ${title}`).toBe(true);
+      // The referenced test must be live: not skipped or marked todo.
+      const line = source.split("\n").find((l) => l.includes(title)) ?? "";
+      expect(line, `${file} :: ${title} is skipped`).not.toMatch(/\.(skip|todo)\b/);
     }
   });
 
@@ -72,10 +75,27 @@ describe("docs/DATA_CARD.md", () => {
     }
   });
 
-  it("names every model by its exact revision", () => {
-    expect(md).toContain("761b726dd34fb83930e26aab4e9ac3899aa1fa78");
-    expect(md).toContain("f8d333a098d19b4fd9a8b18f94170487ad3f821d");
-    expect(md).toContain("3d33597edbdaaba14a8e858e2c8caa76e3cec0cd");
+  it("names the e5 and NLLB revisions the repository really pins, so the card cannot drift", () => {
+    const lock = JSON.parse(read("packages/pack/model.lock.json")) as { revision: string };
+    expect(md).toContain(lock.revision);
+    const nllb = /^REVISION = "([0-9a-f]{40})"/m.exec(read("pipeline/asknoor/translate.py"))?.[1];
+    expect(nllb).toMatch(/^[0-9a-f]{40}$/);
+    expect(md).toContain(nllb as string);
+  });
+
+  it("marks everything that is not pinned or used yet as planned", () => {
+    for (const name of [
+      "Meta MMS-1b-all",
+      "FLORES-200",
+      "FLEURS",
+      "Wikipedia text",
+      "Tatoeba sentences",
+    ]) {
+      const row = md.split("\n").find((l) => l.startsWith(`| ${name}`));
+      expect(row, name).toBeDefined();
+      expect(row, name).toMatch(/[Pp]lanned/);
+    }
+    expect(md).toContain("**planned, Slice 4 step 2, not built**");
   });
 
   it("has a labels table covering the synthetic, stand-in, AI-dubbed and machine-draft items", () => {

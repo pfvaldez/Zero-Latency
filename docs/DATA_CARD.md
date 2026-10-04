@@ -1,6 +1,6 @@
 # Data card: Ask Noor
 
-**DRAFT for Preet to complete and check** (the TRD assigns this document to her). Written 2026-10-04 by Bee with Claude Code from the repository as it stands on `main`; every row below can be checked against the file or the revision it names.
+**DRAFT for Preet to complete and check** (the TRD assigns this document to her). Written 2026-10-04 by Bee with Claude Code from the repository as it stands on `main`; rows for e5 and NLLB are pinned in the repository (`packages/pack/model.lock.json`, `pipeline/asknoor/translate.py`) and a test checks the revisions; **rows marked planned (MMS, FLORES-200, FLEURS, Wikipedia, Tatoeba) were taken from the upstream cards and are not pinned or used in the repository yet.**
 
 > **Non-commercial licenses.** Two models used by this project are **CC-BY-NC-4.0 (non-commercial): NLLB-200 and Meta MMS**. That is fine for a hackathon submission and for research, and it **limits any commercial use and the "any farm, any language" story**: a cooperative that sells the tool would need other models or a license. Everything that comes out of them is labeled a machine draft.
 
@@ -35,14 +35,14 @@
 | Fun facts without a source, products without a price, the farm card without a phone | `needs: ["source"]`, `["price"]`, `["phone"]` | the add-on files and `manifest.addons[].needs` | Demo packs only, labeled; refused in production |
 | Fixture pack | "Synthetic test tone, not a voice" | `manifest.labels.standIn` | No (demo pack for tests) |
 | The 116 test questions | `synthetic = true` on every row | the CSV column | Never shown |
-| Index-only passages (Slice 4 step 2) | `indexOnly` on their embedding rows; never displayed | `manifest.embeddings.rows` | Never shown; they influence which clip is offered, and the guest confirms |
+| Index-only passages (**planned, Slice 4 step 2, not built**) | will be marked `indexOnly` on their embedding rows and never displayed | will be in `manifest.embeddings.rows` | Would never be shown; they would influence which clip is offered, and the guest confirms |
 
 ## 3. Gaps, in plain words
 
 - **No real guest has used this.** All numbers come from synthetic questions.
-- **Nobody who speaks Wolof has checked anything.** Machine Wolof (text and audio) is a draft; its quality is measured, not assumed.
+- **Nobody who speaks Wolof has checked anything.** Machine Wolof (text and audio) is a draft; its quality **will be measured** (planned, Slice 4 step 4) and nothing is measured yet.
 - **de, nl and sv have not been checked by native speakers**, including the safety card text and the stand-in voice label.
 - **The e5 model does not cover Wolof questions.**
 - **Cross-CPU differences:** the same model gave slightly different vectors on Linux x64 and macOS arm64 (cosine 0.9948 for one passage). A threshold has not been checked against vectors made on a phone.
 - **Open content decisions** from the PRD: the final visitor languages from The Gambia's arrival data, and Noor's real language and recording.
-- **Licenses** limit commercial use (NLLB, MMS) and share-alike applies to the Wikipedia and FLORES text used for evaluation and vocabulary (not shipped).
+- **Licenses** limit commercial use (NLLB, MMS) and share-alike would apply to the Wikipedia and FLORES text once it is used for evaluation and vocabulary (planned; never shipped).

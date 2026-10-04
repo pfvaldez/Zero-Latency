@@ -86,10 +86,25 @@ describe("interface strings", () => {
   });
 });
 
+describe("safety card: not saved", () => {
+  const NOT_SAVED = {
+    en: /did not save/i,
+    de: /nicht gespeichert/i,
+    nl: /niet bewaard/i,
+    sv: /inte sparat/i,
+  } as const;
+
+  it("tells the guest in every language that the question was not saved", () => {
+    for (const lang of VISITOR_LANGS) {
+      expect(STRINGS[lang]["ask.safety.body"], lang).toMatch(NOT_SAVED[lang]);
+    }
+  });
+});
+
 describe("safety card", () => {
   const GUIDE = { en: "guide", de: "reiseleiter", nl: "gids", sv: "guide" } as const;
 
-  it("sends every guest to their guide and says the question was not saved", () => {
+  it("sends every guest to their guide", () => {
     for (const lang of VISITOR_LANGS) {
       expect(STRINGS[lang]["ask.safety.title"].toLowerCase(), lang).toContain(GUIDE[lang]);
       expect(STRINGS[lang]["ask.safety.body"].toLowerCase(), lang).toContain(GUIDE[lang]);
