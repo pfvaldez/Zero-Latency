@@ -239,7 +239,7 @@ export interface Moment {
 export interface Clip { id: number; kind: 'stop' | 'answer'; stopCode?: string; audio: string; durationMs: number; momentIds: string[] }
 
 export interface FarmPackManifest {
-  packId: string; farmId: string; version: number; mode: 'production' | 'demo'; createdAt: string;
+  packId: string; farmId: string /* Supabase farms.id, a UUID */; farmSlug: string /* "ondera-noor": paths and pack folders only */; version: number; mode: 'production' | 'demo'; createdAt: string;
   noorLang: NoorLang; visitorLangs: VisitorLang[];
   clips: Clip[]; moments: Moment[]; addons: Addon[];
   model: { id: 'multilingual-e5-small'; dir: string; dim: 384; quantization: 'int8'; vocab: 'full' | 'trimmed'; sizeBytes: number };
@@ -261,13 +261,23 @@ export type OutboxItem =
   | { type: 'order'; id: string; farmId: string; items: { productId: string; qty: number }[]; total: number; currency: string; confirmedByNoor: true; createdAt: string };
 ```
 
+Types not spelled out above, as built in `packages/core/src/types.ts`:
+
+- `farmId` is the Supabase `farms.id` UUID everywhere: in the manifest, in every outbox item and in the `ingest` request. `farmSlug` (`ondera-noor`, lowercase words joined by single hyphens) is only for paths and pack folders, so the schema accepts nothing that could climb out of a folder. `VITE_FARM_ID` is the UUID.
+- `Thresholds` is `{ match: number; margin: number }` (the `thresholds` field of the manifest).
+- `Addon` is a union tagged by `kind` (`fact` with a `source`, `recipe`, `product` with `price` and `currency`, `farm-card`). Every add-on has `id`, `text` per visitor language and `checked`. Only checked add-ons may ship in a production pack.
+
+Zod schemas live in `src/schemas.ts`, pinned to these types with `satisfies`: `FarmPackManifestSchema` and `OutboxItemSchema` (strict objects, so an unknown field is rejected). A production manifest is also rejected if it has draft moment text, an unchecked add-on or a stand-in label. `bun run --cwd packages/core export:schema` writes the manifest's JSON Schema (draft 2020-12) to `packages/core/schema/manifest.schema.json` for the pipeline; a test fails when the committed file is out of date. Refinements (the production rules, `endMs > startMs`) are not part of the JSON Schema, so `pack.py` tests cover them.
+
 Required functions, each with unit tests:
 
 - `normalize(text)`: lowercase, `ß` to `ss`, strip diacritics, collapse non-alphanumerics to spaces, pad with spaces for whole-word matching.
-- `decideSafety(text): boolean`: whole-word match against the multilingual lexicon (English, German, Dutch, Swedish at minimum). Conservative by design: a false positive sends a guest to the guide, which is safe.
-- `decide(results, thresholds): AskOutcome`: pure; no side effects.
-- `themeOf(text): ThemeId`: device-side keyword hints for the fixed taxonomy (the cooperative cross-checks with Groq in P1).
-- `fillTemplate(template, counts, labels): string`: only known placeholders; throws on unknown placeholders or missing checked labels.
+- `redact(text): string`: replaces emails with `[email]` and every run of 7 or more digits (with spaces, dots, dashes or brackets between them) with `[phone]`: international (`+220 345 6789`, `00220 3456789`), national and Gambian 7-digit local numbers. Stops "stop 3" and ISO dates alone. `ingest` (Phase 5) runs it on every free-text field before storing. It does not catch names, @handles or numbers spelled out in words.
+- `decideSafety(text): boolean`: whole-word match against the multilingual lexicon (English, German, Dutch, Swedish at minimum). Conservative by design: a false positive sends a guest to the guide, which is safe. Words common in ordinary tour questions ("help", "fire", "burn", "faint", "bite") are left out on purpose. The lexicon is a draft for Bee and Preet to review.
+- `decide(results, thresholds): AskOutcome`: pure; no side effects. Takes the best score (input order does not matter); at or above `match` is `confirm`, otherwise `saved` (`below-threshold`). It never returns `safety`: the caller runs `decideSafety` first. `margin` is not used until the P1 "A or B" step.
+- `themeOf(text): ThemeId`: device-side keyword hints for the fixed taxonomy (the cooperative cross-checks with Groq in P1). A theme matches if any of its hints appears (whole word, any language); ties go to the earliest theme in taxonomy order; no match is `other`.
+- `fillTemplate(template, counts, labels): FilledTemplate`: only known placeholders (`guests`, `orders`, `items`, `askedCount` are counts; `loved`, `asked`, `wished` are `{ text, checked }` labels). Throws on an unknown placeholder, an unbalanced brace, a count that is not a non-negative integer, or a missing or unchecked label. Returns `{ body, encoding, length, segments, fitsOneSegment }`: bodies over one segment (160 GSM-7 characters, or 70 in UCS-2) are flagged, and more than two segments throws. Multipart messages hold 153 (GSM-7) or 67 (UCS-2) characters per part, and a character is never split across parts (an escape pair such as `€`, or an emoji), so the part count is packed, not `ceil(length / limit)`. Whether the template itself is checked (the "held" state) is decided by `monthly-summary`. Letters outside GSM-7, such as Wolof `ë`, switch the text to UCS-2, so one segment is then only 70 characters.
+- `t(lang, key, params)` and `STRINGS`: interface strings for `en`, `de`, `nl` and `sv`. English is the source; the other three are drafts that no native speaker has checked (`I18N_STATUS`).
 
 ### 6.2 `apps/web`: SOLID boundaries
 
@@ -300,7 +310,7 @@ Routes: `/` (guest tour), `/coop` (sign-in required), `/coop/review`, `/coop/rep
 
 ### 6.4 Offline and PWA
 
-- Workbox precaches the app shell. The farm pack is fetched once into a named cache (`pack-<farmId>-v<version>`) through `PackRepository.download`, which verifies SHA-256 checksums from the manifest.
+- Workbox precaches the app shell. The farm pack is fetched once into a named cache (`pack-<farmSlug>-v<version>`) through `PackRepository.download`, which verifies SHA-256 checksums from the manifest.
 - The manifest is checked for updates when online. A new version downloads in the background and swaps in on the next stop change, never mid-clip.
 - Storage: request persistent storage (`navigator.storage.persist()`) after download, and tell guests to download shortly before the tour, since iOS Safari may clear site data after a period of non-use.
 

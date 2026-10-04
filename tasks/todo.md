@@ -2,7 +2,7 @@
 
 Status: `[ ]` to do, `[~]` in progress, `[x]` done (add a one-line proof), `[!]` blocked (say why).
 Deadline: submit by 8:00 AM ET, October 4 (hard deadline 9:00 AM ET). Feature freeze at 4:30 AM ET.
-Plan status: **Phase 0 approved and built on branch `phase-0-tooling` (PR #1 awaiting the captain's merge). Phases 1–7 are not started.**
+Plan status: **Phase 0 approved and built on branch `phase-0-tooling` (PR #1 awaiting the captain's merge). Phase 1 built on branch `phase-1-core`, awaiting approval. Phases 2–7 are not started.**
 
 ## Checkpoints
 
@@ -129,13 +129,35 @@ Rules for this phase: Bun only (no npm, yarn or pnpm); Node 24 runs the Node-bas
 
 ## Phase 1: Core domain and guardrails (Bee with Claude Code, about 1.5 h)
 
-- [ ] `types.ts` with every contract from TRD section 6.1
-- [ ] `normalize()` with tests (umlauts, `ß`, Swedish letters, punctuation)
-- [ ] `decideSafety()` with a multilingual lexicon and at least 20 test cases (English, German, Dutch, Swedish)
-- [ ] `decide()` with tests at, above and below the threshold
-- [ ] `themeOf()` with the fixed taxonomy and tests for each theme
-- [ ] `fillTemplate()`: only known placeholders, refuses unchecked labels, one SMS segment check
-- [ ] Coverage of `packages/core` at least 90% of lines
+Plan approved 2026-10-03 (`/Users/bhagi/.claude/plans/` copy of the plan). Built on branch `phase-1-core`, cut from `phase-0-tooling` because PR #1 is not merged yet. One change from the plan: `themeOf` scores a theme as matched or not (it does not count hints), because counting made "Wie lange dauert das Rösten?" resolve to `length` (two hits) instead of `roast` (one).
+
+- [x] `types.ts` with every contract from TRD section 6.1 (plus `Addon` and `Thresholds`, which the TRD references without defining), Zod schemas for `FarmPackManifest` and `OutboxItem`, and the JSON Schema export Proof: `bun run typecheck` exits 0 with each schema pinned by `satisfies` (control: adding a field to `Thresholds` fails `tsc -b`); `schemas.test.ts` has 16 tests, including the drift test against `packages/core/schema/manifest.schema.json`
+- [x] `normalize()` with tests (umlauts, `ß`, Swedish letters, punctuation) Proof: `normalize.test.ts`, 11 tests pass
+- [x] `decideSafety()` with a multilingual lexicon and at least 20 test cases (English, German, Dutch, Swedish) Proof: `safety.test.ts` has 48 tests: 28 must-trigger and 11 must-not-trigger sentences plus boundary and lexicon checks; control: removing `ambulans` fails "[sv] Ring en ambulans"
+- [x] `decide()` with tests at, above and below the threshold Proof: `decide.test.ts`, 11 tests; control: `<` changed to `<=` fails "confirms exactly at the threshold"
+- [x] `themeOf()` with the fixed taxonomy and tests for each theme Proof: `themes.test.ts` has 54 tests: 45 phrases covering all 15 themes in at least two languages, plus tie, whole-word and taxonomy-guard tests
+- [x] `fillTemplate()`: only known placeholders, refuses unchecked labels, one SMS segment check Proof: `template.test.ts`, 19 tests; control: dropping the checked test fails "throws on an unchecked label"
+- [x] i18n strings for en, de, nl, sv covering the guest interface (PRD section 6) Proof: 79 keys per language; a missing key fails `tsc -b` (control: a key added to `en.ts` only); `i18n.test.ts` checks keys, placeholders, no pasted English, no phone or email patterns. **de, nl and sv are unchecked drafts** (`I18N_STATUS`); a native speaker must check them before a production pack
+- [x] Coverage of `packages/core` at least 90% of lines Proof: `bun run test:coverage`: 257 tests pass, core lines 100% (106 of 106)
+- [x] Housekeeping: CI runs `test:coverage`; `shadcn` moved to devDependencies Proof: `ci.yml` runs `bun run test:coverage`; `bun install --frozen-lockfile` passes, `vite build` and `bun run e2e` still pass after the move
+- [x] Bundle check: importing core from the placeholder screen first grew the web bundle from 143.2 kB to 172.9 kB gzipped; `"sideEffects": false` in core's `package.json` brings it back Proof: `vite build` reports 143.22 kB gzipped against the 250 KB budget
+
+Guardrail-reviewer (2026-10-03): no violation of the ten non-negotiables after two fixes: `decide` failed open on a NaN threshold (now saves; test added), and the safety lexicon missed inflected forms such as "hurts", "snakes", "dizzy", "Kopfschmerzen" (added, with a test table). Tracked for later phases:
+- [ ] Phase 3 `pack.py`: in production mode fail while any language in `visitorLangs` is `draft` in `I18N_STATUS`, require every non-source subtitle to be checked (the `draft` flag on a moment is opt-in), and require every clip with synthetic audio to be listed in `labels.syntheticVoice`
+- [ ] Phase 3 eval: pick `thresholds.match` from the sweep; the schema allows 0 to 1 (a floor is not set because no calibrated value exists yet). Record that `margin`, `ambiguous` and the P1 "A or B" step are unused in the evaluation limits
+- [ ] Phase 5 `ingest`: call `redact()` from core on every free-text field before storing, with a Deno test; decide whether feedback text should pass `decideSafety`
+- [ ] Phase 5 `monthly-summary`: refuse an unchecked template ("held") with a test, since `fillTemplate` checks only the labels
+
+Captain's follow-ups, same day:
+- [x] `farmId` is the Supabase `farms.id` UUID everywhere and `farmSlug` (`ondera-noor`) is for paths and pack folders Proof: `schemas.test.ts` rejects a slug as `farmId`, and rejects `../etc`, `a/b`, uppercase and spaces as `farmSlug`; schema regenerated; TRD 6.1 updated; `packages/core/schema` is excluded from Biome because it is generated
+- [x] `redact()` in core: emails and phone numbers (international, national, Gambian `+220` and 7-digit local) Proof: `redact.test.ts`, 46 tests including 10 Gambian formats and the things that must stay ("stop 3", `2026-10-03`, prices); non-negotiable 7 is now covered in core, and `ingest` still has to call it (Phase 5)
+- [x] `fillTemplate` segment math uses 153 (GSM-7) and 67 (UCS-2) per part, not 160 and 70 Proof: the limits were already right for plain text, and tests now pin 306/307/459/460 (GSM-7) and 134/135/201/202 (UCS-2). The check found one bug: `ceil(length / limit)` undercounts when an escape pair (`€`) or an emoji straddles a part boundary, so parts are now packed (a test with 152 + `€` + 152 septets needs 3 parts, not 2)
+- Result: 330 tests pass, core lines 100% (126 of 126)
+
+Open items for the captain and Preet (found while building):
+- The safety lexicon and theme hints are first drafts; review them against real questions.
+- The emergency number for the safety card is not in any string yet (content item for Preet).
+- Wolof uses `ë`, which is outside GSM-7, so a Wolof text is UCS-2 with 70 characters per segment. One segment will rarely be possible; `fillTemplate` flags it and allows two.
 
 ## Phase 2: Content (Preet, in parallel)
 
