@@ -1,13 +1,17 @@
 import { type FarmPackManifest, t, type VisitorLang } from "@asknoor/core";
 import { Button } from "@/components/animate-ui/components/buttons/button";
 import { AskPanel } from "@/components/guest/AskPanel.tsx";
+import { FeedbackForm } from "@/components/guest/FeedbackForm.tsx";
 import { Player } from "@/components/guest/Player.tsx";
+import { Shop } from "@/components/guest/Shop.tsx";
 import { StopList } from "@/components/guest/StopList.tsx";
 import { type Tab, useGuest } from "@/state/guest-store.ts";
 
-const TABS: { id: Tab; key: "nav.stops" | "nav.ask" }[] = [
+const TABS: { id: Tab; key: "nav.stops" | "nav.ask" | "nav.shop" | "nav.feedback" }[] = [
   { id: "stops", key: "nav.stops" },
   { id: "ask", key: "nav.ask" },
+  { id: "shop", key: "nav.shop" },
+  { id: "feedback", key: "nav.feedback" },
 ];
 
 /** The tour once the pack is saved: stops and player, ask. Feedback and shop follow. */
@@ -38,6 +42,8 @@ export function GuestTour({ lang, manifest }: { lang: VisitorLang; manifest: Far
       {tab === "stops" && (
         <StopList lang={lang} clips={manifest.clips} onOpen={(c) => openClip(c.id)} />
       )}
+      {tab === "shop" && <Shop lang={lang} manifest={manifest} />}
+      {tab === "feedback" && <FeedbackForm lang={lang} manifest={manifest} />}
       {tab === "ask" && (
         <AskPanel lang={lang} manifest={manifest} onPlay={(m) => openClip(m.clipId, m.id)} />
       )}
