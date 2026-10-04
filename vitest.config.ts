@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 // include paths below match nothing.
 export default defineConfig({
   test: {
-    projects: ["apps/web", "packages/core", "content"],
+    projects: ["apps/web", "packages/core", "packages/pack", "content"],
     coverage: {
       provider: "v8",
       include: ["packages/core/src/**/*.ts"],

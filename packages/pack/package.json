@@ -1,0 +1,21 @@
+{
+  "name": "@asknoor/pack",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Build-time farm pack builder and evaluation. Runs on Node 24 (TypeScript type stripping); never at guest runtime.",
+  "scripts": {
+    "test": "vitest run",
+    "model": "node src/cli.ts model",
+    "eval": "node src/cli.ts eval",
+    "build": "node src/cli.ts build",
+    "fixture": "node src/cli.ts fixture"
+  },
+  "dependencies": {
+    "@asknoor/core": "workspace:*",
+    "@huggingface/transformers": "4.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.1"
+  }
+}

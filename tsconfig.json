@@ -3,6 +3,7 @@
   "references": [
     { "path": "./packages/core" },
     { "path": "./packages/core/scripts" },
+    { "path": "./packages/pack" },
     { "path": "./content" },
     { "path": "./apps/web" }
   ]

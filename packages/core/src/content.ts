@@ -74,6 +74,14 @@ export const RecordingsFileSchema = z.strictObject({
         kind: z.literal("stand-in-voice"),
         label: z.string().regex(/^Stand-in for Noor's voice/),
       }),
+      // Generated test tones for the committed fixture pack: not a voice, no consent needed, and
+      // labeled so the pack is a demo pack (labels.standIn).
+      z.strictObject({
+        ...recordingBase,
+        lang: z.literal("en"),
+        kind: z.literal("synthetic-tone"),
+        label: z.string().regex(/^Synthetic/),
+      }),
       // AI-dubbed Wolof: draft until a Wolof speaker checks it, demo only, and only with a
       // confirmed row for the person in docs/CONSENT.md (the pipeline enforces that).
       z
@@ -179,6 +187,8 @@ export const FarmCardFileSchema = z
   });
 
 export type ChecksFile = z.infer<typeof ChecksFileSchema>;
+export type ClipsFile = z.infer<typeof ClipsFileSchema>;
+export type RecordingsFile = z.infer<typeof RecordingsFileSchema>;
 export interface AddonContent {
   facts: z.infer<typeof FactsFileSchema>;
   recipe: z.infer<typeof RecipeFileSchema>;

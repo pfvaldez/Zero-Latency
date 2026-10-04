@@ -25,12 +25,14 @@ function manifest(overrides: Partial<FarmPackManifest> = {}): FarmPackManifest {
         audio: "clip1.mp3",
         durationMs: 30000,
         momentIds: ["c1-m1"],
+        subtitles: { en: "subtitles/clip01.en.vtt" },
       },
     ],
     moments: [
       {
         id: "c1-m1",
         clipId: 1,
+        timing: "estimated",
         startMs: 0,
         endMs: 9000,
         subtitles: { en: "Welcome" },
@@ -41,12 +43,22 @@ function manifest(overrides: Partial<FarmPackManifest> = {}): FarmPackManifest {
     model: {
       id: "multilingual-e5-small",
       dir: "model",
+      source: "Xenova/multilingual-e5-small",
+      revision: "761b726dd34fb83930e26aab4e9ac3899aa1fa78",
+      queryPrefix: "query: ",
       dim: 384,
       quantization: "int8",
       vocab: "full",
       sizeBytes: 118_000_000,
     },
-    embeddings: { file: "embeddings.bin", count: 1, dim: 384, dtype: "float32" },
+    embeddings: {
+      file: "embeddings.f32",
+      count: 1,
+      dim: 384,
+      dtype: "float32",
+      passagePrefix: "passage: ",
+      rows: [{ momentId: "c1-m1", lang: "en" }],
+    },
     thresholds: { match: 0.8, margin: 0.05 },
     sizes: { "clip1.mp3": 480_000 },
     checksums: { "clip1.mp3": "abc123" },
@@ -98,6 +110,7 @@ describe("FarmPackManifestSchema", () => {
         {
           id: "c1-m1",
           clipId: 1,
+          timing: "estimated",
           startMs: 0,
           endMs: 9000,
           subtitles: { de: "Willkommen" },
@@ -122,6 +135,7 @@ describe("FarmPackManifestSchema", () => {
         {
           id: "c1-m1",
           clipId: 1,
+          timing: "estimated",
           startMs: 0,
           endMs: 9000,
           subtitles: { de: "x" },
@@ -147,6 +161,7 @@ describe("FarmPackManifestSchema", () => {
         {
           id: "c1-m1",
           clipId: 1,
+          timing: "estimated",
           startMs: 0,
           endMs: 9000,
           subtitles: { de: "x" },
@@ -202,7 +217,9 @@ describe("FarmPackManifestSchema", () => {
       FarmPackManifestSchema.safeParse(manifest({ thresholds: { match: 1.5, margin: 0 } })).success,
     ).toBe(false);
     const backwards = manifest({
-      moments: [{ id: "m", clipId: 1, startMs: 5, endMs: 5, subtitles: {}, topic: {} }],
+      moments: [
+        { id: "m", clipId: 1, timing: "estimated", startMs: 5, endMs: 5, subtitles: {}, topic: {} },
+      ],
     });
     expect(FarmPackManifestSchema.safeParse(backwards).success).toBe(false);
     expect(FarmPackManifestSchema.safeParse({ ...manifest(), extra: 1 }).success).toBe(false);
@@ -211,7 +228,15 @@ describe("FarmPackManifestSchema", () => {
   it("rejects a subtitle for a language outside the visitor languages enum", () => {
     const m = manifest({
       moments: [
-        { id: "m", clipId: 1, startMs: 0, endMs: 5, subtitles: { fr: "x" } as never, topic: {} },
+        {
+          id: "m",
+          clipId: 1,
+          timing: "estimated",
+          startMs: 0,
+          endMs: 5,
+          subtitles: { fr: "x" } as never,
+          topic: {},
+        },
       ],
     });
     expect(FarmPackManifestSchema.safeParse(m).success).toBe(false);
