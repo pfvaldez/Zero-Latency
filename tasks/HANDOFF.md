@@ -4,15 +4,15 @@ Everything below this block was written earlier for Pablo and is kept for refere
 
 ## Deploy (Vercel, static)
 
-Live demo: https://ask-noor.vercel.app (Vercel project `ask-noor`, deployed 2026-10-04 with the **synthetic fixture pack**, because Preet's publishing row is still pending). It is a static deploy of the built app, uploaded from this machine:
+Live demo: https://ask-noor.vercel.app (Vercel project `ask-noor`). Since 2026-10-04 it serves the **real demo pack**: 7 stops in Preet's voice (labeled "Voice: Preet, standing in for Noor"), the 7 AI-dubbed Wolof clips, the Wolof drafts and the 44 MB trimmed model; clip 8 is held back. Preet confirmed publishing and transcription in writing on 2026-10-04 (team Discord; the message link is not filed yet). It is a static deploy of the built app, uploaded from this machine:
 
 ```sh
-bun run pack:model --trimmed --into apps/web/public/packs/fixture   # the model is not in git
-bun run --cwd apps/web build
+bun run --cwd packages/pack build --mode demo --model trimmed        # needs the recordings in content/ondera-noor/recordings/
+VITE_PACK_BASE=/packs/ondera-noor/demo bun run --cwd apps/web build   # point the app at the demo pack
 cd apps/web/dist && vercel link --project ask-noor --yes && vercel deploy --prod --yes
 ```
 
-`apps/web/public/vercel.json` rewrites `/stop/n` to `index.html` (first visit to a stop link) and keeps `sw.js` revalidating; `apps/web/public/.vercelignore` keeps the local production pack and an unused hashed copy of the runtime wasm out of the upload. Vercel Hobby allows 100 MB per CLI upload in total (no separate per-file limit); this upload is about 84 MB, so a bigger pack (the real demo pack with audio and the AI-dubbed Wolof) needs checking against it. `vite build` empties `dist`, so run `vercel link` again before each deploy.
+`apps/web/public/vercel.json` rewrites `/stop/n` to `index.html` (first visit to a stop link) and keeps `sw.js` revalidating. `apps/web/public/.vercelignore` keeps the local production pack, the fixture pack (the deployed app does not use it) and an unused hashed copy of the runtime wasm out of the upload. Vercel Hobby allows 100 MB per CLI upload in total (no separate per-file limit); this upload is 88 MB (42.3 MB model, 26.9 + 14.3 MB runtime wasm, 1.4 MB audio). `vite build` empties `dist`, so run `vercel link` again before each deploy. Without `VITE_PACK_BASE` the build points at the fixture pack, which is excluded from the upload, so the deployed app would find no pack.
 
 ## What merged (all with CI green, including the Playwright airplane-mode test, and a guardrail-reviewer PASS)
 | PR | What |
@@ -36,7 +36,7 @@ Test status on main: 643 unit tests, 10 model tests, 97 pytest, 4 Playwright tes
 Small known items from the reviews: the farm-code lockout lives in page memory (a reload clears it); the e2e has no control for a foreign QR code (unit tests cover it); `waitForTimeout(3000)` in the e2e waits for the precache, so poll for it if it flakes; `/stop/n` links on a real host need a single-page-app fallback to `index.html` for the first online visit (the service worker and `vite preview` already do this); the older-Safari wasm build is precached but never exercised.
 
 ## Waiting for Bee
-- **Preet's consent rows** (`docs/CONSENT.md`): set publishing to `confirmed` (needed for any pack with her voice) and decide on transcription; file the Discord link for the dubbing yes. I did not change any row.
+- **Preet's consent rows** (`docs/CONSENT.md`): all three are `confirmed` (publishing and transcription on 2026-10-04). File the Discord message links for the three written yeses.
 - **The audio folder for Pablo**: the 8 English and 8 Wolof recordings are gitignored and only on your machine (`~/Downloads/Archive-2/`); verify with `content/ondera-noor/recordings/audio.sha256`.
 - **Farm code**: pick the real production code (`ASKNOOR_FARM_CODE`, 4 digits, never committed) or decide that order confirmation moves to Noor's own device or the dashboard (a 4-digit code is brute-forceable offline from the pack). The demo code is `4827`.
 - **Hosting and its file limits**: the largest files are the 42.3 MB model, the 26.9 MB runtime wasm and the 14.3 MB older-Safari wasm; the app also precaches about 41 MB before the pack download. Choose a host that allows them, and decide whether to drop the older-Safari wasm.
@@ -122,11 +122,11 @@ bun run --cwd packages/pack build --mode demo --model trimmed   # writes apps/we
 VITE_PACK_BASE=/packs/ondera-noor/demo bun run dev
 ```
 
-**This refuses today**: "consent for Preet Patel (publishing) is 'pending'". That is the correct gate (non-negotiable 10), do not bypass it. The audio is also not in git: `content/ondera-noor/recordings/en/clip01.m4a` to `clip08.m4a` (and `wo/clip01_wo.flac` to `clip08_wo.flac`) are gitignored. They are on Bee's machine (copied from `~/Downloads/Archive-2/`); ask Bee for the folder, check it with `content/ondera-noor/recordings/audio.sha256`, and put it at `content/ondera-noor/recordings/`. I did not build the real demo pack (the build was stopped before it ran).
+**Earlier this refused** ("consent for Preet Patel (publishing) is 'pending'"); since 2026-10-04 the row is confirmed and the build works. The audio is also not in git: `content/ondera-noor/recordings/en/clip01.m4a` to `clip08.m4a` (and `wo/clip01_wo.flac` to `clip08_wo.flac`) are gitignored. They are on Bee's machine (copied from `~/Downloads/Archive-2/`); ask Bee for the folder, check it with `content/ondera-noor/recordings/audio.sha256`, and put it at `content/ondera-noor/recordings/`. I did not build the real demo pack (the build was stopped before it ran).
 
 ## 4. Open decisions and blockers
 
-- **Preet's consent rows** (`docs/CONSENT.md`): dubbing is confirmed (written yes in Discord, link not filed); **transcription is pending** (no live ElevenLabs speech-to-text yet, so subtitles are time-estimated and labeled); **publishing is pending**, which blocks any pack with her audio. Bee sets rows to `confirmed`, nobody else.
+- **Preet's consent rows** (`docs/CONSENT.md`): dubbing confirmed 2026-10-03; transcription and publishing confirmed 2026-10-04 (written yes in Discord, links not filed). The live ElevenLabs transcript has not been run, so subtitles are still time-estimated and labeled. Bee sets rows to `confirmed`, nobody else.
 - **Native-speaker checks**: de, nl, sv interface strings and subtitle translations are drafts that nobody fluent has checked; the guest app labels them in demo mode and a production pack must not ship them. Wolof (NLLB draft and the AI-dubbed audio) needs a Wolof speaker. Preet owns the checks (`content/ondera-noor/checks.json`).
 - **The 44 MB model and the host's file limit**: the hosting platform for the PWA is not chosen. The largest single files are the ONNX model (42.3 MB), the ONNX runtime wasm (26.9 MB asyncify, 14.3 MB plain) and `tokenizer.json` (2 MB). A host with a per-file limit under about 45 MB (some free static hosts use 25 MB) would break the download or the precache. Check the limit before choosing; the model has no smaller option (trim 0.5 is 41 MB). The trimmed model's own home is the private GitHub Release; the app serves it from `/packs/<farm>/<mode>/model/`.
 - **Precache size**: the service worker precaches about 41 MB of ONNX runtime wasm before the guest even downloads the pack, and the pack then adds about 46 MB. Decide whether to drop the non-asyncify wasm (Safari below 26 only).

@@ -32,7 +32,7 @@ The test references are checked by `content/docs.test.ts`: every `` `file` :: `t
 
 ## 3. Consent
 
-`docs/CONSENT.md` is the table. Preet Patel: **dubbing confirmed** (2026-10-03, written yes in the team Discord, link not yet filed); **transcription pending** (the live English transcript has not been run); **publishing pending** (so no pack containing her voice can be built today, in any mode). The pipeline refuses dubbed audio, a transcription or a pack that includes a voice unless the row for that scope is exactly `confirmed`; a row that reads as a refusal never counts; the scope is a whole word. Noor's voice is never synthesized. Showing the recordings to real guests needs new consent.
+`docs/CONSENT.md` is the table. Preet Patel: **dubbing confirmed** (2026-10-03, written yes in the team Discord, link not yet filed); **transcription confirmed** (2026-10-04, written yes in the team Discord, link not yet filed; the live English transcript has not been run yet, so subtitle timing is still estimated and labeled); **publishing confirmed** (2026-10-04, same message, link not yet filed), so the demo pack with her voice and the AI-dubbed Wolof is built and deployed. The pipeline refuses dubbed audio, a transcription or a pack that includes a voice unless the row for that scope is exactly `confirmed`; a row that reads as a refusal never counts; the scope is a whole word. Noor's voice is never synthesized. Showing the recordings to real guests needs new consent.
 
 ## 4. Human oversight
 
