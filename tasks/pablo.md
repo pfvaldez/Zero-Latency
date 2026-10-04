@@ -9,8 +9,8 @@ You own `apps/web`. Don't edit `packages/core`, `supabase/` or `pipeline/` (Bee'
 
 ## To-do
 - [ ] 1. Guest shell (Prompt 4): pack download, stop list with QR scan and number fallback, player with subtitles and the progress animation, fun fact, recipe and farm cards, offline PWA, tests
-- [ ] 2. Ask flow, feedback, shop and outbox, wired to the guardrails in packages/core (Prompt 5)
-- [ ] 3. Swap FakeMatcher for the real e5 worker (Prompt 7, once Bee's farm pack is on main)
+- [x] 2. Ask flow, feedback, shop and outbox, wired to the guardrails in packages/core (Prompt 5)
+- [x] 3. Swap FakeMatcher for the real e5 worker (Prompt 7, once Bee's farm pack is on main)
 - [ ] 4. Point the sync client at the real ingest function (once Bee's Supabase backend is on main)
 - [ ] 5. /coop dashboard (Prompt 9)
 - [ ] 6. Polish: keyboard and screen-reader pass, reduced motion, Lighthouse PWA and accessibility 95+
