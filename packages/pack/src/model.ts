@@ -131,18 +131,53 @@ export async function verifyTrimmedDir(
   return true;
 }
 
+/**
+ * Where to fetch each release asset. A public repository serves them from the plain download URL.
+ * A private one answers 404 there, so with GITHUB_TOKEN (or GH_TOKEN) set we ask the API for the
+ * asset URLs and send the token. The token is read from the environment and never stored.
+ */
+async function releaseSources(
+  lock: TrimmedLock,
+  token: string | undefined,
+  fetchFile: typeof fetch,
+): Promise<(path: string) => { url: string; init?: RequestInit }> {
+  const { repo, tag } = lock.release;
+  if (!token) {
+    return (path) => ({
+      url: `https://github.com/${repo}/releases/download/${tag}/${releaseAssetName(path)}`,
+    });
+  }
+  const headers = { Authorization: `Bearer ${token}`, "X-GitHub-Api-Version": "2022-11-28" };
+  const res = await fetchFile(`https://api.github.com/repos/${repo}/releases/tags/${tag}`, {
+    headers: { ...headers, Accept: "application/vnd.github+json" },
+  });
+  if (!res.ok) throw new Error(`release lookup failed (${res.status}): ${repo} ${tag}`);
+  const assets = ((await res.json()) as { assets: { name: string; url: string }[] }).assets;
+  return (path) => {
+    const asset = assets.find((a) => a.name === releaseAssetName(path));
+    if (!asset) throw new Error(`release ${tag} has no asset ${releaseAssetName(path)}`);
+    return {
+      url: asset.url,
+      init: { headers: { ...headers, Accept: "application/octet-stream" } },
+    };
+  };
+}
+
 /** Download any missing or corrupted trimmed file from the GitHub Release and verify it against the lock. */
 export async function ensureTrimmedModel(
   dir = TRIMMED_CACHE,
   lock?: TrimmedLock,
   fetchFile: typeof fetch = fetch,
+  token: string | undefined = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN,
 ): Promise<string> {
   const l = lock ?? (await readTrimmedLock());
+  let source: Awaited<ReturnType<typeof releaseSources>> | undefined;
   for (const file of l.files) {
     const path = join(dir, file.path);
     if (await fileMatches(path, file)) continue;
-    const url = `https://github.com/${l.release.repo}/releases/download/${l.release.tag}/${releaseAssetName(file.path)}`;
-    const res = await fetchFile(url);
+    source ??= await releaseSources(l, token, fetchFile);
+    const { url, init } = source(file.path);
+    const res = await fetchFile(url, init);
     if (!res.ok) throw new Error(`download failed (${res.status}): ${url}`);
     const bytes = new Uint8Array(await res.arrayBuffer());
     if (bytes.length !== file.size || sha256(bytes) !== file.sha256) {
