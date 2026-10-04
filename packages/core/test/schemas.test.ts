@@ -4,12 +4,14 @@ import { FarmPackManifestSchema, manifestJsonSchema, OutboxItemSchema } from "..
 import type { FarmPackManifest, OutboxItem } from "../src/types.ts";
 
 const UUID = "3f2504e0-4f89-41d3-9a0c-0305e82c3301";
+const FARM_ID = "7c9e6679-7425-40de-944b-e07fc1f90ae7";
 const NOW = "2026-10-03T20:15:00Z";
 
 function manifest(overrides: Partial<FarmPackManifest> = {}): FarmPackManifest {
   return {
     packId: "ondera-noor-1",
-    farmId: "ondera-noor",
+    farmId: FARM_ID,
+    farmSlug: "ondera-noor",
     version: 1,
     mode: "production",
     createdAt: NOW,
@@ -56,7 +58,7 @@ function manifest(overrides: Partial<FarmPackManifest> = {}): FarmPackManifest {
 const question = (): OutboxItem => ({
   type: "question",
   id: UUID,
-  farmId: "ondera-noor",
+  farmId: FARM_ID,
   lang: "de",
   text: "Kann man hier übernachten?",
   deviceTheme: "stay",
@@ -65,7 +67,7 @@ const question = (): OutboxItem => ({
 const feedback = (): OutboxItem => ({
   type: "feedback",
   id: UUID,
-  farmId: "ondera-noor",
+  farmId: FARM_ID,
   lang: "nl",
   loved: "De verhalen",
   change: "Meer schaduw",
@@ -76,7 +78,7 @@ const feedback = (): OutboxItem => ({
 const order = (): OutboxItem => ({
   type: "order",
   id: UUID,
-  farmId: "ondera-noor",
+  farmId: FARM_ID,
   items: [{ productId: "beans-250", qty: 2 }],
   total: 500,
   currency: "GMD",
@@ -149,6 +151,32 @@ describe("FarmPackManifestSchema", () => {
     expect(FarmPackManifestSchema.safeParse(m).success).toBe(true);
   });
 
+  it("requires farmId to be a UUID and farmSlug to be a safe slug", () => {
+    const ok = (overrides: object) =>
+      FarmPackManifestSchema.safeParse({ ...manifest(), ...overrides }).success;
+    expect(ok({})).toBe(true);
+    expect(ok({ farmId: "ondera-noor" })).toBe(false); // the slug is not an identifier
+    expect(ok({ farmId: "" })).toBe(false);
+    for (const slug of [
+      "",
+      "Ondera-Noor",
+      "ondera noor",
+      "../etc",
+      "a/b",
+      "a..b",
+      "-a",
+      "a-",
+      "a--b",
+      "a.b",
+    ]) {
+      expect(ok({ farmSlug: slug }), slug).toBe(false);
+    }
+    for (const slug of ["ondera-noor", "farm2", "a"])
+      expect(ok({ farmSlug: slug }), slug).toBe(true);
+    const { farmSlug: _slug, ...withoutSlug } = manifest();
+    expect(FarmPackManifestSchema.safeParse(withoutSlug).success).toBe(false);
+  });
+
   it("rejects unknown language, empty visitorLangs, wrong dim, wrong quantization and bad mode", () => {
     const bad = [
       { ...manifest(), noorLang: "fr" },
@@ -197,6 +225,15 @@ describe("OutboxItemSchema", () => {
       ...rest
     } = feedback() as Extract<OutboxItem, { type: "feedback" }>;
     expect(OutboxItemSchema.safeParse(rest).success).toBe(true);
+  });
+
+  it("rejects a farmId that is not a UUID (the slug is not accepted)", () => {
+    for (const item of [question(), feedback(), order()]) {
+      expect(
+        OutboxItemSchema.safeParse({ ...item, farmId: "ondera-noor" }).success,
+        item.type,
+      ).toBe(false);
+    }
   });
 
   it("rejects an unknown type", () => {

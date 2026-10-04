@@ -21,5 +21,6 @@ export {
   type TemplateLabels,
 } from "./sms/template.ts";
 export { normalize } from "./text/normalize.ts";
+export { REDACTED_EMAIL, REDACTED_PHONE, redact } from "./text/redact.ts";
 export { THEME_ORDER, THEMES, type Theme, themeOf } from "./themes/themes.ts";
 export * from "./types.ts";

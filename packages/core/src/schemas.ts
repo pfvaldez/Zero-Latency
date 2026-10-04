@@ -25,6 +25,13 @@ const currency = z.string().regex(/^[A-Z]{3}$/, "ISO 4217 code, for example GMD"
 const nonNegInt = z.number().int().nonnegative();
 const unitInterval = z.number().min(0).max(1);
 
+const farmId = z.uuid(); // Supabase farms.id
+// Lowercase words joined by single hyphens. Used in paths and pack folder names, so no dots,
+// slashes or spaces can get in.
+const farmSlug = z
+  .string()
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "lowercase letters, digits and hyphens");
+
 const MAX_TEXT = 1000; // a guest question or feedback line; keeps a stray paste out of the outbox
 
 // ---- Outbox ----------------------------------------------------------------------------------
@@ -32,7 +39,7 @@ const MAX_TEXT = 1000; // a guest question or feedback line; keeps a stray paste
 const questionItem = z.strictObject({
   type: z.literal("question"),
   id: z.uuid(),
-  farmId: z.string().min(1),
+  farmId,
   lang: visitorLang,
   text: z.string().min(1).max(MAX_TEXT),
   deviceTheme: themeId,
@@ -42,7 +49,7 @@ const questionItem = z.strictObject({
 const feedbackItem = z.strictObject({
   type: z.literal("feedback"),
   id: z.uuid(),
-  farmId: z.string().min(1),
+  farmId,
   lang: visitorLang,
   loved: z.string().max(MAX_TEXT).optional(),
   change: z.string().max(MAX_TEXT).optional(),
@@ -54,7 +61,7 @@ const feedbackItem = z.strictObject({
 const orderItem = z.strictObject({
   type: z.literal("order"),
   id: z.uuid(),
-  farmId: z.string().min(1),
+  farmId,
   items: z
     .array(
       z.strictObject({
@@ -118,7 +125,8 @@ const addonSchema = z.discriminatedUnion("kind", [
 export const FarmPackManifestSchema = z
   .strictObject({
     packId: z.string().min(1),
-    farmId: z.string().min(1),
+    farmId,
+    farmSlug,
     version: nonNegInt,
     mode: z.enum(["production", "demo"]),
     createdAt: isoTime,

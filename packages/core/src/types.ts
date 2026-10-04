@@ -69,7 +69,8 @@ export interface Thresholds {
 
 export interface FarmPackManifest {
   packId: string;
-  farmId: string;
+  farmId: string; // Supabase farms.id (a UUID); what outbox items and ingest carry
+  farmSlug: string; // "ondera-noor": for paths and pack folders, never an identifier
   version: number;
   mode: "production" | "demo";
   createdAt: string;

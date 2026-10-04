@@ -8,7 +8,12 @@
     },
     "farmId": {
       "type": "string",
-      "minLength": 1
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "farmSlug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
     },
     "version": {
       "type": "integer",
@@ -17,7 +22,10 @@
     },
     "mode": {
       "type": "string",
-      "enum": ["production", "demo"]
+      "enum": [
+        "production",
+        "demo"
+      ]
     },
     "createdAt": {
       "type": "string",
@@ -26,14 +34,22 @@
     },
     "noorLang": {
       "type": "string",
-      "enum": ["wo", "gu"]
+      "enum": [
+        "wo",
+        "gu"
+      ]
     },
     "visitorLangs": {
       "minItems": 1,
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["en", "de", "nl", "sv"]
+        "enum": [
+          "en",
+          "de",
+          "nl",
+          "sv"
+        ]
       }
     },
     "clips": {
@@ -48,7 +64,10 @@
           },
           "kind": {
             "type": "string",
-            "enum": ["stop", "answer"]
+            "enum": [
+              "stop",
+              "answer"
+            ]
           },
           "stopCode": {
             "type": "string",
@@ -71,7 +90,13 @@
             }
           }
         },
-        "required": ["id", "kind", "audio", "durationMs", "momentIds"],
+        "required": [
+          "id",
+          "kind",
+          "audio",
+          "durationMs",
+          "momentIds"
+        ],
         "additionalProperties": false
       }
     },
@@ -103,7 +128,12 @@
             "type": "object",
             "propertyNames": {
               "type": "string",
-              "enum": ["en", "de", "nl", "sv"]
+              "enum": [
+                "en",
+                "de",
+                "nl",
+                "sv"
+              ]
             },
             "additionalProperties": {
               "type": "string"
@@ -113,7 +143,12 @@
             "type": "object",
             "propertyNames": {
               "type": "string",
-              "enum": ["en", "de", "nl", "sv"]
+              "enum": [
+                "en",
+                "de",
+                "nl",
+                "sv"
+              ]
             },
             "additionalProperties": {
               "type": "string"
@@ -123,14 +158,26 @@
             "type": "object",
             "propertyNames": {
               "type": "string",
-              "enum": ["en", "de", "nl", "sv"]
+              "enum": [
+                "en",
+                "de",
+                "nl",
+                "sv"
+              ]
             },
             "additionalProperties": {
               "type": "boolean"
             }
           }
         },
-        "required": ["id", "clipId", "startMs", "endMs", "subtitles", "topic"],
+        "required": [
+          "id",
+          "clipId",
+          "startMs",
+          "endMs",
+          "subtitles",
+          "topic"
+        ],
         "additionalProperties": false
       }
     },
@@ -149,7 +196,12 @@
                 "type": "object",
                 "propertyNames": {
                   "type": "string",
-                  "enum": ["en", "de", "nl", "sv"]
+                  "enum": [
+                    "en",
+                    "de",
+                    "nl",
+                    "sv"
+                  ]
                 },
                 "additionalProperties": {
                   "type": "string"
@@ -167,7 +219,13 @@
                 "minLength": 1
               }
             },
-            "required": ["id", "text", "checked", "kind", "source"],
+            "required": [
+              "id",
+              "text",
+              "checked",
+              "kind",
+              "source"
+            ],
             "additionalProperties": false
           },
           {
@@ -181,7 +239,12 @@
                 "type": "object",
                 "propertyNames": {
                   "type": "string",
-                  "enum": ["en", "de", "nl", "sv"]
+                  "enum": [
+                    "en",
+                    "de",
+                    "nl",
+                    "sv"
+                  ]
                 },
                 "additionalProperties": {
                   "type": "string"
@@ -195,7 +258,12 @@
                 "const": "recipe"
               }
             },
-            "required": ["id", "text", "checked", "kind"],
+            "required": [
+              "id",
+              "text",
+              "checked",
+              "kind"
+            ],
             "additionalProperties": false
           },
           {
@@ -209,7 +277,12 @@
                 "type": "object",
                 "propertyNames": {
                   "type": "string",
-                  "enum": ["en", "de", "nl", "sv"]
+                  "enum": [
+                    "en",
+                    "de",
+                    "nl",
+                    "sv"
+                  ]
                 },
                 "additionalProperties": {
                   "type": "string"
@@ -231,7 +304,14 @@
                 "pattern": "^[A-Z]{3}$"
               }
             },
-            "required": ["id", "text", "checked", "kind", "price", "currency"],
+            "required": [
+              "id",
+              "text",
+              "checked",
+              "kind",
+              "price",
+              "currency"
+            ],
             "additionalProperties": false
           },
           {
@@ -245,7 +325,12 @@
                 "type": "object",
                 "propertyNames": {
                   "type": "string",
-                  "enum": ["en", "de", "nl", "sv"]
+                  "enum": [
+                    "en",
+                    "de",
+                    "nl",
+                    "sv"
+                  ]
                 },
                 "additionalProperties": {
                   "type": "string"
@@ -259,7 +344,12 @@
                 "const": "farm-card"
               }
             },
-            "required": ["id", "text", "checked", "kind"],
+            "required": [
+              "id",
+              "text",
+              "checked",
+              "kind"
+            ],
             "additionalProperties": false
           }
         ]
@@ -286,7 +376,10 @@
         },
         "vocab": {
           "type": "string",
-          "enum": ["full", "trimmed"]
+          "enum": [
+            "full",
+            "trimmed"
+          ]
         },
         "sizeBytes": {
           "type": "integer",
@@ -294,7 +387,14 @@
           "maximum": 9007199254740991
         }
       },
-      "required": ["id", "dir", "dim", "quantization", "vocab", "sizeBytes"],
+      "required": [
+        "id",
+        "dir",
+        "dim",
+        "quantization",
+        "vocab",
+        "sizeBytes"
+      ],
       "additionalProperties": false
     },
     "embeddings": {
@@ -318,7 +418,12 @@
           "const": "float32"
         }
       },
-      "required": ["file", "count", "dim", "dtype"],
+      "required": [
+        "file",
+        "count",
+        "dim",
+        "dtype"
+      ],
       "additionalProperties": false
     },
     "thresholds": {
@@ -335,7 +440,10 @@
           "maximum": 1
         }
       },
-      "required": ["match", "margin"],
+      "required": [
+        "match",
+        "margin"
+      ],
       "additionalProperties": false
     },
     "sizes": {
@@ -375,13 +483,17 @@
           }
         }
       },
-      "required": ["standIn", "syntheticVoice"],
+      "required": [
+        "standIn",
+        "syntheticVoice"
+      ],
       "additionalProperties": false
     }
   },
   "required": [
     "packId",
     "farmId",
+    "farmSlug",
     "version",
     "mode",
     "createdAt",

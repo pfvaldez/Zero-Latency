@@ -115,6 +115,61 @@ describe("fillTemplate", () => {
   });
 });
 
+describe("smsSize: multipart limits are 153 (GSM-7) and 67 (UCS-2), not 160 and 70", () => {
+  const gsm = (n: number) => smsSize("a".repeat(n));
+  const ucs = (n: number) => smsSize(`${"a".repeat(n - 1)}ë`);
+
+  it("GSM-7: 160 is one part, 161 is two", () => {
+    expect(gsm(160).segments).toBe(1);
+    expect(gsm(161).segments).toBe(2);
+  });
+
+  it("GSM-7: two parts hold 153 x 2 = 306, not 320", () => {
+    expect(gsm(306).segments).toBe(2);
+    expect(gsm(307).segments).toBe(3);
+    expect(gsm(320).segments).toBe(3);
+  });
+
+  it("GSM-7: three parts hold 459", () => {
+    expect(gsm(459).segments).toBe(3);
+    expect(gsm(460).segments).toBe(4);
+  });
+
+  it("UCS-2: 70 is one part, 71 is two", () => {
+    expect(ucs(70).segments).toBe(1);
+    expect(ucs(71).segments).toBe(2);
+  });
+
+  it("UCS-2: two parts hold 67 x 2 = 134, not 140", () => {
+    expect(ucs(134).segments).toBe(2);
+    expect(ucs(135).segments).toBe(3);
+    expect(ucs(140).segments).toBe(3);
+  });
+
+  it("UCS-2: three parts hold 201", () => {
+    expect(ucs(201).segments).toBe(3);
+    expect(ucs(202).segments).toBe(4);
+  });
+
+  it("never splits a GSM-7 escape pair across parts", () => {
+    // 152 + € (2) + 152 = 306 septets: ceil(306 / 153) is 2, but the € cannot straddle the
+    // first part, so a third part is needed.
+    const text = `${"a".repeat(152)}€${"a".repeat(152)}`;
+    expect(smsSize(text)).toMatchObject({ encoding: "gsm7", length: 306, segments: 3 });
+  });
+
+  it("never splits an emoji across UCS-2 parts", () => {
+    const text = `${"a".repeat(66)}😀${"a".repeat(66)}`;
+    expect(smsSize(text)).toMatchObject({ encoding: "ucs2", length: 134, segments: 3 });
+  });
+
+  it("fillTemplate throws above two parts using the multipart limits", () => {
+    expect(fillTemplate("a".repeat(306), COUNTS, LABELS).segments).toBe(2);
+    expect(() => fillTemplate("a".repeat(307), COUNTS, LABELS)).toThrow(/3 SMS segments/);
+    expect(() => fillTemplate(`${"a".repeat(134)}ë`, COUNTS, LABELS)).toThrow(/3 SMS segments/);
+  });
+});
+
 describe("smsSize", () => {
   it("returns zero segments for an empty text", () => {
     expect(smsSize("")).toEqual({ encoding: "gsm7", length: 0, segments: 0 });
