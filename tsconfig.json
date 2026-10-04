@@ -5,6 +5,7 @@
     { "path": "./packages/core/scripts" },
     { "path": "./packages/pack" },
     { "path": "./content" },
-    { "path": "./apps/web" }
+    { "path": "./apps/web" },
+    { "path": "./apps/coop" }
   ]
 }
