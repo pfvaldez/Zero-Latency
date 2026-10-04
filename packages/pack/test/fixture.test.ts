@@ -1,3 +1,4 @@
+import { execFileSync } from "node:child_process";
 import { cp, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -6,15 +7,13 @@ import { describe, expect, it } from "vitest";
 import { verifyPack } from "../src/build.ts";
 import { FIXTURE_DIR } from "../src/fixture.ts";
 
-const files = async (dir: string, base = dir): Promise<string[]> => {
-  const out: string[] = [];
-  for (const e of await readdir(dir, { withFileTypes: true })) {
-    const full = join(dir, e.name);
-    if (e.isDirectory()) out.push(...(await files(full, base)));
-    else out.push(full.slice(base.length + 1));
-  }
-  return out.sort();
-};
+// The files git tracks in the fixture folder. A developer may stage the model there to run the
+// offline e2e (it is gitignored); that must not count as committed.
+const committed = (): string[] =>
+  execFileSync("git", ["ls-files", "--", "."], { cwd: FIXTURE_DIR, encoding: "utf8" })
+    .split("\n")
+    .filter(Boolean)
+    .sort();
 
 describe("the committed fixture pack", () => {
   it("validates against the core schema, with every file's size and sha256 matching", async () => {
@@ -31,8 +30,7 @@ describe("the committed fixture pack", () => {
   });
 
   it("holds no model files (135 MB) and stays small", async () => {
-    const listed = await files(FIXTURE_DIR);
-    expect(listed.some((f) => f.startsWith("model/"))).toBe(false);
+    expect(committed().some((f) => f.startsWith("model/"))).toBe(false);
     const manifest = await verifyPack(FIXTURE_DIR, { requireModel: false });
     expect(Object.values(manifest.sizes).reduce((a, b) => a + b, 0)).toBeLessThan(500_000);
     expect(manifest.model.sizeBytes).toBeGreaterThan(100e6); // still records the model it was embedded with
@@ -40,7 +38,7 @@ describe("the committed fixture pack", () => {
 
   it("has no stray files: everything on disk is in the manifest, and the other way round", async () => {
     const manifest = await verifyPack(FIXTURE_DIR, { requireModel: false });
-    expect((await files(FIXTURE_DIR)).filter((f) => f !== "manifest.json")).toEqual(
+    expect(committed().filter((f) => f !== "manifest.json")).toEqual(
       Object.keys(manifest.checksums).sort(),
     );
   });

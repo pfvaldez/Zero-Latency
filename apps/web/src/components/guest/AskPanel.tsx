@@ -36,7 +36,10 @@ export function AskPanel({
     matcher
       .ready()
       .then(() => live && setReady(true))
-      .catch(() => live && setView({ step: "error" }));
+      .catch((e: unknown) => {
+        console.error("the matcher did not start", e);
+        if (live) setView({ step: "error" });
+      });
     return () => {
       live = false;
     };

@@ -42,7 +42,8 @@ async function init(req: Extract<WorkerRequest, { type: "init" }>) {
   // modelDir is "model/multilingual-e5-small": its parent folder is the model root.
   const parent = req.modelDir.split("/").slice(0, -1).join("/");
   const name = req.modelDir.split("/").at(-1) ?? "";
-  env.localModelPath = `${origin}${req.base}/${parent}/`;
+  // A path, not a full URL: Transformers.js only treats a non-URL path as a local model folder.
+  env.localModelPath = `${req.base}/${parent}/`;
   const wasm = (env.backends.onnx as { wasm?: Record<string, unknown> }).wasm;
   if (wasm) {
     wasm.numThreads = 1;
@@ -76,7 +77,7 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
     post({
       type: "error",
       ...(req.type === "match" ? { id: req.id } : {}),
-      message: e instanceof Error ? e.message : String(e),
+      message: e instanceof Error ? `${e.message}\n${e.stack}` : String(e),
     }),
   );
 };
