@@ -85,13 +85,15 @@ The brief's workflow we name in the video: **learning from visitor feedback**. T
 |---|---|
 | Package manager and scripts | Bun 1.3.x (`bun install`, `bun run`, `bunx`). Never npm, yarn or pnpm. |
 | Tooling runtime | Node.js 24 LTS. Node 16 is end-of-life and must not be used. |
-| Frontend | React 19.2, TypeScript strict, Vite, Tailwind CSS v4, Animate UI (shadcn CLI, Motion), GSAP 3 for the one signature timeline, Zustand, Dexie, vite-plugin-pwa, qr-scanner, TanStack Query (coop pages only) |
+| Frontend | React 19.3, TypeScript strict, Vite, Tailwind CSS v4, Animate UI (shadcn CLI, Motion), GSAP 3 for the one signature timeline, Zustand, Dexie, vite-plugin-pwa, qr-scanner, TanStack Query (coop pages only) |
 | On-device AI | multilingual-e5-small (ONNX, int8) through Transformers.js in a Web Worker, loaded from local pack files only |
 | Backend | Supabase: Postgres with RLS, Edge Functions (Deno), Auth for cooperative staff, pg_cron |
 | Cloud AI, cooperative side only | Groq with strict JSON schema output and a fixed theme enum |
 | Build-time AI | Meta MMS (speech-to-text and forced alignment), NLLB-200 distilled 600M (draft subtitles), ElevenLabs (narrator audio from checked text) |
 | Pipeline | Python 3.12 with uv |
 | Quality | Biome, Vitest, Testing Library, Playwright (including offline), pytest |
+
+**Bun version:** everyone uses exactly Bun 1.3.10 (the `packageManager` field in the root `package.json`, which CI also reads). Don't run `bun upgrade`: Bun 1.4 changes the lockfile format, so one teammate on 1.4 breaks `--frozen-lockfile` for everyone.
 
 ## Commands
 
@@ -130,7 +132,7 @@ The brief's workflow we name in the video: **learning from visitor feedback**. T
 - **Bee (captain):** pipeline, `packages/core`, matcher worker, Supabase functions, evaluation numbers. Final calls.
 - **Pablo (Philippines, 12 hours ahead of ET):** guest PWA, PWA offline behavior, cooperative dashboard UI, video editing. Covers the US-night shift.
 - **Preet:** content (scripts, add-ons, checks, test questions), data card, responsible-AI section, problem evidence, presents the video, submits.
-- Submit by 8:00 AM ET on October 4 (hard deadline 9:00 AM ET). Feature freeze at 4:00 AM ET.
+- Submit by 8:00 AM ET on October 4 (hard deadline 9:00 AM ET). Feature freeze at 4:30 AM ET.
 
 ## What the judges score (World Bank brief, section 09)
 
