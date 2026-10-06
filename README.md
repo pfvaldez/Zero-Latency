@@ -151,7 +151,7 @@ tasks           build plan, lessons and team tasks
  
 - **Bhagyasri Uddandam**, AI and data
 - **Pablo Valdez**: app and backend
-- **Preet Patel**: content, research and the video
+- **Preet Patel**: content, tech, research and the video
 ## Licenses and credits
  
 - multilingual-e5-small is MIT licensed. NLLB-200 and MMS are CC-BY-NC 4.0, so they're limited to non-commercial use, and a commercial rollout would need other models or licenses.
